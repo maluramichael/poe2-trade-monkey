@@ -4,7 +4,9 @@ import type { KeyValueStorage } from '../core/storage';
 import type { Store } from '../core/store';
 import type { PageBridge } from '../site/bridge/client';
 import type { ResultsObserver } from '../site/results';
+import type { TradeData } from '../site/tradeData';
 import type { TradeLocation } from '../site/tradeLocation';
+import type { CurrentSearch } from './currentSearch';
 import type { LeagueService } from './leagues';
 import type { Settings } from './settings';
 import type { Toaster } from './toaster';
@@ -18,8 +20,17 @@ export interface AppContext {
   settings: Store<Settings>;
   /** Current trade URL, `null` on non-search pages (history, settings, about). */
   location: Store<TradeLocation | null>;
+  /** The search on screen (location + query + sort), `null` without a search id. */
+  currentSearch: Store<CurrentSearch | null>;
   leagues: LeagueService;
+  /**
+   * User-given names of searches by search id. Written by the bookmarks feature, read by others
+   * (tab title, history) so they show "My helmet" instead of a generated title.
+   */
+  searchNames: Store<Record<string, string>>;
   results: ResultsObserver;
+  /** Stat texts, currencies and filter labels from the public data endpoints. */
+  data: TradeData;
   toast: Toaster;
 }
 

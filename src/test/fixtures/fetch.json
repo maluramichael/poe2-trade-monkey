@@ -1,0 +1,930 @@
+{
+ "result": [
+  {
+   "id": "9396b25f6f7f02824d1c16fecec915ef2b90720163b248bcdbe373fe2cc80bd3",
+   "listing": {
+    "method": "psapi",
+    "indexed": "2026-03-18T21:30:48Z",
+    "stash": {
+     "name": "~price 1 exalted",
+     "x": 6,
+     "y": 2
+    },
+    "price": {
+     "type": "~price",
+     "amount": 1,
+     "currency": "exalted"
+    },
+    "account": {
+     "name": "Seller1#0001",
+     "online": {
+      "league": "Standard"
+     },
+     "lastCharacterName": "Character2",
+     "language": "ru_RU",
+     "realm": "poe2"
+    },
+    "whisper": "@Character2 Здравствуйте, хочу купить у вас Колючий фермуар Золотой амулет за 1 exalted в лиге Standard (секция \"~price 1 exalted\"; позиция: 7 столбец, 3 ряд)"
+   },
+   "item": {
+    "realm": "poe2",
+    "verified": true,
+    "w": 1,
+    "h": 1,
+    "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+    "league": "Standard",
+    "id": "9396b25f6f7f02824d1c16fecec915ef2b90720163b248bcdbe373fe2cc80bd3",
+    "name": "Bramble Locket",
+    "typeLine": "Gold Amulet",
+    "baseType": "Gold Amulet",
+    "rarity": "Rare",
+    "ilvl": 80,
+    "identified": true,
+    "properties": [
+     {
+      "name": "Amulet",
+      "values": [],
+      "displayMode": 0,
+      "type": 109
+     }
+    ],
+    "requirements": [
+     {
+      "name": "Level",
+      "values": [
+       [
+        "56",
+        0
+       ]
+      ],
+      "displayMode": 0,
+      "type": 62
+     }
+    ],
+    "implicitMods": [
+     {
+      "description": "17% increased [ItemRarity|Rarity of Items] found",
+      "domain": "implicit",
+      "hash": "stat.implicit.stat_3917489142",
+      "mods": [
+       {
+        "level": 44,
+        "magnitudes": [
+         {
+          "min": "12",
+          "max": "20"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "explicitMods": [
+     {
+      "description": "22% increased [Armour]",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_2866361420",
+      "mods": [
+       {
+        "name": "Lobstered",
+        "tier": "P5",
+        "level": 33,
+        "magnitudes": [
+         {
+          "min": "21",
+          "max": "26"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": "44% increased maximum [EnergyShield|Energy Shield]",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_2482852589",
+      "mods": [
+       {
+        "name": "Indomitable",
+        "tier": "P2",
+        "level": 65,
+        "magnitudes": [
+         {
+          "min": "39",
+          "max": "44"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": "+89 to maximum Life",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_3299347043",
+      "mods": [
+       {
+        "name": "Rotund",
+        "tier": "P3",
+        "level": 46,
+        "magnitudes": [
+         {
+          "min": "85",
+          "max": "99"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": "21% increased [ItemRarity|Rarity of Items] found",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_3917489142",
+      "mods": [
+       {
+        "name": "of Excavation",
+        "tier": "S0",
+        "level": 63,
+        "magnitudes": [
+         {
+          "min": "19",
+          "max": "21"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": "+40% to [Resistances|Lightning Resistance]",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_1671376347",
+      "mods": [
+       {
+        "name": "of the Lightning",
+        "tier": "S2",
+        "level": 71,
+        "magnitudes": [
+         {
+          "min": "36",
+          "max": "40"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": "11% increased Mana Regeneration Rate",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_789117908",
+      "mods": [
+       {
+        "name": "of Excitement",
+        "tier": "S6",
+        "magnitudes": [
+         {
+          "min": "10",
+          "max": "19"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "frameType": 2,
+    "frameTypeId": "Rare",
+    "extended": {
+     "hashes": {
+      "explicit": [
+       [
+        "explicit.stat_2866361420",
+        [
+         4
+        ]
+       ],
+       [
+        "explicit.stat_2482852589",
+        [
+         5
+        ]
+       ],
+       [
+        "explicit.stat_3299347043",
+        [
+         1
+        ]
+       ],
+       [
+        "explicit.stat_3917489142",
+        [
+         2
+        ]
+       ],
+       [
+        "explicit.stat_1671376347",
+        [
+         0
+        ]
+       ],
+       [
+        "explicit.stat_789117908",
+        [
+         3
+        ]
+       ]
+      ],
+      "implicit": [
+       [
+        "implicit.stat_3917489142",
+        [
+         0
+        ]
+       ]
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "8e261082b3ed7d400c78f41fa2d1416fdef0d05b97b555789d236f807bfe3b32",
+   "listing": {
+    "method": "psapi",
+    "indexed": "2025-01-22T20:06:53Z",
+    "stash": {
+     "name": "shop",
+     "x": 9,
+     "y": 0
+    },
+    "price": {
+     "type": "~price",
+     "amount": 3,
+     "currency": "exalted"
+    },
+    "account": {
+     "name": "Seller3#0003",
+     "online": {
+      "league": "Standard"
+     },
+     "lastCharacterName": "Character4",
+     "language": "ru_RU",
+     "realm": "poe2"
+    },
+    "whisper": "@Character4 Здравствуйте, хочу купить у вас Колючий шнурок Золотой амулет за 3 exalted в лиге Standard (секция \"shop\"; позиция: 10 столбец, 1 ряд)"
+   },
+   "item": {
+    "realm": "poe2",
+    "verified": true,
+    "w": 1,
+    "h": 1,
+    "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+    "league": "Standard",
+    "id": "8e261082b3ed7d400c78f41fa2d1416fdef0d05b97b555789d236f807bfe3b32",
+    "name": "Bramble Braid",
+    "typeLine": "Gold Amulet",
+    "baseType": "Gold Amulet",
+    "rarity": "Rare",
+    "ilvl": 68,
+    "identified": true,
+    "note": "~price 3 exalted",
+    "properties": [
+     {
+      "name": "Amulet",
+      "values": [],
+      "displayMode": 0,
+      "type": 109
+     }
+    ],
+    "requirements": [
+     {
+      "name": "Level",
+      "values": [
+       [
+        "36",
+        0
+       ]
+      ],
+      "displayMode": 0,
+      "type": 62
+     }
+    ],
+    "implicitMods": [
+     {
+      "description": "15% increased [ItemRarity|Rarity of Items] found",
+      "domain": "implicit",
+      "hash": "stat.implicit.stat_3917489142",
+      "mods": [
+       {
+        "level": 44,
+        "magnitudes": [
+         {
+          "min": "12",
+          "max": "20"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "explicitMods": [
+     {
+      "description": "25% increased maximum [EnergyShield|Energy Shield]",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_2482852589",
+      "mods": [
+       {
+        "name": "Resolute",
+        "tier": "P5",
+        "level": 33,
+        "magnitudes": [
+         {
+          "min": "21",
+          "max": "26"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": "+38 to maximum Life",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_3299347043",
+      "mods": [
+       {
+        "name": "Sanguine",
+        "tier": "P7",
+        "level": 16,
+        "magnitudes": [
+         {
+          "min": "30",
+          "max": "39"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": "+43 to [Spirit|Spirit]",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_3981240776",
+      "mods": [
+       {
+        "name": "Marchioness'",
+        "tier": "P2",
+        "level": 46,
+        "magnitudes": [
+         {
+          "min": "43",
+          "max": "46"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": "+16 to [Strength|Strength]",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_4080418644",
+      "mods": [
+       {
+        "name": "of the Bear",
+        "tier": "S6",
+        "level": 22,
+        "magnitudes": [
+         {
+          "min": "13",
+          "max": "16"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": "+18% to [Resistances|Fire Resistance]",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_3372524247",
+      "mods": [
+       {
+        "name": "of the Drake",
+        "tier": "S6",
+        "level": 24,
+        "magnitudes": [
+         {
+          "min": "16",
+          "max": "20"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": "7.9 Life Regeneration per second",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_3325883026",
+      "mods": [
+       {
+        "name": "of the Hydra",
+        "tier": "S6",
+        "level": 26,
+        "magnitudes": [
+         {
+          "min": "6.1",
+          "max": "9"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "frameType": 2,
+    "frameTypeId": "Rare",
+    "extended": {
+     "hashes": {
+      "explicit": [
+       [
+        "explicit.stat_2482852589",
+        [
+         5
+        ]
+       ],
+       [
+        "explicit.stat_3299347043",
+        [
+         1
+        ]
+       ],
+       [
+        "explicit.stat_3981240776",
+        [
+         3
+        ]
+       ],
+       [
+        "explicit.stat_4080418644",
+        [
+         2
+        ]
+       ],
+       [
+        "explicit.stat_3372524247",
+        [
+         0
+        ]
+       ],
+       [
+        "explicit.stat_3325883026",
+        [
+         4
+        ]
+       ]
+      ],
+      "implicit": [
+       [
+        "implicit.stat_3917489142",
+        [
+         0
+        ]
+       ]
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "bdb8cfc66295c6f8ffe0410fe31ac7cf43b2282201e7bb20e61bb787e84d2ab1",
+   "listing": {
+    "method": "psapi",
+    "indexed": "2025-07-29T16:09:39Z",
+    "stash": {
+     "name": "For Sale 4",
+     "x": 9,
+     "y": 18
+    },
+    "price": {
+     "type": "~price",
+     "amount": 5,
+     "currency": "exalted"
+    },
+    "account": {
+     "name": "Seller7#0007",
+     "online": {
+      "league": "Standard"
+     },
+     "lastCharacterName": "Character8",
+     "language": "en_US",
+     "realm": "poe2"
+    },
+    "whisper": "@Character8 Hi, I would like to buy your Skull Medallion Gold Amulet listed for 5 exalted in Standard (stash tab \"For Sale 4\"; position: left 10, top 19)"
+   },
+   "item": {
+    "realm": "poe2",
+    "verified": true,
+    "w": 1,
+    "h": 1,
+    "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+    "league": "Standard",
+    "id": "bdb8cfc66295c6f8ffe0410fe31ac7cf43b2282201e7bb20e61bb787e84d2ab1",
+    "name": "Skull Medallion",
+    "typeLine": "Gold Amulet",
+    "baseType": "Gold Amulet",
+    "rarity": "Rare",
+    "ilvl": 80,
+    "identified": true,
+    "note": "~price 5 exalted",
+    "properties": [
+     {
+      "name": "Amulet",
+      "values": [],
+      "displayMode": 0,
+      "type": 109
+     }
+    ],
+    "requirements": [
+     {
+      "name": "Level",
+      "values": [
+       [
+        "60",
+        0
+       ]
+      ],
+      "displayMode": 0,
+      "type": 62
+     }
+    ],
+    "implicitMods": [
+     {
+      "description": "16% increased [ItemRarity|Rarity of Items] found",
+      "domain": "implicit",
+      "hash": "stat.implicit.stat_3917489142",
+      "mods": [
+       {
+        "level": 44,
+        "magnitudes": [
+         {
+          "min": "12",
+          "max": "20"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "explicitMods": [
+     {
+      "description": "+217 to [Accuracy|Accuracy] Rating",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_803737631",
+      "mods": [
+       {
+        "name": "Steady",
+        "tier": "P3",
+        "level": 48,
+        "magnitudes": [
+         {
+          "min": "168",
+          "max": "236"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": "47% increased maximum [EnergyShield|Energy Shield]",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_2482852589",
+      "mods": [
+       {
+        "name": "Unassailable",
+        "tier": "P1",
+        "level": 75,
+        "magnitudes": [
+         {
+          "min": "45",
+          "max": "50"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": "+69 to maximum Life",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_3299347043",
+      "mods": [
+       {
+        "name": "Stout",
+        "tier": "P5",
+        "level": 33,
+        "magnitudes": [
+         {
+          "min": "60",
+          "max": "69"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": "19% increased [ItemRarity|Rarity of Items] found",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_3917489142",
+      "mods": [
+       {
+        "name": "of Archaeology",
+        "tier": "S1",
+        "level": 40,
+        "magnitudes": [
+         {
+          "min": "15",
+          "max": "18"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": "+32 to [Strength|Strength]",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_4080418644",
+      "mods": [
+       {
+        "name": "of the Titan",
+        "tier": "S1",
+        "level": 74,
+        "magnitudes": [
+         {
+          "min": "31",
+          "max": "33"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": "6.6 Life Regeneration per second",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_3325883026",
+      "mods": [
+       {
+        "name": "of the Hydra",
+        "tier": "S6",
+        "level": 26,
+        "magnitudes": [
+         {
+          "min": "6.1",
+          "max": "9"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "frameType": 2,
+    "frameTypeId": "Rare",
+    "extended": {
+     "hashes": {
+      "explicit": [
+       [
+        "explicit.stat_803737631",
+        [
+         1
+        ]
+       ],
+       [
+        "explicit.stat_2482852589",
+        [
+         4
+        ]
+       ],
+       [
+        "explicit.stat_3299347043",
+        [
+         3
+        ]
+       ],
+       [
+        "explicit.stat_3917489142",
+        [
+         0
+        ]
+       ],
+       [
+        "explicit.stat_4080418644",
+        [
+         2
+        ]
+       ],
+       [
+        "explicit.stat_3325883026",
+        [
+         5
+        ]
+       ]
+      ],
+      "implicit": [
+       [
+        "implicit.stat_3917489142",
+        [
+         0
+        ]
+       ]
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "7120929a03ac1f055d95c3aa8d9595474e837cb3e74b76dfd5ebb4820de9fd2e",
+   "listing": {
+    "method": "psapi",
+    "indexed": "2025-02-11T22:16:04Z",
+    "stash": {
+     "name": "5 Хлам",
+     "x": 0,
+     "y": 7
+    },
+    "price": {
+     "type": "~price",
+     "amount": 5,
+     "currency": "exalted"
+    },
+    "account": {
+     "name": "Seller11#00011",
+     "online": {
+      "league": "Standard"
+     },
+     "lastCharacterName": "Character12",
+     "language": "ru_RU",
+     "realm": "poe2"
+    },
+    "whisper": "@Character12 Здравствуйте, хочу купить у вас Катастрофические бусы Золотой амулет за 5 exalted в лиге Standard (секция \"5 Хлам\"; позиция: 1 столбец, 8 ряд)"
+   },
+   "item": {
+    "realm": "poe2",
+    "verified": true,
+    "w": 1,
+    "h": 1,
+    "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvR29sZEFtdWxldCIsInciOjEsImgiOjEsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/7da5b5dc6e/GoldAmulet.png",
+    "league": "Standard",
+    "id": "7120929a03ac1f055d95c3aa8d9595474e837cb3e74b76dfd5ebb4820de9fd2e",
+    "name": "Cataclysm Beads",
+    "typeLine": "Gold Amulet",
+    "baseType": "Gold Amulet",
+    "rarity": "Rare",
+    "ilvl": 80,
+    "identified": true,
+    "note": "~price 5 exalted",
+    "properties": [
+     {
+      "name": "Amulet",
+      "values": [],
+      "displayMode": 0,
+      "type": 109
+     }
+    ],
+    "requirements": [
+     {
+      "name": "Level",
+      "values": [
+       [
+        "36",
+        0
+       ]
+      ],
+      "displayMode": 0,
+      "type": 62
+     }
+    ],
+    "implicitMods": [
+     {
+      "description": "19% increased [ItemRarity|Rarity of Items] found",
+      "domain": "implicit",
+      "hash": "stat.implicit.stat_3917489142",
+      "mods": [
+       {
+        "level": 44,
+        "magnitudes": [
+         {
+          "min": "12",
+          "max": "20"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "explicitMods": [
+     {
+      "description": "31% increased maximum [EnergyShield|Energy Shield]",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_2482852589",
+      "mods": [
+       {
+        "name": "Fearless",
+        "tier": "P4",
+        "level": 46,
+        "magnitudes": [
+         {
+          "min": "27",
+          "max": "32"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": "+35 to maximum Life",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_3299347043",
+      "mods": [
+       {
+        "name": "Sanguine",
+        "tier": "P7",
+        "level": 16,
+        "magnitudes": [
+         {
+          "min": "30",
+          "max": "39"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": "+63 to maximum Mana",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_1050105434",
+      "mods": [
+       {
+        "name": "Cerulean",
+        "tier": "P9",
+        "level": 33,
+        "magnitudes": [
+         {
+          "min": "55",
+          "max": "64"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": "12.3 Life Regeneration per second",
+      "domain": "explicit",
+      "hash": "stat.explicit.stat_3325883026",
+      "mods": [
+       {
+        "name": "of the Troll",
+        "tier": "S5",
+        "level": 35,
+        "magnitudes": [
+         {
+          "min": "9.1",
+          "max": "13"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "frameType": 2,
+    "frameTypeId": "Rare",
+    "extended": {
+     "hashes": {
+      "explicit": [
+       [
+        "explicit.stat_2482852589",
+        [
+         0
+        ]
+       ],
+       [
+        "explicit.stat_3299347043",
+        [
+         3
+        ]
+       ],
+       [
+        "explicit.stat_1050105434",
+        [
+         1
+        ]
+       ],
+       [
+        "explicit.stat_3325883026",
+        [
+         2
+        ]
+       ]
+      ],
+      "implicit": [
+       [
+        "implicit.stat_3917489142",
+        [
+         0
+        ]
+       ]
+      ]
+     }
+    }
+   }
+  }
+ ]
+}

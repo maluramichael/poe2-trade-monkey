@@ -1,0 +1,97 @@
+{
+ "result": [
+  {
+   "id": "pseudo",
+   "label": "Pseudo",
+   "entries": [
+    {
+     "id": "pseudo.pseudo_total_elemental_resistance",
+     "text": "+#% total Elemental Resistance",
+     "type": "pseudo"
+    },
+    {
+     "id": "pseudo.pseudo_total_life",
+     "text": "+# total maximum Life",
+     "type": "pseudo"
+    }
+   ]
+  },
+  {
+   "id": "explicit",
+   "label": "Explicit",
+   "entries": [
+    {
+     "id": "explicit.stat_1050105434",
+     "text": "# to maximum Mana",
+     "type": "explicit"
+    },
+    {
+     "id": "explicit.stat_3299347043",
+     "text": "# to maximum Life",
+     "type": "explicit"
+    },
+    {
+     "id": "explicit.stat_3372524247",
+     "text": "#% to Fire Resistance",
+     "type": "explicit"
+    },
+    {
+     "id": "explicit.stat_1671376347",
+     "text": "#% to Lightning Resistance",
+     "type": "explicit"
+    },
+    {
+     "id": "explicit.stat_3917489142",
+     "text": "#% increased Rarity of Items found",
+     "type": "explicit"
+    },
+    {
+     "id": "explicit.stat_4080418644",
+     "text": "# to Strength",
+     "type": "explicit"
+    },
+    {
+     "id": "explicit.stat_789117908",
+     "text": "#% increased Mana Regeneration Rate",
+     "type": "explicit"
+    },
+    {
+     "id": "explicit.stat_3325883026",
+     "text": "# Life Regeneration per second",
+     "type": "explicit"
+    },
+    {
+     "id": "explicit.stat_803737631",
+     "text": "# to Accuracy Rating",
+     "type": "explicit"
+    },
+    {
+     "id": "explicit.stat_3981240776",
+     "text": "# to Spirit",
+     "type": "explicit"
+    },
+    {
+     "id": "explicit.stat_2482852589",
+     "text": "#% increased maximum Energy Shield",
+     "type": "explicit"
+    },
+    {
+     "id": "explicit.stat_2866361420",
+     "text": "#% increased Armour",
+     "type": "explicit"
+    }
+   ]
+  },
+  {
+   "id": "implicit",
+   "label": "Implicit",
+   "entries": [
+    {
+     "id": "implicit.stat_3917489142",
+     "text": "#% increased Rarity of Items found",
+     "type": "implicit"
+    }
+   ]
+  }
+ ]
+}

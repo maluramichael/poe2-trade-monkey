@@ -1,6 +1,7 @@
-/* Shared UI shell. Tokens and components follow DESIGN.md. Everything is scoped to #ptm-root. */
+/* Shared UI shell. Tokens and components follow DESIGN.md. Components are scoped to #ptm-root. */
 
-#ptm-root {
+/* Tokens live on :root so feature styles inside the trade page can use them too. */
+:root {
   --ptm-sidebar-width: 400px;
   --ptm-bg: rgba(10, 10, 10, 0.88);
   --ptm-surface: #161616;
@@ -26,7 +27,9 @@
   --ptm-menu-border: #7a7a7a;
   --ptm-font-title: FontinSmallCaps, FontinSmallcaps, Verdana, Arial, sans-serif;
   --ptm-font-body: Verdana, Arial, Helvetica, sans-serif;
+}
 
+#ptm-root {
   font-family: var(--ptm-font-body);
   font-size: 13px;
   color: var(--ptm-text);

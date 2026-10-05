@@ -1,9 +1,11 @@
 import { render } from 'preact';
 import type { AppContext } from './app/context';
+import { trackCurrentSearch } from './app/currentSearch';
 import { FeatureHost } from './app/featureHost';
 import { LeagueService } from './app/leagues';
 import { loadSettings, type Settings } from './app/settings';
 import { createToaster } from './app/toaster';
+import { Store } from './core/store';
 import { detectLocale, setLocale } from './core/i18n';
 import { log } from './core/log';
 import { GmStorage } from './core/storage';
@@ -11,6 +13,7 @@ import { features } from './features';
 import { injectPageScript, PageBridge } from './site/bridge/client';
 import { trackLocation } from './site/location';
 import { ResultsObserver } from './site/results';
+import { TradeData } from './site/tradeData';
 import { App } from './ui/App';
 import coreCss from './ui/core.css';
 
@@ -46,8 +49,11 @@ async function boot(): Promise<void> {
     storage,
     settings,
     location,
+    currentSearch: trackCurrentSearch(location, bridge),
     leagues,
+    searchNames: new Store<Record<string, string>>({}),
     results: new ResultsObserver(bridge, document),
+    data: new TradeData(),
     toast: createToaster(),
   };
 
