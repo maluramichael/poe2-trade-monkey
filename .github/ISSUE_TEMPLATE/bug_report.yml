@@ -1,0 +1,26 @@
+name: Bug report
+description: Something on the trade site does not work as expected
+labels: [bug]
+body:
+  - type: textarea
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, what happened instead? A screenshot helps a lot.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Trade site URL
+      description: The search URL where it happens (https://www.pathofexile.com/trade2/search/poe2/...)
+  - type: input
+    attributes:
+      label: Script version
+      description: Shown in your userscript manager, e.g. 0.2.2
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Browser and userscript manager
+      description: e.g. Firefox 143 + Violentmonkey 2.31
+    validations:
+      required: true

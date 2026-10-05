@@ -2,7 +2,7 @@
 // @name            PoE2 Trade Monkey
 // @name:de         PoE2 Trade Monkey
 // @namespace       https://github.com/maluramichael/poe2-trade-monkey
-// @version         0.2.1
+// @version         0.2.2
 // @description     Userscript that enhances the Path of Exile 2 trade site: bookmarks, history, pins, layout and result tools.
 // @description:de  Erweitert die Trade-Seite von Path of Exile 2: Lesezeichen für jede Liga, Verlauf, Pins, Schnellfilter, Zwei-Spalten-Layout und Werkzeuge für die Ergebnisse.
 // @author          Michael Malura
@@ -10,6 +10,8 @@
 // @homepageURL     https://github.com/maluramichael/poe2-trade-monkey
 // @supportURL      https://github.com/maluramichael/poe2-trade-monkey/issues
 // @icon            https://raw.githubusercontent.com/maluramichael/poe2-trade-monkey/master/assets/icon.png
+// @compatible      firefox Violentmonkey, Tampermonkey
+// @compatible      chrome Tampermonkey, Violentmonkey (enable "Allow User Scripts")
 // @match           https://*.pathofexile.com/trade2*
 // @run-at          document-start
 // @grant           GM.getValue

@@ -21,6 +21,8 @@ const metadata = [
   ['homepageURL', 'https://github.com/maluramichael/poe2-trade-monkey'],
   ['supportURL', 'https://github.com/maluramichael/poe2-trade-monkey/issues'],
   ['icon', `${REPO_RAW}/assets/icon.png`],
+  ['compatible', 'firefox Violentmonkey, Tampermonkey'],
+  ['compatible', 'chrome Tampermonkey, Violentmonkey (enable "Allow User Scripts")'],
   ['match', 'https://*.pathofexile.com/trade2*'],
   ['run-at', 'document-start'],
   ['grant', 'GM.getValue'],

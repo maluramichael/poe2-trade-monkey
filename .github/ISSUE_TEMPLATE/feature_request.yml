@@ -1,0 +1,10 @@
+name: Feature request
+description: An idea for the trade site
+labels: [enhancement]
+body:
+  - type: textarea
+    attributes:
+      label: What do you want to do on the trade site?
+      description: Describe the task and what is annoying about it today. Note that the script never sends searches or whispers on its own (GGG rules).
+    validations:
+      required: true

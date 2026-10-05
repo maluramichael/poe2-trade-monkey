@@ -12,12 +12,30 @@ API that Tampermonkey and Greasemonkey 4 share, so those should work too.
 
 1. Install [Violentmonkey for Firefox](https://addons.mozilla.org/firefox/addon/violentmonkey/)
    (other browsers: see [violentmonkey.github.io](https://violentmonkey.github.io/get-it/)).
-2. Open
-   [poe2-trade-monkey.user.js](https://raw.githubusercontent.com/maluramichael/poe2-trade-monkey/master/dist/poe2-trade-monkey.user.js)
+2. Install the script from
+   [Greasy Fork](https://greasyfork.org/en/scripts/598884-poe2-trade-monkey) or directly from
+   [GitHub](https://raw.githubusercontent.com/maluramichael/poe2-trade-monkey/master/dist/poe2-trade-monkey.user.js)
    and confirm the install dialog.
 3. Open the trade site. The sidebar appears on the right.
 
 Updates install automatically.
+
+**Chrome, Edge and other Chromium browsers:** since Chrome 138, userscript managers only run
+scripts after you allow it. Open `chrome://extensions`, click "Details" on Tampermonkey or
+Violentmonkey and turn on "Allow User Scripts" (older versions: turn on Developer mode at the top
+right). See the [Tampermonkey FAQ](https://www.tampermonkey.net/faq.php?q=Q209).
+
+## Coming from Better Trading?
+
+Your bookmarks come with you. Two ways:
+
+- **Backup file:** export a backup in Better Trading. In Trade Monkey, open the Bookmarks tab and
+  click "Load backup" at the bottom. Folders, icons and archived folders are kept.
+- **Single folders:** copy a folder's share code in Better Trading and paste it into "Import
+  folder".
+
+After that, every saved search opens in the league you are playing now. "Check in current league"
+in a bookmark's menu tells you if one of its stats no longer exists.
 
 How it came together: [blog post on malura.de](https://malura.de/en/blog/poe2-trade-monkey-the-chrome-trade-extensions-as-a-userscript-for-firefox)
 ([Deutsch](https://malura.de/blog/poe2-trade-monkey)).
