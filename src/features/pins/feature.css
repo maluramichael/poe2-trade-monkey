@@ -22,16 +22,22 @@
 }
 
 .ptm-pin {
+  min-width: 0;
   border: 1px solid var(--ptm-blue-line);
   background: #000;
 }
 
+/* The site sizes item cards for the result list; in the 380px sidebar they must shrink. */
 .ptm-pin__item {
   display: flex;
   justify-content: center;
+  overflow: hidden;
 }
 
 .ptm-pin__item .item-popup {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   margin: 0;
 }
 
@@ -60,12 +66,5 @@
 }
 
 .ptm-pin__actions {
-  display: flex;
-  gap: 5px;
   padding: 8px 10px 10px;
-}
-
-.ptm-pin__actions .ptm-btn {
-  flex: 1 1 auto;
-  margin-left: 0;
 }

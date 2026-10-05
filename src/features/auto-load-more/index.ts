@@ -37,36 +37,57 @@ export function autoLoadMore(
     button.click();
   };
 
-  const io = new Observer(
-    (entries) => {
-      const entry = entries.find((e) => e.target === watched);
-      if (!entry) return;
-      inView = entry.isIntersecting;
-      tryLoad();
-    },
-    { rootMargin: '480px' },
-  );
+  let io: IntersectionObserver | null = null;
+  let root: Element | null = null;
+
+  // The look-ahead margin only works on the element that actually scrolls: the window normally,
+  // the results column in the two-column layout. Rebuild the observer when that changes.
+  const observe = (button: Element | null, nextRoot: Element | null) => {
+    io?.disconnect();
+    root = nextRoot;
+    io = new Observer(
+      (entries) => {
+        const entry = entries.find((e) => e.target === watched);
+        if (!entry) return;
+        inView = entry.isIntersecting;
+        tryLoad();
+      },
+      { root, rootMargin: '480px' },
+    );
+    if (button) io.observe(button);
+  };
 
   // Vue re-renders the result list (new search, sort, load more), so follow the current button.
   const attach = () => {
     const button = doc.querySelector(sel.loadMoreButton);
-    if (button === watched) return;
-    if (watched) io.unobserve(watched);
+    const nextRoot = button ? scrollParent(button) : null;
+    if (button === watched && nextRoot === root && io) return;
     watched = button;
     inView = false;
-    if (button) io.observe(button);
+    observe(button, nextRoot);
   };
   const mutations = new MutationObserver(attach);
   mutations.observe(doc.body, { childList: true, subtree: true });
+  // The layout feature switches columns via classes on <html>.
+  mutations.observe(doc.documentElement, { attributes: true, attributeFilter: ['class'] });
   attach();
 
   return {
     dispose() {
       clearTimeout(retry);
       mutations.disconnect();
-      io.disconnect();
+      io?.disconnect();
     },
   };
+}
+
+/** Nearest ancestor that scrolls on its own, `null` for the window. */
+function scrollParent(element: Element): Element | null {
+  for (let node = element.parentElement; node && node !== element.ownerDocument.body; node = node.parentElement) {
+    const { overflowY } = getComputedStyle(node);
+    if (overflowY === 'auto' || overflowY === 'scroll') return node;
+  }
+  return null;
 }
 
 export const autoLoadMoreFeature: Feature = {

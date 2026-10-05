@@ -44,7 +44,22 @@ npm run test:e2e     # Playwright gegen Fixtures (offline)
 - Ergebnis-Mods: `.item-mod--explicit > [data-field="stat.explicit.stat_N"]`.
 - Seite hat keine CSP. Login und Cloudflare blocken automatisierte Browser.
 
-## Live testen
+## Offline testen (Standard)
+
+```bash
+npm run build && npm run test:e2e                         # 7 Flows gegen die nachgebaute Seite
+npm run build && PTM_SCREENS=1 npx playwright test e2e/screens.spec.ts
+```
+
+`e2e/fake-site.ts` baut die trade2-Seite aus den Fixtures nach (Fake-Vuex, echte API-Antworten).
+Die Screenshot-Spec lädt zusätzlich das echte Seiten-CSS vom CDN (web.poecdn.com, ohne Login und
+ohne Cloudflare) und legt Bilder unter `~/.claude/screenshots/pathofexile2trademonkey/offline/` ab.
+Design und Abläufe zuerst hier prüfen.
+
+## Live testen (sparsam)
+
+Zu viele Reloads in kurzer Zeit lösen eine Cloudflare-Prüfung aus, die immer länger dauert.
+Live nur gebündelt mit Checkliste, höchstens etwa 10 Seitenladungen pro Sitzung.
 
 Echtes Chrome mit eigenem Profil (Login bleibt erhalten), Playwright hängt sich per CDP an:
 

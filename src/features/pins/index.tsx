@@ -3,7 +3,7 @@ import { createTranslator } from '../../core/i18n';
 import type { AppContext } from '../../app/context';
 import type { ResultRow } from '../../site/results';
 import { sel } from '../../site/selectors';
-import { Button } from '../../ui/components/Button';
+import { Button, ButtonGroup } from '../../ui/components/Button';
 import { IconPin, IconTrash } from '../../ui/icons';
 import type { Feature } from '../types';
 import css from './feature.css';
@@ -133,7 +133,7 @@ function start(ctx: AppContext) {
     return (
       <div class="ptm-pins">
         <div class="ptm-toolbar">
-          <Button variant="gold" icon={<IconTrash />} onClick={() => pins.set([])}>
+          <Button variant="gold" size="sm" icon={<IconTrash />} onClick={() => pins.set([])}>
             {t('clear')}
           </Button>
         </div>
@@ -146,13 +146,14 @@ function start(ctx: AppContext) {
               {pin.indexed && ` · ${new Date(pin.indexed).toLocaleString()}`}
             </p>
             <div class="ptm-pin__actions">
-              {/* Plain button with kit classes: the kit's Button props do not accept `disabled`. */}
-              <button type="button" class="ptm-btn ptm-btn--blue" disabled={!findRow(pin.id)} onClick={() => scrollTo(pin.id)}>
-                <span>{t('scroll')}</span>
-              </button>
-              <Button variant="plain" onClick={() => pins.update((all) => all.filter((p) => p.id !== pin.id))}>
-                {t('remove')}
-              </Button>
+              <ButtonGroup block>
+                <Button size="sm" disabled={!findRow(pin.id)} onClick={() => scrollTo(pin.id)}>
+                  {t('scroll')}
+                </Button>
+                <Button variant="plain" size="sm" onClick={() => pins.update((all) => all.filter((p) => p.id !== pin.id))}>
+                  {t('remove')}
+                </Button>
+              </ButtonGroup>
             </div>
           </article>
         ))}

@@ -57,7 +57,7 @@ describe('price-equivalent feature', () => {
     expect(lines()).toHaveLength(2);
 
     const [first, second] = lines();
-    expect(first!.parentElement!.matches('.price')).toBe(true);
+    expect(first!.parentElement!.matches('[data-field="price"]')).toBe(true);
     expect(first!.textContent).toContain('≈ 2');
     expect(first!.querySelector('img')!.getAttribute('alt')).toBe('Divine Orb');
     expect(second!.textContent).toContain('≈ 1,031');

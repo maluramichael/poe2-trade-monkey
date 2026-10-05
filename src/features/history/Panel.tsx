@@ -60,6 +60,11 @@ export function historyPanel(entries: Store<HistoryEntry[]>, ctx: Pick<AppContex
 
     return (
       <div class="ptm-history">
+        <div class="ptm-toolbar">
+          <Button variant="gold" size="sm" icon={<IconTrash />} onClick={() => setConfirming(true)}>
+            {t('clear')}
+          </Button>
+        </div>
         <ul class="ptm-history__list">
           {list.map((entry) => {
             const href = (league: string) =>
@@ -85,9 +90,6 @@ export function historyPanel(entries: Store<HistoryEntry[]>, ctx: Pick<AppContex
             );
           })}
         </ul>
-        <Button variant="gold" block icon={<IconTrash />} onClick={() => setConfirming(true)}>
-          {t('clear')}
-        </Button>
         {confirming && (
           <ConfirmDialog
             title={t('clear')}

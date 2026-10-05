@@ -1,7 +1,11 @@
 .ptm-price-equivalent {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0 8px;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(163, 141, 109, 0.25);
   font-family: var(--ptm-font-title);
   font-size: 13px;
   color: var(--ptm-muted);

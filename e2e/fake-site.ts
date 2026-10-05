@@ -104,6 +104,11 @@ export async function setupFakeSite(context: BrowserContext): Promise<void> {
   await context.route('**/*', (route) => {
     const url = new URL(route.request().url());
     if (url.hostname === 'poe.ninja') return json(route, read('src/features/price-equivalent/ninja-overview.fixture.json'));
+    // Folder icons are served from this repository on GitHub; use the local copies.
+    const icon = /\/assets\/folder-icons\/([\w-]+\.png)$/.exec(url.pathname);
+    if (url.hostname === 'raw.githubusercontent.com' && icon) {
+      return route.fulfill({ status: 200, contentType: 'image/png', body: readFileSync(`assets/folder-icons/${icon[1]}`) });
+    }
     if (url.hostname !== 'www.pathofexile.com') return route.fulfill({ status: 404, body: '' });
     const data = DATA.exec(url.pathname);
     if (data) return json(route, fixture(`${data[1]}.json`));

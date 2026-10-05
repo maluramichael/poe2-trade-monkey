@@ -5,7 +5,10 @@ import { autoLoadMore, THROTTLE_MS } from './index';
 class FakeObserver {
   static last: FakeObserver;
   readonly targets = new Set<Element>();
-  constructor(readonly callback: IntersectionObserverCallback) {
+  constructor(
+    readonly callback: IntersectionObserverCallback,
+    readonly options: IntersectionObserverInit = {},
+  ) {
     FakeObserver.last = this;
   }
   observe(target: Element) {
@@ -49,17 +52,34 @@ describe('auto-load-more', () => {
     vi.advanceTimersByTime(THROTTLE_MS);
     expect(clicks).toBe(1);
 
-    // Vue renders a new button: it gets observed, the old one is dropped.
+    // Vue renders a new button: a fresh observer watches it, the old one is dropped.
     const next = render();
     next.addEventListener('click', () => clicks++);
-    await vi.waitFor(() => expect([...io.targets]).toEqual([next]));
-    io.fire(true);
+    await vi.waitFor(() => expect([...FakeObserver.last.targets]).toEqual([next]));
+    expect(io.targets.size).toBe(0);
+    const io2 = FakeObserver.last;
+    io2.fire(true);
     expect(clicks).toBe(2);
-    io.fire(true);
+    io2.fire(true);
     vi.advanceTimersByTime(THROTTLE_MS);
     expect(clicks).toBe(3);
 
     instance.dispose!();
-    expect(io.targets.size).toBe(0);
+    expect(io2.targets.size).toBe(0);
+  });
+
+  it('uses the scrolling results column as root in the two-column layout', async () => {
+    render();
+    const instance = autoLoadMore(createTestContext(), FakeObserver as unknown as typeof IntersectionObserver);
+    expect(FakeObserver.last.options.root ?? null).toBeNull();
+
+    const portal = document.querySelector('#vue3-portal') as HTMLElement;
+    portal.style.overflowY = 'auto';
+    document.documentElement.classList.add('ptm-layout-split');
+    await vi.waitFor(() => expect(FakeObserver.last.options.root).toBe(portal));
+    expect(FakeObserver.last.options.rootMargin).toBe('480px');
+
+    document.documentElement.classList.remove('ptm-layout-split');
+    instance.dispose!();
   });
 });

@@ -91,5 +91,6 @@ function render(doc: Document, row: ResultRow, rates: Rates, currencies: Map<str
     }
     line.append(span);
   }
-  target.append(line);
+  // Inside the site's grey price box, right under the asking price.
+  (target.querySelector(sel.row.priceField) ?? target).append(line);
 }
