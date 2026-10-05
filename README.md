@@ -12,7 +12,7 @@ the features of the popular Chrome trade extensions to every browser, Firefox fi
 Made for [Violentmonkey](https://violentmonkey.github.io/) in Firefox. It only uses the userscript
 API that Tampermonkey and Greasemonkey 4 share, so those should work too.
 
-![The trade site with quick filters and the bookmarks sidebar](docs/screenshots/overview.png)
+![Demo: add a mod as filter, quick filter, search, save it as a bookmark](docs/screenshots/demo.gif)
 
 ## Install
 

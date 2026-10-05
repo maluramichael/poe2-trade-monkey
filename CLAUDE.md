@@ -71,7 +71,9 @@ playwright-cli -s=poe attach --cdp=http://127.0.0.1:9333
 npm run build && node e2e/live-inject.mjs > /tmp/inject.js && playwright-cli -s=poe run-code --filename=/tmp/inject.js
 ```
 
-Screenshots nach `~/.claude/screenshots/pathofexile2trademonkey/`. Rohe Fixtures mit
+Screenshots nach `~/.claude/screenshots/pathofexile2trademonkey/`. Das README-GIF entsteht mit
+`node e2e/record-demo.mjs /tmp/ptm-demo` (CDP-Screencast, 2 Seitenladungen), Umwandlung per ffmpeg
+(concat-Liste `frames.txt`, fps 15, Breite 1200, palettegen). Rohe Fixtures mit
 Account-Namen liegen in `e2e/fixtures/raw/` (gitignored), nie committen.
 
 ## Regeln

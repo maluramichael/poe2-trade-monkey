@@ -1,6 +1,6 @@
 Brings the features of the popular Chrome trade extensions (Better Trading, TradeUX) to the [Path of Exile 2 trade site](https://www.pathofexile.com/trade2) in every browser, Firefox first. Made for Violentmonkey. Tampermonkey and Greasemonkey 4 should work too.
 
-![The trade site with quick filters and the bookmarks sidebar](https://raw.githubusercontent.com/maluramichael/poe2-trade-monkey/master/docs/screenshots/overview.png)
+![Demo: add a mod as filter, quick filter, search, save it as a bookmark](https://raw.githubusercontent.com/maluramichael/poe2-trade-monkey/master/docs/screenshots/demo.gif)
 
 ## Features
 
