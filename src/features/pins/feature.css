@@ -1,0 +1,71 @@
+.ptm-pinned {
+  box-shadow: inset 0 0 10px 2px var(--ptm-blue-border);
+}
+
+.ptm-pin-glow {
+  animation: ptm-pin-glow 1s ease;
+}
+
+@keyframes ptm-pin-glow {
+  0%, 50%, 100% { box-shadow: inset 0 0 10px 2px var(--ptm-blue-border); }
+  25%, 75% { box-shadow: inset 0 0 20px 10px var(--ptm-blue-border); }
+}
+
+/* Same width for "Pin" and "Unpin", so the button bar does not jump. */
+.ptm-pin-btn {
+  min-width: 60px;
+}
+
+.ptm-pins {
+  display: grid;
+  gap: 10px;
+}
+
+.ptm-pin {
+  border: 1px solid var(--ptm-blue-line);
+  background: #000;
+}
+
+.ptm-pin__item {
+  display: flex;
+  justify-content: center;
+}
+
+.ptm-pin__item .item-popup {
+  margin: 0;
+}
+
+.ptm-pin__price {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 5px 10px 0;
+  color: var(--ptm-muted);
+}
+
+.ptm-pin__price img {
+  height: 25px;
+}
+
+.ptm-pin__price br,
+.ptm-pin__price .price-label,
+.ptm-pin__price .currency-text span {
+  display: none;
+}
+
+.ptm-pin__seller {
+  padding: 4px 10px 0;
+  text-align: center;
+}
+
+.ptm-pin__actions {
+  display: flex;
+  gap: 5px;
+  padding: 8px 10px 10px;
+}
+
+.ptm-pin__actions .ptm-btn {
+  flex: 1 1 auto;
+  margin-left: 0;
+}

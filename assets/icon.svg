@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 32 32">
+  <circle cx="16" cy="16" r="15" fill="#5a3806" stroke="#c59a50" stroke-width="2"/>
+  <circle cx="16" cy="16" r="11" fill="none" stroke="#8a5609" stroke-width="1.5"/>
+  <text x="16" y="20.5" text-anchor="middle" font-family="Georgia, serif" font-weight="bold" font-size="11" fill="#f3d278">TM</text>
+</svg>

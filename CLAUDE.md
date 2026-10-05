@@ -32,9 +32,12 @@ npm run test:e2e     # Playwright gegen Fixtures (offline)
 
 - Suchformular: Vue 2.6 + Vuex unter `#trade`, global als `window.app`. Ergebnisliste: Vue-3-App
   in `#vue3-portal`. Snapshots in `docs/dom/`.
-- Mutationen sind namespaced: `persistent/setStatFilter {group, value}`,
-  `persistent/pushStatGroup {type, filters}`, `persistent/setPropertyFilter {group, index, value}`,
-  `persistent/setFilterGroupDisabled {type, group, disable}`. Quelltext in `docs/dom/vuex-mutations.txt`.
+- Vuex-Module sind **nicht** namespaced: `commit('setStatFilter', {group, value: {id, value: {min}}})`,
+  `commit('pushStatGroup', {type: 'not', filters: []})`,
+  `commit('setPropertyFilter', {group: 'misc_filters', index: 'corrupted', value: {option: 'false'}})`
+  (leerer `value` löscht), `commit('setFilterGroupDisabled', {type: 'filters', group, disable})`,
+  `commit('setItem', {name, type, disc, term})`. Live verifiziert, das Formular zieht sofort nach.
+  Quelltext (Pfadpräfix dort ist nur das Modul, nicht Teil des Namens): `docs/dom/vuex-mutations.txt`.
 - Suche = XHR `POST /api/trade2/search/poe2/{league}`, Listings = fetch `GET /api/trade2/fetch/...`.
 - Such-IDs sind gzip+base64url der Query (`H4sI...`) und league-unabhängig. `?q=<json>` lässt die
   Seite eine Query selbst ausführen.

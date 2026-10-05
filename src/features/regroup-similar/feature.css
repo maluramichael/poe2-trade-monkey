@@ -1,0 +1,11 @@
+.ptm-regroup-hidden {
+  display: none !important;
+}
+
+.ptm-regroup-shown {
+  background: rgba(16, 16, 16, 0.8) !important;
+}
+
+.ptm-regroup-btn {
+  margin-left: 5px;
+}

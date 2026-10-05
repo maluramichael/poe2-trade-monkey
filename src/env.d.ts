@@ -7,3 +7,9 @@ declare module '*.css' {
   const css: string;
   export default css;
 }
+
+/** Vite `?raw` imports, used by tests to load fixtures as text. */
+declare module '*?raw' {
+  const text: string;
+  export default text;
+}

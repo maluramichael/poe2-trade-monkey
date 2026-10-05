@@ -9,9 +9,12 @@ const loader = `(() => { if (window.__ptmDevLoader) return; window.__ptmDevLoade
 
 process.stdout.write(`async page => {
   await page.evaluate((code) => localStorage.setItem('__ptm_dev_code', code), ${JSON.stringify(code)});
-  if (!(await page.evaluate(() => window.__ptmDevLoader === true))) {
-    await page.context().addInitScript({ content: ${JSON.stringify(loader)} });
-  }
+  // Registering again is harmless: the loader guards itself, a second binding throws and is ignored.
+  await page.context().addInitScript({ content: ${JSON.stringify(loader)} });
+  await page.context().exposeBinding('__ptmGmXhr', async (_source, request) => {
+    const response = await fetch(request.url, { method: request.method, headers: request.headers, body: request.data });
+    return { status: response.status, responseText: await response.text() };
+  }).catch(() => {});
   await page.reload({ waitUntil: 'domcontentloaded' });
   await page.waitForSelector('#ptm-root', { state: 'attached', timeout: 20000 });
   return 'injected';

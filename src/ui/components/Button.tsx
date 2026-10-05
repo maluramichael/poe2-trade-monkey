@@ -2,7 +2,7 @@ import type { ComponentChildren, JSX } from 'preact';
 
 export type ButtonVariant = 'blue' | 'gold' | 'red' | 'plain';
 
-type ButtonProps = Omit<JSX.HTMLAttributes<HTMLButtonElement>, 'icon'> & {
+type ButtonProps = Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'icon' | 'type'> & {
   variant?: ButtonVariant;
   icon?: ComponentChildren;
   /** Stretches the button to the full width of its container. */
@@ -20,7 +20,7 @@ export function Button({ variant = 'blue', icon, block, children, class: classNa
   );
 }
 
-type IconButtonProps = JSX.HTMLAttributes<HTMLButtonElement> & { label: string; children: ComponentChildren };
+type IconButtonProps = JSX.ButtonHTMLAttributes<HTMLButtonElement> & { label: string; children: ComponentChildren };
 
 /** Icon-only button for list rows and headers. `label` is the tooltip and accessible name. */
 export function IconButton({ label, children, class: className, ...rest }: IconButtonProps) {

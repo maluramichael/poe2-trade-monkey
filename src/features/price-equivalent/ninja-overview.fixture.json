@@ -1,0 +1,193 @@
+{
+ "core": {
+  "items": [
+   {
+    "id": "divine",
+    "name": "Divine Orb",
+    "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lNb2RWYWx1ZXMiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/2986e220b3/CurrencyModValues.png",
+    "category": "Currency",
+    "detailsId": "divine-orb"
+   },
+   {
+    "id": "exalted",
+    "name": "Exalted Orb",
+    "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb1JhcmUiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/ad7c366789/CurrencyAddModToRare.png",
+    "category": "Currency",
+    "detailsId": "exalted-orb"
+   },
+   {
+    "id": "chaos",
+    "name": "Chaos Orb",
+    "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lSZXJvbGxSYXJlIiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/c0ca392a78/CurrencyRerollRare.png",
+    "category": "Currency",
+    "detailsId": "chaos-orb"
+   }
+  ],
+  "rates": {
+   "exalted": 515.7,
+   "chaos": 7.98
+  },
+  "primary": "divine",
+  "secondary": "chaos"
+ },
+ "lines": [
+  {
+   "id": "alch",
+   "primaryValue": 0.000123,
+   "volumePrimaryValue": 0.08855,
+   "maxVolumeCurrency": "exalted",
+   "maxVolumeRate": 15.77,
+   "sparkline": {
+    "totalChange": -77.15,
+    "data": [
+     49.59,
+     -11.27,
+     23.93,
+     72.02,
+     100.2,
+     10.11,
+     -77.15
+    ]
+   }
+  },
+  {
+   "id": "exalted",
+   "primaryValue": 0.001939,
+   "volumePrimaryValue": 114.5,
+   "maxVolumeCurrency": "divine",
+   "maxVolumeRate": 515.7,
+   "sparkline": {
+    "totalChange": 5.63,
+    "data": [
+     0.15,
+     4.43,
+     2.3,
+     -2.03,
+     2.71,
+     7.31,
+     5.63
+    ]
+   }
+  },
+  {
+   "id": "chaos",
+   "primaryValue": 0.1253,
+   "volumePrimaryValue": 2167,
+   "maxVolumeCurrency": "divine",
+   "maxVolumeRate": 7.98,
+   "sparkline": {
+    "totalChange": 14.35,
+    "data": [
+     -1.43,
+     0.42,
+     1.48,
+     0.4,
+     5.73,
+     7.65,
+     14.35
+    ]
+   }
+  },
+  {
+   "id": "divine",
+   "primaryValue": 1,
+   "volumePrimaryValue": 2167,
+   "maxVolumeCurrency": "chaos",
+   "maxVolumeRate": 0.1253,
+   "sparkline": {
+    "totalChange": -12.55,
+    "data": [
+     1.49,
+     -0.41,
+     -1.44,
+     -0.36,
+     -5.4,
+     -7.09,
+     -12.55
+    ]
+   }
+  },
+  {
+   "id": "annul",
+   "primaryValue": 0.3922,
+   "volumePrimaryValue": 387.0,
+   "maxVolumeCurrency": "divine",
+   "maxVolumeRate": 2.55,
+   "sparkline": {
+    "totalChange": -14.97,
+    "data": [
+     -6.92,
+     -4.76,
+     -6.12,
+     -9.36,
+     -8.83,
+     -9.32,
+     -14.97
+    ]
+   }
+  },
+  {
+   "id": "mirror",
+   "primaryValue": 5960,
+   "volumePrimaryValue": 8940,
+   "maxVolumeCurrency": "divine",
+   "maxVolumeRate": 0.0001678,
+   "sparkline": {
+    "totalChange": 0.66,
+    "data": [
+     2.27,
+     3.52,
+     3.89,
+     2.74,
+     -0.54,
+     1.85,
+     0.66
+    ]
+   }
+  }
+ ],
+ "items": [
+  {
+   "id": "alch",
+   "name": "Orb of Alchemy",
+   "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lVcGdyYWRlVG9SYXJlIiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/9b80b44821/CurrencyUpgradeToRare.png",
+   "category": "Currency",
+   "detailsId": "orb-of-alchemy"
+  },
+  {
+   "id": "exalted",
+   "name": "Exalted Orb",
+   "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb1JhcmUiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/ad7c366789/CurrencyAddModToRare.png",
+   "category": "Currency",
+   "detailsId": "exalted-orb"
+  },
+  {
+   "id": "chaos",
+   "name": "Chaos Orb",
+   "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lSZXJvbGxSYXJlIiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/c0ca392a78/CurrencyRerollRare.png",
+   "category": "Currency",
+   "detailsId": "chaos-orb"
+  },
+  {
+   "id": "divine",
+   "name": "Divine Orb",
+   "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lNb2RWYWx1ZXMiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/2986e220b3/CurrencyModValues.png",
+   "category": "Currency",
+   "detailsId": "divine-orb"
+  },
+  {
+   "id": "annul",
+   "name": "Orb of Annulment",
+   "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQW5udWxsT3JiIiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/2daba8ccca/AnnullOrb.png",
+   "category": "Currency",
+   "detailsId": "orb-of-annulment"
+  },
+  {
+   "id": "mirror",
+   "name": "Mirror of Kalandra",
+   "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lEdXBsaWNhdGUiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/26bc31680e/CurrencyDuplicate.png",
+   "category": "Currency",
+   "detailsId": "mirror-of-kalandra"
+  }
+ ]
+}

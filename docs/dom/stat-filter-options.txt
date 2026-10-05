@@ -1,0 +1,17 @@
+Stat filter dropdown ("+ Add Stat Filter"), live 2026-10-05, after typing "life":
+List: #trade .search-advanced-pane.brown .filter-select-mutate .multiselect__content (435 <li> for "life")
+
+Group header (disabled option):
+<li class="multiselect__element"><span class="multiselect__option multiselect__option--disabled"><span>Pseudo</span></span></li>
+
+Option (no stat id in the markup, only type tag + text with the matched word in <strong>):
+<li class="multiselect__element"><span class="multiselect__option multiselect__option--highlight">
+  <i class="mutate-type mutate-type-pseudo">pseudo</i> <div><span>+# total maximum <strong>Life</strong></span></div></span></li>
+<li class="multiselect__element"><span class="multiselect__option">
+  <i class="mutate-type mutate-type-explicit">explicit</i> <div><span># to maximum <strong>Life</strong></span></div></span></li>
+
+Stable key for an option: "<type>::<text>" with type from the mutate-type-* class and text = textContent of the <div>.
+The matching stat id can be resolved via /api/trade2/data/stats (TradeData.stats()): entry.type === type && entry.text === text.
+Selecting an option = clicking the .multiselect__option span (vue-multiselect handles mousedown/click).
+
+Search item field: #trade .search-bar .search-left .multiselect (class search-select). Clearing the item: commit('setItem', {}) sets name/type/disc/term to null.

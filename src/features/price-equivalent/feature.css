@@ -1,0 +1,19 @@
+.ptm-price-equivalent {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 8px;
+  font-family: var(--ptm-font-title);
+  font-size: 13px;
+  color: var(--ptm-muted);
+}
+
+.ptm-price-equivalent__part {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.ptm-price-equivalent__icon {
+  width: 16px;
+  height: 16px;
+}
