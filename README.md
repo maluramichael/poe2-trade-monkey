@@ -6,6 +6,8 @@ the features of the popular Chrome trade extensions to every browser, Firefox fi
 Made for [Violentmonkey](https://violentmonkey.github.io/) in Firefox. It only uses the userscript
 API that Tampermonkey and Greasemonkey 4 share, so those should work too.
 
+![The trade site with quick filters and the bookmarks sidebar](docs/screenshots/overview.png)
+
 ## Install
 
 1. Install [Violentmonkey for Firefox](https://addons.mozilla.org/firefox/addon/violentmonkey/)
@@ -29,10 +31,17 @@ Every feature can be switched off in the settings (gear icon in the sidebar).
 - Share a folder as a code, import codes from Better Trading, back up and restore everything
   (also reads Better Trading backup files).
 
+<p>
+  <img src="docs/screenshots/bookmark-menu.png" alt="Bookmark menu with copy, live search, overwrite, check in current league" width="380">
+  <img src="docs/screenshots/save-search.png" alt="Save search dialog" width="440">
+</p>
+
 **History and pins**
 - The last 50 searches, reopen them in their league or in the current one.
 - Pin results to keep them next to the list while you compare.
 - The browser tab shows the bookmark name or the searched item, with ⚡ for live searches.
+
+![A pinned item in the sidebar next to the result list](docs/screenshots/pins.png)
 
 **Results**
 - Mods that match your stat filters are highlighted (exact stat id match).
@@ -48,7 +57,17 @@ Every feature can be switched off in the settings (gear icon in the sidebar).
 - Star stats in the stat filter dropdown to keep them on top.
 - Clear button in the item search field.
 
+![Quick filter bar above Search and Clear](docs/screenshots/quick-filters.png)
+
 The interface follows the trade site's language (German on de.pathofexile.com, otherwise English).
+
+<img src="docs/screenshots/settings.png" alt="Settings with a switch for every feature" width="520">
+
+## Also for PoE2
+
+[poe2speedrun.malura.de](https://poe2speedrun.malura.de/) is a campaign speedrun guide made for a
+tablet next to the game: route checklist with act timers, every quest with its log steps, and a
+reference section. German and English.
 
 ## How it works with the trade site
 
