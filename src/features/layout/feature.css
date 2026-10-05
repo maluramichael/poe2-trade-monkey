@@ -150,3 +150,40 @@ html.ptm-layout.ptm-layout-split #trade .search-advanced.search-advanced-hidden 
 html.ptm-layout.ptm-layout-split #trade .controls .toggle-search-btn {
   display: none;
 }
+
+/*
+ * Row actions (Travel to Hideout / Direct Whisper, Ignore Player, Pin, "N similar") as one vertical
+ * button group: same width, shared borders, no loose buttons. Status and IGN stay above as text.
+ */
+html.ptm-layout #vue3-portal .resultset > .row .details .btns {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+
+html.ptm-layout #vue3-portal .resultset > .row .details .btns > .btn-group,
+html.ptm-layout #vue3-portal .resultset > .row .details .btns > span:has(> .btn) {
+  display: block;
+  float: none;
+  margin: 0;
+}
+
+html.ptm-layout #vue3-portal .resultset > .row .details .btns .btn {
+  display: block;
+  float: none;
+  width: 100%;
+  min-height: 26px;
+  margin: 0 0 -1px !important;
+  padding: 4px 8px;
+  border-radius: 0;
+  font-size: 13px;
+  line-height: 16px;
+  text-align: center;
+}
+
+html.ptm-layout #vue3-portal .resultset > .row .details .btns > .status,
+html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name {
+  margin-bottom: 4px;
+  text-align: center;
+}

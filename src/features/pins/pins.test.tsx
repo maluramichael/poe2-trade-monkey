@@ -127,3 +127,29 @@ describe('pins', () => {
     instance = {};
   });
 });
+
+describe('pins across searches and reloads', () => {
+  const SEARCH = { type: 'search', realm: 'poe2', league: 'Runes of Aldur', id: 'H4sIabc', live: false } as const;
+
+  it('links to the original search once the row is gone and survives a restart', async () => {
+    ctx.currentSearch.set({ location: SEARCH, payload: null, total: null });
+    act(() => pinButton(rows()[0]!).click());
+
+    // New search: the pinned row is no longer on the page.
+    document.body.innerHTML = '';
+    ctx.results.flush();
+    let Panel = instance.Panel!;
+    act(() => render(<Panel />, panel));
+    const link = panel.querySelector<HTMLAnchorElement>('a.ptm-btn')!;
+    expect(link.textContent).toBe('Open search');
+    expect(link.getAttribute('href')).toBe('/trade2/search/poe2/Runes%20of%20Aldur/H4sIabc');
+
+    // Feature restart (page reload) with the same storage keeps the pin.
+    act(() => render(null, panel));
+    instance.dispose?.();
+    instance = (await pinsFeature.start(ctx)) as FeatureInstance;
+    Panel = instance.Panel!;
+    act(() => render(<Panel />, panel));
+    expect(panel.querySelectorAll('.ptm-pin')).toHaveLength(1);
+  });
+});

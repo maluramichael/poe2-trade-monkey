@@ -1,8 +1,10 @@
+import { persistedStore } from '../../core/storage';
 import { Store, useStore } from '../../core/store';
 import { createTranslator } from '../../core/i18n';
 import type { AppContext } from '../../app/context';
 import type { ResultRow } from '../../site/results';
 import { sel } from '../../site/selectors';
+import { buildTradePath, type TradeLocation } from '../../site/tradeLocation';
 import { Button, ButtonGroup } from '../../ui/components/Button';
 import { IconPin, IconTrash } from '../../ui/icons';
 import type { Feature } from '../types';
@@ -16,10 +18,12 @@ const t = createTranslator({
     pin: 'Anpinnen',
     unpin: 'Lösen',
     scroll: 'Zum Ergebnis',
+    openSearch: 'Suche öffnen',
+    openSearchTitle: 'Öffnet die Suche, in der du das Item gepinnt hast ({league})',
     remove: 'Entfernen',
     clear: 'Alle entfernen',
     seller: 'Verkäufer: {seller}',
-    empty: 'Noch nichts angepinnt. Klick bei einem Ergebnis auf „Anpinnen“, um es hier zu sammeln. Pins bleiben bis zum Neuladen der Seite erhalten, auch bei neuen Suchen.',
+    empty: 'Noch nichts angepinnt. Klick bei einem Ergebnis auf „Anpinnen“, um es hier zu sammeln. Pins bleiben erhalten, auch bei neuen Suchen und nach dem Neuladen.',
   },
   en: {
     label: 'Pinned items',
@@ -28,10 +32,12 @@ const t = createTranslator({
     pin: 'Pin',
     unpin: 'Unpin',
     scroll: 'Scroll to result',
+    openSearch: 'Open search',
+    openSearchTitle: 'Opens the search you pinned this item from ({league})',
     remove: 'Unpin',
     clear: 'Clear pins',
     seller: 'Seller: {seller}',
-    empty: 'Nothing pinned yet. Click "Pin" on a result to collect it here. Pins stay until you reload the page, even across new searches.',
+    empty: 'Nothing pinned yet. Click "Pin" on a result to collect it here. Pins stay across new searches and page reloads.',
   },
 });
 
@@ -43,16 +49,20 @@ interface Pin {
   seller: string;
   indexed: string;
   pinnedAt: number;
+  /** Search the item was pinned from, to find it again later. */
+  search: Pick<TradeLocation, 'type' | 'realm' | 'league' | 'id'> | null;
 }
+
+const MAX_PINS = 100;
 
 const BUTTON_CLASS = 'ptm-pin-btn';
 const PINNED_CLASS = 'ptm-pinned';
 const GLOW_CLASS = 'ptm-pin-glow';
 const GLOW_MS = 1000;
 
-function start(ctx: AppContext) {
+async function start(ctx: AppContext) {
   const { doc } = ctx;
-  const pins = new Store<Pin[]>([]);
+  const pins = await persistedStore<Pin[]>(ctx.storage, 'pins:items', { schema: 1, defaultValue: [] });
   /** Bumped whenever rows appear or vanish, so the panel re-checks which pins are on screen. */
   const rowsVersion = new Store(0);
   const timers = new Set<ReturnType<typeof setTimeout>>();
@@ -82,6 +92,7 @@ function start(ctx: AppContext) {
       seller: listing?.account.name ?? element.querySelector(sel.row.sellerLink)?.textContent ?? '',
       indexed: listing?.indexed ?? '',
       pinnedAt: Date.now(),
+      search: searchOf(ctx.currentSearch.get()?.location ?? null),
     };
   };
 
@@ -91,7 +102,7 @@ function start(ctx: AppContext) {
       pins.update((list) => list.filter((pin) => pin.id !== id));
       return;
     }
-    pins.update((list) => [...list, snapshot(element, id)]);
+    pins.update((list) => [...list, snapshot(element, id)].slice(-MAX_PINS));
     ctx.settings.update((settings) => ({ ...settings, activeTab: 'pins' }));
   };
 
@@ -147,9 +158,19 @@ function start(ctx: AppContext) {
             </p>
             <div class="ptm-pin__actions">
               <ButtonGroup block>
-                <Button size="sm" disabled={!findRow(pin.id)} onClick={() => scrollTo(pin.id)}>
-                  {t('scroll')}
-                </Button>
+                {findRow(pin.id) || !pin.search ? (
+                  <Button size="sm" disabled={!findRow(pin.id)} onClick={() => scrollTo(pin.id)}>
+                    {t('scroll')}
+                  </Button>
+                ) : (
+                  <a
+                    class="ptm-btn ptm-btn--blue ptm-btn--sm"
+                    href={buildTradePath({ ...pin.search, live: false })}
+                    title={t('openSearchTitle', { league: pin.search.league })}
+                  >
+                    <span>{t('openSearch')}</span>
+                  </a>
+                )}
                 <Button variant="plain" size="sm" onClick={() => pins.update((all) => all.filter((p) => p.id !== pin.id))}>
                   {t('remove')}
                 </Button>
@@ -172,6 +193,11 @@ function start(ctx: AppContext) {
       doc.querySelectorAll(`.${PINNED_CLASS}, .${GLOW_CLASS}`).forEach((element) => element.classList.remove(PINNED_CLASS, GLOW_CLASS));
     },
   };
+}
+
+function searchOf(location: TradeLocation | null): Pin['search'] {
+  if (!location?.id) return null;
+  return { type: location.type, realm: location.realm, league: location.league, id: location.id };
 }
 
 export const pinsFeature: Feature = {

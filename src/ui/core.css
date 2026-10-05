@@ -187,6 +187,11 @@ html:not(.ptm-sidebar-open) .ptm-sidebar {
   user-select: none;
 }
 
+a.ptm-btn,
+a.ptm-btn:hover {
+  text-decoration: none;
+}
+
 .ptm-btn > span {
   overflow: hidden;
   text-overflow: ellipsis;
