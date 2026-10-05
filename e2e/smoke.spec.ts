@@ -117,3 +117,13 @@ test('settings: switching Bookmarks off removes its tab', async ({ page }) => {
   await expect(toggle.getByRole('checkbox')).toBeChecked();
   await expect(tab).toHaveCount(1);
 });
+
+test('fuzzy search: opening the item search adds ~ and selects the rest', async ({ page }) => {
+  await open(page);
+  const input = page.locator('#trade .search-bar .search-left .multiselect__input');
+  await input.fill('Gold');
+  // The fake site has no vue-multiselect, so toggle its open class like Vue would.
+  await input.evaluate((el) => el.closest('.multiselect')!.classList.add('multiselect--active'));
+  await expect(input).toHaveValue('~Gold');
+  expect(await input.evaluate((el: HTMLInputElement) => [el.selectionStart, el.selectionEnd])).toEqual([1, 5]);
+});

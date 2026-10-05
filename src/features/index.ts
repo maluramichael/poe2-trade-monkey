@@ -11,6 +11,7 @@ import { layoutFeature } from './layout';
 import { quickFiltersFeature } from './quick-filters';
 import { statFavoritesFeature } from './stat-favorites';
 import { searchClearFeature } from './search-clear';
+import { fuzzySearchFeature } from './fuzzy-search';
 import type { Feature } from './types';
 
 /** All features in sidebar/settings order. Adding a feature = one import and one entry here. */
@@ -28,4 +29,5 @@ export const features: Feature[] = [
   quickFiltersFeature,
   statFavoritesFeature,
   searchClearFeature,
+  fuzzySearchFeature,
 ];

@@ -26,7 +26,7 @@ declare global {
 // The bridge listens before the page script exists, and the page script is injected at
 // document-start so it hooks the site's XHR/fetch before the site's own code runs.
 const bridge = new PageBridge(window);
-if (!window.__ptmLoaded) injectPageScript(__PAGE_SCRIPT__);
+if (!window.__ptmLoaded) injectPageScript(`(${__ptmPageScript.toString()})();`);
 
 async function boot(): Promise<void> {
   await domReady();

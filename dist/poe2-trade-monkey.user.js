@@ -1,28 +1,173 @@
 // ==UserScript==
-// @name         PoE2 Trade Monkey
-// @namespace    https://github.com/maluramichael/poe2-trade-monkey
-// @version      0.2.0
-// @description  Userscript that enhances the Path of Exile 2 trade site: bookmarks, history, pins, layout and result tools.
-// @author       Michael Malura
-// @license      MIT
-// @homepageURL  https://github.com/maluramichael/poe2-trade-monkey
-// @supportURL   https://github.com/maluramichael/poe2-trade-monkey/issues
-// @icon         https://raw.githubusercontent.com/maluramichael/poe2-trade-monkey/master/assets/icon.png
-// @match        https://*.pathofexile.com/trade2*
-// @run-at       document-start
-// @grant        GM.getValue
-// @grant        GM.setValue
-// @grant        GM.deleteValue
-// @grant        GM.listValues
-// @grant        GM.xmlHttpRequest
-// @grant        GM.setClipboard
-// @grant        GM_addValueChangeListener
-// @grant        GM_removeValueChangeListener
-// @grant        unsafeWindow
-// @connect      poe.ninja
-// @updateURL    https://raw.githubusercontent.com/maluramichael/poe2-trade-monkey/master/dist/poe2-trade-monkey.meta.js
-// @downloadURL  https://raw.githubusercontent.com/maluramichael/poe2-trade-monkey/master/dist/poe2-trade-monkey.user.js
+// @name            PoE2 Trade Monkey
+// @name:de         PoE2 Trade Monkey
+// @namespace       https://github.com/maluramichael/poe2-trade-monkey
+// @version         0.2.1
+// @description     Userscript that enhances the Path of Exile 2 trade site: bookmarks, history, pins, layout and result tools.
+// @description:de  Erweitert die Trade-Seite von Path of Exile 2: Lesezeichen für jede Liga, Verlauf, Pins, Schnellfilter, Zwei-Spalten-Layout und Werkzeuge für die Ergebnisse.
+// @author          Michael Malura
+// @license         MIT
+// @homepageURL     https://github.com/maluramichael/poe2-trade-monkey
+// @supportURL      https://github.com/maluramichael/poe2-trade-monkey/issues
+// @icon            https://raw.githubusercontent.com/maluramichael/poe2-trade-monkey/master/assets/icon.png
+// @match           https://*.pathofexile.com/trade2*
+// @run-at          document-start
+// @grant           GM.getValue
+// @grant           GM.setValue
+// @grant           GM.deleteValue
+// @grant           GM.listValues
+// @grant           GM.xmlHttpRequest
+// @grant           GM.setClipboard
+// @grant           GM_addValueChangeListener
+// @grant           GM_removeValueChangeListener
+// @grant           unsafeWindow
+// @connect         poe.ninja
+// @updateURL       https://raw.githubusercontent.com/maluramichael/poe2-trade-monkey/master/dist/poe2-trade-monkey.meta.js
+// @downloadURL     https://raw.githubusercontent.com/maluramichael/poe2-trade-monkey/master/dist/poe2-trade-monkey.user.js
 // ==/UserScript==
+// Bundled library: Preact 10.29.8, https://github.com/preactjs/preact, MIT License, (c) Jason Miller
+// Source of this script: https://github.com/maluramichael/poe2-trade-monkey
+function __ptmPageScript() {
+"use strict";
+(() => {
+  // src/site/bridge/protocol.ts
+  var PAGE_TO_CONTENT = "ptm:page";
+  var CONTENT_TO_PAGE = "ptm:content";
+
+  // src/site/page/network.ts
+  var SEARCH_URL = /\/api\/trade2\/(search|exchange)\/(?:(poe2|xbox|sony)\/)?([^/?#]+)\/?(?:[?#]|$)/;
+  var FETCH_URL = /\/api\/trade2\/fetch\//;
+  function parseSearchUrl(url) {
+    const match = SEARCH_URL.exec(url);
+    if (!match) return null;
+    return {
+      type: match[1],
+      realm: match[2] ?? "poe2",
+      league: decodeURIComponent(match[3])
+    };
+  }
+  function isFetchUrl(url) {
+    return FETCH_URL.test(url);
+  }
+  function installNetworkHooks(win, callbacks) {
+    hookXhr(win, callbacks);
+    hookFetch(win, callbacks);
+  }
+  function handleSearch(url, body, responseText, callbacks) {
+    const target = parseSearchUrl(url);
+    if (!target || typeof body !== "string") return;
+    try {
+      const response = JSON.parse(responseText);
+      if (!response || typeof response.id !== "string") return;
+      callbacks.onSearch({ ...target, request: JSON.parse(body), response });
+    } catch {
+    }
+  }
+  function handleListings(json, callbacks) {
+    const results = json?.result;
+    if (Array.isArray(results)) callbacks.onListings(results.filter(Boolean));
+  }
+  function hookXhr(win, callbacks) {
+    const proto = win.XMLHttpRequest.prototype;
+    const originalOpen = proto.open;
+    const originalSend = proto.send;
+    const urls = /* @__PURE__ */ new WeakMap();
+    proto.open = function(...args) {
+      urls.set(this, String(args[1]));
+      return originalOpen.apply(this, args);
+    };
+    proto.send = function(body) {
+      const url = urls.get(this) ?? "";
+      if (parseSearchUrl(url)) {
+        this.addEventListener("load", () => {
+          if (this.status === 200) handleSearch(url, body, this.responseText, callbacks);
+        });
+      } else if (isFetchUrl(url)) {
+        this.addEventListener("load", () => {
+          if (this.status !== 200) return;
+          try {
+            handleListings(JSON.parse(this.responseText), callbacks);
+          } catch {
+          }
+        });
+      }
+      return originalSend.call(this, body);
+    };
+  }
+  function hookFetch(win, callbacks) {
+    const originalFetch = win.fetch;
+    win.fetch = async function(input, init) {
+      const response = await originalFetch.call(win, input, init);
+      const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+      if (response.ok && (isFetchUrl(url) || parseSearchUrl(url))) {
+        response.clone().text().then((text) => {
+          if (isFetchUrl(url)) handleListings(JSON.parse(text), callbacks);
+          else handleSearch(url, init?.body, text, callbacks);
+        }).catch(() => {
+        });
+      }
+      return response;
+    };
+  }
+
+  // src/site/page/vue.ts
+  function findTradeApp(win) {
+    const candidate = win.app ?? win.document.querySelector("#trade")?.__vue__;
+    return candidate?.$store ? candidate : null;
+  }
+  function waitForTradeApp(win, timeoutMs = 3e4) {
+    return new Promise((resolve, reject) => {
+      const started = Date.now();
+      const tick = () => {
+        const app = findTradeApp(win);
+        if (app) return resolve(app);
+        if (Date.now() - started > timeoutMs) return reject(new Error("trade app not found"));
+        win.setTimeout(tick, 100);
+      };
+      tick();
+    });
+  }
+
+  // src/site/page/index.ts
+  function post(message) {
+    window.dispatchEvent(new CustomEvent(PAGE_TO_CONTENT, { detail: JSON.stringify(message) }));
+  }
+  function handleCommand(app, command) {
+    const { requestId } = command;
+    try {
+      switch (command.kind) {
+        case "getState":
+          return { kind: "reply", requestId, ok: true, value: JSON.parse(JSON.stringify(app.$store.state.persistent)) };
+        case "commit":
+          app.$store.commit(command.mutation, command.payload);
+          return { kind: "reply", requestId, ok: true, value: null };
+      }
+    } catch (error) {
+      return { kind: "reply", requestId, ok: false, error: String(error) };
+    }
+  }
+  if (!window.__ptmPageBridge) {
+    window.__ptmPageBridge = true;
+    installNetworkHooks(window, {
+      onSearch: (captured) => post({ kind: "search", captured }),
+      onListings: (results) => post({ kind: "listings", results })
+    });
+    waitForTradeApp(window).then(
+      (app) => {
+        window.addEventListener(CONTENT_TO_PAGE, (event) => {
+          const detail = event.detail;
+          if (typeof detail !== "string") return;
+          post(handleCommand(app, JSON.parse(detail)));
+        });
+        app.$store.subscribe((mutation) => post({ kind: "mutation", type: mutation.type }));
+        post({ kind: "ready" });
+      },
+      () => {
+      }
+    );
+  }
+})();
+}
 
 "use strict";
 (() => {
@@ -54,14 +199,14 @@
   function b(n2) {
     n2 && n2.parentNode && n2.parentNode.removeChild(n2);
   }
-  function k(l3, u4, t19) {
+  function k(l3, u4, t20) {
     var i3, r3, o3, e3 = {};
     for (o3 in u4) "key" == o3 ? i3 = u4[o3] : "ref" == o3 ? r3 = u4[o3] : e3[o3] = u4[o3];
-    if (arguments.length > 2 && (e3.children = arguments.length > 3 ? n.call(arguments, 2) : t19), "function" == typeof l3 && null != l3.defaultProps) for (o3 in l3.defaultProps) void 0 === e3[o3] && (e3[o3] = l3.defaultProps[o3]);
+    if (arguments.length > 2 && (e3.children = arguments.length > 3 ? n.call(arguments, 2) : t20), "function" == typeof l3 && null != l3.defaultProps) for (o3 in l3.defaultProps) void 0 === e3[o3] && (e3[o3] = l3.defaultProps[o3]);
     return x(l3, e3, i3, r3, null);
   }
-  function x(n2, t19, i3, r3, o3) {
-    var e3 = { type: n2, props: t19, key: i3, ref: r3, __k: null, __: null, __b: 0, __e: null, __c: null, constructor: void 0, __v: null == o3 ? ++u : o3, __i: -1, __u: 0 };
+  function x(n2, t20, i3, r3, o3) {
+    var e3 = { type: n2, props: t20, key: i3, ref: r3, __k: null, __: null, __b: 0, __e: null, __c: null, constructor: void 0, __v: null == o3 ? ++u : o3, __i: -1, __u: 0 };
     return null == o3 && null != l.vnode && l.vnode(e3), e3;
   }
   function S(n2) {
@@ -77,8 +222,8 @@
   }
   function I(n2) {
     if (n2.__P && n2.__d) {
-      var u4 = n2.__v, t19 = u4.__e, i3 = [], r3 = [], o3 = m({}, u4);
-      o3.__v = u4.__v + 1, l.vnode && l.vnode(o3), q(n2.__P, o3, u4, n2.__n, n2.__P.namespaceURI, 32 & u4.__u ? [t19] : null, i3, null == t19 ? $(u4) : t19, !!(32 & u4.__u), r3), o3.__v = u4.__v, o3.__.__k[o3.__i] = o3, D(i3, o3, r3), u4.__e = u4.__ = null, o3.__e != t19 && P(o3);
+      var u4 = n2.__v, t20 = u4.__e, i3 = [], r3 = [], o3 = m({}, u4);
+      o3.__v = u4.__v + 1, l.vnode && l.vnode(o3), q(n2.__P, o3, u4, n2.__n, n2.__P.namespaceURI, 32 & u4.__u ? [t20] : null, i3, null == t20 ? $(u4) : t20, !!(32 & u4.__u), r3), o3.__v = u4.__v, o3.__.__k[o3.__i] = o3, D(i3, o3, r3), u4.__e = u4.__ = null, o3.__e != t20 && P(o3);
     }
   }
   function P(n2) {
@@ -96,21 +241,21 @@
       i.length = H.__r = 0;
     }
   }
-  function L(n2, l3, u4, t19, i3, r3, o3, e3, f4, c3, a3) {
-    var s3, h3, p3, v3, y3, _2, g2 = t19 && t19.__k || w, m3 = l3.length;
+  function L(n2, l3, u4, t20, i3, r3, o3, e3, f4, c3, a3) {
+    var s3, h3, p3, v3, y3, _2, g2 = t20 && t20.__k || w, m3 = l3.length;
     for (f4 = T(u4, l3, g2, f4, m3), s3 = 0; s3 < m3; s3++) null != (p3 = u4.__k[s3]) && (h3 = -1 != p3.__i && g2[p3.__i] || d, p3.__i = s3, _2 = q(n2, p3, h3, i3, r3, o3, e3, f4, c3, a3), v3 = p3.__e, p3.ref && h3.ref != p3.ref && (h3.ref && J(h3.ref, null, p3), a3.push(p3.ref, p3.__c || v3, p3)), null == y3 && null != v3 && (y3 = v3), 4 & p3.__u ? (f4 = j(p3, f4, n2), h3.__e && (h3.__e = null)) : "function" == typeof p3.type && void 0 !== _2 ? f4 = _2 : v3 && (f4 = v3.nextSibling), p3.__u &= -7);
     return u4.__e = y3, f4;
   }
-  function T(n2, l3, u4, t19, i3) {
+  function T(n2, l3, u4, t20, i3) {
     var r3, o3, e3, f4, c3, a3 = u4.length, s3 = a3, h3 = 0;
     for (n2.__k = new Array(i3), r3 = 0; r3 < i3; r3++) null != (o3 = l3[r3]) && "boolean" != typeof o3 && "function" != typeof o3 ? ("string" == typeof o3 || "number" == typeof o3 || "bigint" == typeof o3 || o3.constructor == String ? o3 = n2.__k[r3] = x(null, o3, null, null, null) : g(o3) ? o3 = n2.__k[r3] = x(S, { children: o3 }, null, null, null) : void 0 === o3.constructor && o3.__b > 0 ? o3 = n2.__k[r3] = x(o3.type, o3.props, o3.key, o3.ref ? o3.ref : null, o3.__v) : n2.__k[r3] = o3, f4 = r3 + h3, o3.__ = n2, o3.__b = n2.__b + 1, e3 = null, -1 != (c3 = o3.__i = O(o3, u4, f4, s3)) && (s3--, (e3 = u4[c3]) && (e3.__u |= 2)), null == e3 || null == e3.__v ? (-1 == c3 && (i3 > a3 ? h3-- : i3 < a3 && h3++), "function" != typeof o3.type && (o3.__u |= 4)) : c3 != f4 && (c3 == f4 - 1 ? h3-- : c3 == f4 + 1 ? h3++ : (c3 > f4 ? h3-- : h3++, o3.__u |= 4))) : n2.__k[r3] = null;
-    if (s3) for (r3 = 0; r3 < a3; r3++) null != (e3 = u4[r3]) && 0 == (2 & e3.__u) && (e3.__e == t19 && (t19 = $(e3)), K(e3, e3));
-    return t19;
+    if (s3) for (r3 = 0; r3 < a3; r3++) null != (e3 = u4[r3]) && 0 == (2 & e3.__u) && (e3.__e == t20 && (t20 = $(e3)), K(e3, e3));
+    return t20;
   }
   function j(n2, l3, u4) {
-    var t19, i3;
+    var t20, i3;
     if ("function" == typeof n2.type) {
-      for (t19 = n2.__k, i3 = 0; t19 && i3 < t19.length; i3++) t19[i3] && (t19[i3].__ = n2, l3 = j(t19[i3], l3, u4));
+      for (t20 = n2.__k, i3 = 0; t20 && i3 < t20.length; i3++) t20[i3] && (t20[i3].__ = n2, l3 = j(t20[i3], l3, u4));
       return l3;
     }
     n2.__e != l3 && (l3 && n2.type && !l3.parentNode && (l3 = $(n2)), l3 = u4.insertBefore(n2.__e, l3 || null));
@@ -119,10 +264,10 @@
     } while (null != l3 && 8 == l3.nodeType);
     return l3;
   }
-  function O(n2, l3, u4, t19) {
+  function O(n2, l3, u4, t20) {
     var i3, r3, o3, e3 = n2.key, f4 = n2.type, c3 = l3[u4], a3 = null != c3 && 0 == (2 & c3.__u);
     if (null === c3 && null == e3 || a3 && e3 == c3.key && f4 == c3.type) return u4;
-    if (t19 > (a3 ? 1 : 0)) {
+    if (t20 > (a3 ? 1 : 0)) {
       for (i3 = u4 - 1, r3 = u4 + 1; i3 >= 0 || r3 < l3.length; ) if (null != (c3 = l3[o3 = i3 >= 0 ? i3-- : r3++]) && 0 == (2 & c3.__u) && e3 == c3.key && f4 == c3.type) return o3;
     }
     return -1;
@@ -130,14 +275,14 @@
   function z(n2, l3, u4) {
     "-" == l3[0] ? n2.setProperty(l3, null == u4 ? "" : u4) : n2[l3] = null == u4 ? "" : "number" != typeof u4 || _.test(l3) ? u4 : u4 + "px";
   }
-  function N(n2, l3, u4, t19, i3) {
+  function N(n2, l3, u4, t20, i3) {
     var r3, o3;
     n: if ("style" == l3) if ("string" == typeof u4) n2.style.cssText = u4;
     else {
-      if ("string" == typeof t19 && (n2.style.cssText = t19 = ""), t19) for (l3 in t19) u4 && l3 in u4 || z(n2.style, l3, "");
-      if (u4) for (l3 in u4) t19 && u4[l3] == t19[l3] || z(n2.style, l3, u4[l3]);
+      if ("string" == typeof t20 && (n2.style.cssText = t20 = ""), t20) for (l3 in t20) u4 && l3 in u4 || z(n2.style, l3, "");
+      if (u4) for (l3 in u4) t20 && u4[l3] == t20[l3] || z(n2.style, l3, u4[l3]);
     }
-    else if ("o" == l3[0] && "n" == l3[1]) r3 = l3 != (l3 = l3.replace(s, "$1")), o3 = l3.toLowerCase(), l3 = o3 in n2 || "onFocusOut" == l3 || "onFocusIn" == l3 ? o3.slice(2) : l3.slice(2), n2.l || (n2.l = {}), n2.l[l3 + r3] = u4, u4 ? t19 ? u4[a] = t19[a] : (u4[a] = h, n2.addEventListener(l3, r3 ? v : p, r3)) : n2.removeEventListener(l3, r3 ? v : p, r3);
+    else if ("o" == l3[0] && "n" == l3[1]) r3 = l3 != (l3 = l3.replace(s, "$1")), o3 = l3.toLowerCase(), l3 = o3 in n2 || "onFocusOut" == l3 || "onFocusIn" == l3 ? o3.slice(2) : l3.slice(2), n2.l || (n2.l = {}), n2.l[l3 + r3] = u4, u4 ? t20 ? u4[a] = t20[a] : (u4[a] = h, n2.addEventListener(l3, r3 ? v : p, r3)) : n2.removeEventListener(l3, r3 ? v : p, r3);
     else {
       if ("http://www.w3.org/2000/svg" == i3) l3 = l3.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s");
       else if ("width" != l3 && "height" != l3 && "href" != l3 && "list" != l3 && "form" != l3 && "tabIndex" != l3 && "download" != l3 && "rowSpan" != l3 && "colSpan" != l3 && "role" != l3 && "popover" != l3 && l3 in n2) try {
@@ -151,26 +296,26 @@
   function V(n2) {
     return function(u4) {
       if (this.l) {
-        var t19 = this.l[u4.type + n2];
+        var t20 = this.l[u4.type + n2];
         if (null == u4[c]) u4[c] = h++;
-        else if (u4[c] < t19[a]) return;
-        return t19(l.event ? l.event(u4) : u4);
+        else if (u4[c] < t20[a]) return;
+        return t20(l.event ? l.event(u4) : u4);
       }
     };
   }
-  function q(n2, u4, t19, i3, r3, o3, e3, f4, c3, a3) {
+  function q(n2, u4, t20, i3, r3, o3, e3, f4, c3, a3) {
     var s3, h3, p3, v3, y3, d3, _2, k3, x3, M, I2, P2, A3, H2, T3, j3, F = u4.type;
     if (void 0 !== u4.constructor) return null;
-    128 & t19.__u && (c3 = !!(32 & t19.__u), o3 = [f4 = u4.__e = t19.__e]), (s3 = l.__b) && s3(u4);
+    128 & t20.__u && (c3 = !!(32 & t20.__u), o3 = [f4 = u4.__e = t20.__e]), (s3 = l.__b) && s3(u4);
     n: if ("function" == typeof F) {
       h3 = e3.length;
       try {
-        if (x3 = u4.props, M = F.prototype && F.prototype.render, I2 = (s3 = F.contextType) && i3[s3.__c], P2 = s3 ? I2 ? I2.props.value : s3.__ : i3, t19.__c ? k3 = (p3 = u4.__c = t19.__c).__ = p3.__E : (M ? u4.__c = p3 = new F(x3, P2) : (u4.__c = p3 = new C(x3, P2), p3.constructor = F, p3.render = Q), I2 && I2.sub(p3), p3.state || (p3.state = {}), p3.__n = i3, v3 = p3.__d = true, p3.__h = [], p3._sb = []), M && null == p3.__s && (p3.__s = p3.state), M && null != F.getDerivedStateFromProps && (p3.__s == p3.state && (p3.__s = m({}, p3.__s)), m(p3.__s, F.getDerivedStateFromProps(x3, p3.__s))), y3 = p3.props, d3 = p3.state, p3.__v = u4, v3) M && null == F.getDerivedStateFromProps && null != p3.componentWillMount && p3.componentWillMount(), M && null != p3.componentDidMount && p3.__h.push(p3.componentDidMount);
+        if (x3 = u4.props, M = F.prototype && F.prototype.render, I2 = (s3 = F.contextType) && i3[s3.__c], P2 = s3 ? I2 ? I2.props.value : s3.__ : i3, t20.__c ? k3 = (p3 = u4.__c = t20.__c).__ = p3.__E : (M ? u4.__c = p3 = new F(x3, P2) : (u4.__c = p3 = new C(x3, P2), p3.constructor = F, p3.render = Q), I2 && I2.sub(p3), p3.state || (p3.state = {}), p3.__n = i3, v3 = p3.__d = true, p3.__h = [], p3._sb = []), M && null == p3.__s && (p3.__s = p3.state), M && null != F.getDerivedStateFromProps && (p3.__s == p3.state && (p3.__s = m({}, p3.__s)), m(p3.__s, F.getDerivedStateFromProps(x3, p3.__s))), y3 = p3.props, d3 = p3.state, p3.__v = u4, v3) M && null == F.getDerivedStateFromProps && null != p3.componentWillMount && p3.componentWillMount(), M && null != p3.componentDidMount && p3.__h.push(p3.componentDidMount);
         else {
-          if (M && null == F.getDerivedStateFromProps && x3 !== y3 && null != p3.componentWillReceiveProps && p3.componentWillReceiveProps(x3, P2), u4.__v == t19.__v || !p3.__e && null != p3.shouldComponentUpdate && false === p3.shouldComponentUpdate(x3, p3.__s, P2)) {
-            u4.__v != t19.__v && (p3.props = x3, p3.state = p3.__s, p3.__d = false), u4.__e = t19.__e, u4.__k = t19.__k, u4.__k.some(function(n3) {
+          if (M && null == F.getDerivedStateFromProps && x3 !== y3 && null != p3.componentWillReceiveProps && p3.componentWillReceiveProps(x3, P2), u4.__v == t20.__v || !p3.__e && null != p3.shouldComponentUpdate && false === p3.shouldComponentUpdate(x3, p3.__s, P2)) {
+            u4.__v != t20.__v && (p3.props = x3, p3.state = p3.__s, p3.__d = false), u4.__e = t20.__e, u4.__k = t20.__k, u4.__k.some(function(n3) {
               n3 && (n3.__ = u4);
-            }), w.push.apply(p3.__h, p3._sb), p3._sb = [], p3.__h.length && e3.push(p3), f4 = $(t19);
+            }), w.push.apply(p3.__h, p3._sb), p3._sb = [], p3.__h.length && e3.push(p3), f4 = $(t20);
             break n;
           }
           null != p3.componentWillUpdate && p3.componentWillUpdate(x3, p3.__s, P2), M && null != p3.componentDidUpdate && p3.__h.push(function() {
@@ -181,24 +326,24 @@
         else do {
           p3.__d = false, A3 && A3(u4), s3 = p3.render(p3.props, p3.state, p3.context), p3.state = p3.__s;
         } while (p3.__d && ++H2 < 25);
-        p3.state = p3.__s, null != p3.getChildContext && (i3 = m(m({}, i3), p3.getChildContext())), M && !v3 && null != p3.getSnapshotBeforeUpdate && (_2 = p3.getSnapshotBeforeUpdate(y3, d3)), T3 = null != s3 && s3.type === S && null == s3.key ? E(s3.props.children) : s3, f4 = L(n2, g(T3) ? T3 : [T3], u4, t19, i3, r3, o3, e3, f4, c3, a3), p3.base = u4.__e, u4.__u &= -161, p3.__h.length && e3.push(p3), k3 && (p3.__E = p3.__ = null);
+        p3.state = p3.__s, null != p3.getChildContext && (i3 = m(m({}, i3), p3.getChildContext())), M && !v3 && null != p3.getSnapshotBeforeUpdate && (_2 = p3.getSnapshotBeforeUpdate(y3, d3)), T3 = null != s3 && s3.type === S && null == s3.key ? E(s3.props.children) : s3, f4 = L(n2, g(T3) ? T3 : [T3], u4, t20, i3, r3, o3, e3, f4, c3, a3), p3.base = u4.__e, u4.__u &= -161, p3.__h.length && e3.push(p3), k3 && (p3.__E = p3.__ = null);
       } catch (n3) {
         if (e3.length = h3, u4.__v = null, c3 || null != o3) {
           if (n3.then) {
             for (u4.__u |= c3 ? 160 : 128; f4 && 8 == f4.nodeType && f4.nextSibling; ) f4 = f4.nextSibling;
             null != o3 && (o3[o3.indexOf(f4)] = null), u4.__e = f4;
           } else if (null != o3) for (j3 = o3.length; j3--; ) b(o3[j3]);
-        } else u4.__e = t19.__e;
-        null == u4.__k && (u4.__k = t19.__k || []), n3.then || B(u4), l.__e(n3, u4, t19);
+        } else u4.__e = t20.__e;
+        null == u4.__k && (u4.__k = t20.__k || []), n3.then || B(u4), l.__e(n3, u4, t20);
       }
-    } else null == o3 && u4.__v == t19.__v ? (u4.__k = t19.__k, u4.__e = t19.__e) : f4 = u4.__e = G(t19.__e, u4, t19, i3, r3, o3, e3, c3, a3);
+    } else null == o3 && u4.__v == t20.__v ? (u4.__k = t20.__k, u4.__e = t20.__e) : f4 = u4.__e = G(t20.__e, u4, t20, i3, r3, o3, e3, c3, a3);
     return (s3 = l.diffed) && s3(u4), 128 & u4.__u ? void 0 : f4;
   }
   function B(n2) {
     n2 && (n2.__c && (n2.__c.__e = true), n2.__k && n2.__k.some(B));
   }
-  function D(n2, u4, t19) {
-    for (var i3 = 0; i3 < t19.length; i3++) J(t19[i3], t19[++i3], t19[++i3]);
+  function D(n2, u4, t20) {
+    for (var i3 = 0; i3 < t20.length; i3++) J(t20[i3], t20[++i3], t20[++i3]);
     l.__c && l.__c(u4, n2), n2.some(function(u5) {
       try {
         n2 = u5.__h, u5.__h = [], n2.some(function(n3) {
@@ -212,8 +357,8 @@
   function E(n2) {
     return "object" != typeof n2 || null == n2 || n2.__b > 0 ? n2 : g(n2) ? n2.map(E) : void 0 !== n2.constructor ? null : m({}, n2);
   }
-  function G(u4, t19, i3, r3, o3, e3, f4, c3, a3) {
-    var s3, h3, p3, v3, y3, w3, _2, m3 = i3.props || d, k3 = t19.props, x3 = t19.type;
+  function G(u4, t20, i3, r3, o3, e3, f4, c3, a3) {
+    var s3, h3, p3, v3, y3, w3, _2, m3 = i3.props || d, k3 = t20.props, x3 = t20.type;
     if ("svg" == x3 ? o3 = "http://www.w3.org/2000/svg" : "math" == x3 ? o3 = "http://www.w3.org/1998/Math/MathML" : o3 || (o3 = "http://www.w3.org/1999/xhtml"), null != e3) {
       for (s3 = 0; s3 < e3.length; s3++) if ((y3 = e3[s3]) && "setAttribute" in y3 == !!x3 && (x3 ? y3.localName == x3 : 3 == y3.nodeType)) {
         u4 = y3, e3[s3] = null;
@@ -222,30 +367,30 @@
     }
     if (null == u4) {
       if (null == x3) return document.createTextNode(k3);
-      u4 = document.createElementNS(o3, x3, k3.is && k3), c3 && (l.__m && l.__m(t19, e3), c3 = false), e3 = null;
+      u4 = document.createElementNS(o3, x3, k3.is && k3), c3 && (l.__m && l.__m(t20, e3), c3 = false), e3 = null;
     }
     if (null == x3) m3 === k3 || c3 && u4.data == k3 || (u4.data = k3);
     else {
       if (e3 = "textarea" == x3 && null != k3.defaultValue ? null : e3 && n.call(u4.childNodes), !c3 && null != e3) for (m3 = {}, s3 = 0; s3 < u4.attributes.length; s3++) m3[(y3 = u4.attributes[s3]).name] = y3.value;
       for (s3 in m3) y3 = m3[s3], "dangerouslySetInnerHTML" == s3 ? p3 = y3 : "children" == s3 || s3 in k3 || "value" == s3 && "defaultValue" in k3 || "checked" == s3 && "defaultChecked" in k3 || N(u4, s3, null, y3, o3);
       for (s3 in k3) y3 = k3[s3], "children" == s3 ? v3 = y3 : "dangerouslySetInnerHTML" == s3 ? h3 = y3 : "value" == s3 ? w3 = y3 : "checked" == s3 ? _2 = y3 : c3 && "function" != typeof y3 || m3[s3] === y3 || N(u4, s3, y3, m3[s3], o3);
-      if (h3) c3 || p3 && (h3.__html == p3.__html || h3.__html == u4.innerHTML) || (u4.innerHTML = h3.__html), t19.__k = [];
-      else if (p3 && (u4.innerHTML = ""), L("template" == t19.type ? u4.content : u4, g(v3) ? v3 : [v3], t19, i3, r3, "foreignObject" == x3 ? "http://www.w3.org/1999/xhtml" : o3, e3, f4, e3 ? e3[0] : i3.__k && $(i3, 0), c3, a3), null != e3) for (s3 = e3.length; s3--; ) b(e3[s3]);
+      if (h3) c3 || p3 && (h3.__html == p3.__html || h3.__html == u4.innerHTML) || (u4.innerHTML = h3.__html), t20.__k = [];
+      else if (p3 && (u4.innerHTML = ""), L("template" == t20.type ? u4.content : u4, g(v3) ? v3 : [v3], t20, i3, r3, "foreignObject" == x3 ? "http://www.w3.org/1999/xhtml" : o3, e3, f4, e3 ? e3[0] : i3.__k && $(i3, 0), c3, a3), null != e3) for (s3 = e3.length; s3--; ) b(e3[s3]);
       c3 && "textarea" != x3 || (s3 = "value", "progress" == x3 && null == w3 ? u4.removeAttribute("value") : null != w3 && (w3 !== u4[s3] || "progress" == x3 && !w3 || "option" == x3 && w3 != m3[s3]) && N(u4, s3, w3, m3[s3], o3), s3 = "checked", null != _2 && _2 != u4[s3] && N(u4, s3, _2, m3[s3], o3));
     }
     return u4;
   }
-  function J(n2, u4, t19) {
+  function J(n2, u4, t20) {
     try {
       if ("function" == typeof n2) {
         var i3 = "function" == typeof n2.__u;
         i3 && n2.__u(), i3 && null == u4 || (n2.__u = n2(u4));
       } else n2.current = u4;
     } catch (n3) {
-      l.__e(n3, t19);
+      l.__e(n3, t20);
     }
   }
-  function K(n2, u4, t19) {
+  function K(n2, u4, t20) {
     var i3, r3;
     if (l.unmount && l.unmount(n2), (i3 = n2.ref) && (i3.current && i3.current != n2.__e || J(i3, null, u4)), null != (i3 = n2.__c)) {
       if (i3.componentWillUnmount) try {
@@ -255,21 +400,21 @@
       }
       i3.base = i3.__P = i3.__n = null;
     }
-    if (i3 = n2.__k) for (r3 = 0; r3 < i3.length; r3++) i3[r3] && K(i3[r3], u4, t19 || "function" != typeof n2.type);
-    t19 || b(n2.__e), n2.__c = n2.__ = n2.__e = void 0;
+    if (i3 = n2.__k) for (r3 = 0; r3 < i3.length; r3++) i3[r3] && K(i3[r3], u4, t20 || "function" != typeof n2.type);
+    t20 || b(n2.__e), n2.__c = n2.__ = n2.__e = void 0;
   }
   function Q(n2, l3, u4) {
     return this.constructor(n2, u4);
   }
-  function R(u4, t19, i3) {
+  function R(u4, t20, i3) {
     var r3, o3, e3, f4;
-    t19 == document && (t19 = document.documentElement), l.__ && l.__(u4, t19), o3 = (r3 = "function" == typeof i3) ? null : i3 && i3.__k || t19.__k, e3 = [], f4 = [], q(t19, u4 = (!r3 && i3 || t19).__k = k(S, null, [u4]), o3 || d, d, t19.namespaceURI, !r3 && i3 ? [i3] : o3 ? null : t19.firstChild ? n.call(t19.childNodes) : null, e3, !r3 && i3 ? i3 : o3 ? o3.__e : t19.firstChild, r3, f4), D(e3, u4, f4), u4.props.children = null;
+    t20 == document && (t20 = document.documentElement), l.__ && l.__(u4, t20), o3 = (r3 = "function" == typeof i3) ? null : i3 && i3.__k || t20.__k, e3 = [], f4 = [], q(t20, u4 = (!r3 && i3 || t20).__k = k(S, null, [u4]), o3 || d, d, t20.namespaceURI, !r3 && i3 ? [i3] : o3 ? null : t20.firstChild ? n.call(t20.childNodes) : null, e3, !r3 && i3 ? i3 : o3 ? o3.__e : t20.firstChild, r3, f4), D(e3, u4, f4), u4.props.children = null;
   }
   function X(n2) {
     function l3(n3) {
-      var u4, t19;
-      return this.getChildContext || (u4 = /* @__PURE__ */ new Set(), (t19 = {})[l3.__c] = this, this.getChildContext = function() {
-        return t19;
+      var u4, t20;
+      return this.getChildContext || (u4 = /* @__PURE__ */ new Set(), (t20 = {})[l3.__c] = this, this.getChildContext = function() {
+        return t20;
       }, this.componentWillUnmount = function() {
         u4 = null;
       }, this.shouldComponentUpdate = function(n4) {
@@ -288,9 +433,9 @@
       return n3.children(l4);
     }).contextType = l3, l3;
   }
-  n = w.slice, l = { __e: function(n2, l3, u4, t19) {
+  n = w.slice, l = { __e: function(n2, l3, u4, t20) {
     for (var i3, r3, o3; l3 = l3.__; ) if ((i3 = l3.__c) && !i3.__) try {
-      if ((r3 = i3.constructor) && null != r3.getDerivedStateFromError && (i3.setState(r3.getDerivedStateFromError(n2)), o3 = i3.__d), null != i3.componentDidCatch && (i3.componentDidCatch(n2, t19 || {}), o3 = i3.__d), o3) return i3.__E = i3;
+      if ((r3 = i3.constructor) && null != r3.getDerivedStateFromError && (i3.setState(r3.getDerivedStateFromError(n2)), o3 = i3.__d), null != i3.componentDidCatch && (i3.componentDidCatch(n2, t20 || {}), o3 = i3.__d), o3) return i3.__E = i3;
     } catch (l4) {
       n2 = l4;
     }
@@ -320,8 +465,8 @@
   var l2 = c2.__c;
   var m2 = c2.unmount;
   var p2 = c2.__;
-  function s2(n2, t19) {
-    c2.__h && c2.__h(r2, n2, o2 || t19), o2 = 0;
+  function s2(n2, t20) {
+    c2.__h && c2.__h(r2, n2, o2 || t20), o2 = 0;
     var u4 = r2.__H || (r2.__H = { __: [], __h: [] });
     return n2 >= u4.__.length && u4.__.push({}), u4.__[n2];
   }
@@ -331,32 +476,32 @@
   function y2(n2, u4, i3) {
     var o3 = s2(t2++, 2);
     if (o3.t = n2, !o3.__c && (o3.__ = [i3 ? i3(u4) : D2(void 0, u4), function(n3) {
-      var t19 = o3.__N ? o3.__N[0] : o3.__[0], r3 = o3.t(t19, n3);
-      t19 !== r3 && (o3.__N = [r3, o3.__[1]], o3.__c.setState({}));
+      var t20 = o3.__N ? o3.__N[0] : o3.__[0], r3 = o3.t(t20, n3);
+      t20 !== r3 && (o3.__N = [r3, o3.__[1]], o3.__c.setState({}));
     }], o3.__c = r2, !r2.__f)) {
-      var f4 = function(n3, t19, r3) {
+      var f4 = function(n3, t20, r3) {
         if (!o3.__c.__H) return true;
         var u5 = false, i4 = o3.__c.props !== n3;
         if (o3.__c.__H.__.some(function(n4) {
           if (n4.__N) {
             u5 = true;
-            var t20 = n4.__[0];
-            n4.__ = n4.__N, n4.__N = void 0, t20 !== n4.__[0] && (i4 = true);
+            var t21 = n4.__[0];
+            n4.__ = n4.__N, n4.__N = void 0, t21 !== n4.__[0] && (i4 = true);
           }
         }), c3) {
-          var f5 = c3.call(this, n3, t19, r3);
+          var f5 = c3.call(this, n3, t20, r3);
           return u5 ? f5 || i4 : f5;
         }
         return !u5 || i4;
       };
       r2.__f = true;
       var c3 = r2.shouldComponentUpdate, e3 = r2.componentWillUpdate;
-      r2.componentWillUpdate = function(n3, t19, r3) {
+      r2.componentWillUpdate = function(n3, t20, r3) {
         if (this.__e) {
           var u5 = c3;
-          c3 = void 0, f4(n3, t19, r3), c3 = u5;
+          c3 = void 0, f4(n3, t20, r3), c3 = u5;
         }
-        e3 && e3.call(this, n3, t19, r3);
+        e3 && e3.call(this, n3, t20, r3);
       }, r2.shouldComponentUpdate = f4;
     }
     return o3.__N || o3.__;
@@ -380,18 +525,18 @@
   }
   function j2() {
     for (var n2; n2 = f2.shift(); ) {
-      var t19 = n2.__H;
-      if (n2.__P && t19) try {
-        t19.__h.some(z2), t19.__h.some(B2), t19.__h = [];
+      var t20 = n2.__H;
+      if (n2.__P && t20) try {
+        t20.__h.some(z2), t20.__h.some(B2), t20.__h = [];
       } catch (r3) {
-        t19.__h = [], c2.__e(r3, n2.__v);
+        t20.__h = [], c2.__e(r3, n2.__v);
       }
     }
   }
   c2.__b = function(n2) {
     r2 = null, e2 && e2(n2);
-  }, c2.__ = function(n2, t19) {
-    n2 && t19.__k && t19.__k.__m && (n2.__m = t19.__k.__m), p2 && p2(n2, t19);
+  }, c2.__ = function(n2, t20) {
+    n2 && t20.__k && t20.__k.__m && (n2.__m = t20.__k.__m), p2 && p2(n2, t20);
   }, c2.__r = function(n2) {
     a2 && a2(n2), t2 = 0;
     var i3 = (r2 = n2.__c).__H;
@@ -400,55 +545,55 @@
     })) : (i3.__h.some(z2), i3.__h.some(B2), i3.__h = [], t2 = 0)), u2 = r2;
   }, c2.diffed = function(n2) {
     v2 && v2(n2);
-    var t19 = n2.__c;
-    t19 && t19.__H && (t19.__H.__h.length && (1 !== f2.push(t19) && i2 === c2.requestAnimationFrame || ((i2 = c2.requestAnimationFrame) || w2)(j2)), t19.__H.__.some(function(n3) {
+    var t20 = n2.__c;
+    t20 && t20.__H && (t20.__H.__h.length && (1 !== f2.push(t20) && i2 === c2.requestAnimationFrame || ((i2 = c2.requestAnimationFrame) || w2)(j2)), t20.__H.__.some(function(n3) {
       n3.u && (n3.__H = n3.u, n3.u = void 0);
     })), u2 = r2 = null;
-  }, c2.__c = function(n2, t19) {
-    t19.some(function(n3) {
+  }, c2.__c = function(n2, t20) {
+    t20.some(function(n3) {
       try {
         n3.__h.some(z2), n3.__h = n3.__h.filter(function(n4) {
           return !n4.__ || B2(n4);
         });
       } catch (r3) {
-        t19.some(function(n4) {
+        t20.some(function(n4) {
           n4.__h && (n4.__h = []);
-        }), t19 = [], c2.__e(r3, n3.__v);
+        }), t20 = [], c2.__e(r3, n3.__v);
       }
-    }), l2 && l2(n2, t19);
+    }), l2 && l2(n2, t20);
   }, c2.unmount = function(n2) {
     m2 && m2(n2);
-    var t19, r3 = n2.__c;
+    var t20, r3 = n2.__c;
     r3 && r3.__H && (r3.__H.__.some(function(n3) {
       try {
         z2(n3);
       } catch (n4) {
-        t19 = n4;
+        t20 = n4;
       }
-    }), r3.__H = void 0, t19 && c2.__e(t19, r3.__v));
+    }), r3.__H = void 0, t20 && c2.__e(t20, r3.__v));
   };
   var k2 = "function" == typeof requestAnimationFrame;
   function w2(n2) {
-    var t19, r3 = function() {
-      clearTimeout(u4), k2 && cancelAnimationFrame(t19), setTimeout(n2);
+    var t20, r3 = function() {
+      clearTimeout(u4), k2 && cancelAnimationFrame(t20), setTimeout(n2);
     }, u4 = setTimeout(r3, 35);
-    k2 && (t19 = requestAnimationFrame(r3));
+    k2 && (t20 = requestAnimationFrame(r3));
   }
   function z2(n2) {
-    var t19 = r2, u4 = n2.__c;
-    "function" == typeof u4 && (n2.__c = void 0, u4()), r2 = t19;
+    var t20 = r2, u4 = n2.__c;
+    "function" == typeof u4 && (n2.__c = void 0, u4()), r2 = t20;
   }
   function B2(n2) {
-    var t19 = r2;
-    n2.__c = n2.__(), r2 = t19;
+    var t20 = r2;
+    n2.__c = n2.__(), r2 = t20;
   }
-  function C2(n2, t19) {
-    return !n2 || n2.length !== t19.length || t19.some(function(t20, r3) {
-      return t20 !== n2[r3];
+  function C2(n2, t20) {
+    return !n2 || n2.length !== t20.length || t20.some(function(t21, r3) {
+      return t21 !== n2[r3];
     });
   }
-  function D2(n2, t19) {
-    return "function" == typeof t19 ? t19(n2) : t19;
+  function D2(n2, t20) {
+    return "function" == typeof t20 ? t20(n2) : t20;
   }
 
   // src/core/store.ts
@@ -776,10 +921,10 @@
 
   // node_modules/preact/jsx-runtime/dist/jsxRuntime.module.js
   var f3 = 0;
-  function u3(e3, t19, n2, o3, i3, u4) {
-    t19 || (t19 = {});
-    var a3, c3, p3 = t19;
-    if ("ref" in p3) for (c3 in p3 = {}, t19) "ref" == c3 ? a3 = t19[c3] : p3[c3] = t19[c3];
+  function u3(e3, t20, n2, o3, i3, u4) {
+    t20 || (t20 = {});
+    var a3, c3, p3 = t20;
+    if ("ref" in p3) for (c3 in p3 = {}, t20) "ref" == c3 ? a3 = t20[c3] : p3[c3] = t20[c3];
     var l3 = { type: e3, props: p3, key: n2, ref: a3, __k: null, __: null, __b: 0, __e: null, __c: null, constructor: void 0, __v: --f3, __i: -1, __u: 0, __source: i3, __self: u4 };
     if ("function" == typeof e3 && (a3 = e3.defaultProps)) for (c3 in a3) void 0 === p3[c3] && (p3[c3] = a3[c3]);
     return l.vnode && l.vnode(l3), l3;
@@ -1416,8 +1561,8 @@
     return typeof f4 === "object" && f4 !== null && isString(f4.title) && isNullableString(f4.icon) && isNullableString(f4.archivedAt) && Array.isArray(f4.trades) && f4.trades.every(isTrade);
   }
   function isTrade(value2) {
-    const t19 = value2;
-    return typeof t19 === "object" && t19 !== null && isString(t19.title) && TYPES2.has(t19.type) && isString(t19.realm) && isString(t19.searchId) && t19.searchId !== "" && isString(t19.savedLeague) && (t19.payload === null || typeof t19.payload === "object" && typeof t19.payload.query === "object") && isNullableString(t19.completedAt) && isString(t19.createdAt) && isString(t19.updatedAt);
+    const t20 = value2;
+    return typeof t20 === "object" && t20 !== null && isString(t20.title) && TYPES2.has(t20.type) && isString(t20.realm) && isString(t20.searchId) && t20.searchId !== "" && isString(t20.savedLeague) && (t20.payload === null || typeof t20.payload === "object" && typeof t20.payload.query === "object") && isNullableString(t20.completedAt) && isString(t20.createdAt) && isString(t20.updatedAt);
   }
   function toBase64(text2) {
     let binary = "";
@@ -2148,7 +2293,7 @@
     }
     deleteTrade(tradeId) {
       this.#setFolders(
-        (folders) => folders.map((f4) => f4.trades.some((t19) => t19.id === tradeId) ? { ...f4, trades: f4.trades.filter((t19) => t19.id !== tradeId) } : f4)
+        (folders) => folders.map((f4) => f4.trades.some((t20) => t20.id === tradeId) ? { ...f4, trades: f4.trades.filter((t20) => t20.id !== tradeId) } : f4)
       );
     }
     /** `toIndex` counts in the target list after the trade was taken out. */
@@ -2183,13 +2328,13 @@
     /** The bookmark for a search id, preferring active folders over archived ones. */
     findTradeBySearchId(searchId) {
       const matches = this.data.get().folders.flatMap(
-        (folder) => folder.trades.filter((t19) => t19.searchId === searchId).map((trade) => ({ folder, trade }))
+        (folder) => folder.trades.filter((t20) => t20.searchId === searchId).map((trade) => ({ folder, trade }))
       );
       return matches.find((m3) => !m3.folder.archivedAt) ?? matches[0] ?? null;
     }
     #findTrade(tradeId) {
       for (const folder of this.data.get().folders) {
-        const trade = folder.trades.find((t19) => t19.id === tradeId);
+        const trade = folder.trades.find((t20) => t20.id === tradeId);
         if (trade) return { folder, trade };
       }
       return null;
@@ -2203,7 +2348,7 @@
     #mapTrade(tradeId, fn) {
       const folderId = this.#findTrade(tradeId)?.folder.id;
       if (!folderId) return;
-      this.#mapFolder(folderId, (folder) => ({ ...folder, trades: folder.trades.map((t19) => t19.id === tradeId ? fn(t19) : t19) }));
+      this.#mapFolder(folderId, (folder) => ({ ...folder, trades: folder.trades.map((t20) => t20.id === tradeId ? fn(t20) : t20) }));
     }
   };
   function fromSearch({ location: location2, payload }) {
@@ -3900,6 +4045,50 @@
     start: start4
   };
 
+  // src/features/fuzzy-search/index.ts
+  var t19 = createTranslator({
+    de: {
+      label: "Immer unscharf suchen",
+      description: "Setzt automatisch ~ vor die Eingabe in den Suchfeldern, damit die Seite unscharf sucht."
+    },
+    en: {
+      label: "Always fuzzy search",
+      description: "Adds ~ in front of what you type in search fields so the site matches fuzzily."
+    }
+  });
+  var ACTIVE = "multiselect--active";
+  function start5({ doc }) {
+    const handled = /* @__PURE__ */ new WeakSet();
+    const observer = new MutationObserver((records) => {
+      for (const { target } of records) {
+        const select = target;
+        if (!select.classList.contains("multiselect") || !select.closest(sel.tradeRoot)) continue;
+        if (!select.classList.contains(ACTIVE)) {
+          handled.delete(select);
+          continue;
+        }
+        if (handled.has(select)) continue;
+        const input = select.querySelector(".multiselect__input");
+        if (!input) continue;
+        handled.add(select);
+        if (input.value.startsWith("~")) continue;
+        input.value = `~${input.value}`;
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        input.setSelectionRange(1, input.value.length);
+      }
+    });
+    observer.observe(doc.body, { attributes: true, attributeFilter: ["class"], subtree: true });
+    return { dispose: () => observer.disconnect() };
+  }
+  var fuzzySearchFeature = {
+    id: "fuzzy-search",
+    label: () => t19("label"),
+    description: () => t19("description"),
+    toggleable: true,
+    defaultEnabled: true,
+    start: start5
+  };
+
   // src/features/index.ts
   var features = [
     bookmarksFeature,
@@ -3914,7 +4103,8 @@
     layoutFeature,
     quickFiltersFeature,
     statFavoritesFeature,
-    searchClearFeature
+    searchClearFeature,
+    fuzzySearchFeature
   ];
 
   // src/core/events.ts
@@ -4282,7 +4472,7 @@
         feature.id
       )) }),
       /* @__PURE__ */ u3("p", { class: "ptm-meta", children: [
-        t4("version", { version: "0.2.0" }),
+        t4("version", { version: "0.2.1" }),
         " ·",
         " ",
         /* @__PURE__ */ u3("a", { href: "https://github.com/maluramichael/poe2-trade-monkey", target: "_blank", rel: "noreferrer", children: t4("sourceCode") })
@@ -4361,7 +4551,7 @@
 
   // src/main.tsx
   var bridge = new PageBridge(window);
-  if (!window.__ptmLoaded) injectPageScript('"use strict";\n(() => {\n  // src/site/bridge/protocol.ts\n  var PAGE_TO_CONTENT = "ptm:page";\n  var CONTENT_TO_PAGE = "ptm:content";\n\n  // src/site/page/network.ts\n  var SEARCH_URL = /\\/api\\/trade2\\/(search|exchange)\\/(?:(poe2|xbox|sony)\\/)?([^/?#]+)\\/?(?:[?#]|$)/;\n  var FETCH_URL = /\\/api\\/trade2\\/fetch\\//;\n  function parseSearchUrl(url) {\n    const match = SEARCH_URL.exec(url);\n    if (!match) return null;\n    return {\n      type: match[1],\n      realm: match[2] ?? "poe2",\n      league: decodeURIComponent(match[3])\n    };\n  }\n  function isFetchUrl(url) {\n    return FETCH_URL.test(url);\n  }\n  function installNetworkHooks(win, callbacks) {\n    hookXhr(win, callbacks);\n    hookFetch(win, callbacks);\n  }\n  function handleSearch(url, body, responseText, callbacks) {\n    const target = parseSearchUrl(url);\n    if (!target || typeof body !== "string") return;\n    try {\n      const response = JSON.parse(responseText);\n      if (!response || typeof response.id !== "string") return;\n      callbacks.onSearch({ ...target, request: JSON.parse(body), response });\n    } catch {\n    }\n  }\n  function handleListings(json, callbacks) {\n    const results = json?.result;\n    if (Array.isArray(results)) callbacks.onListings(results.filter(Boolean));\n  }\n  function hookXhr(win, callbacks) {\n    const proto = win.XMLHttpRequest.prototype;\n    const originalOpen = proto.open;\n    const originalSend = proto.send;\n    const urls = /* @__PURE__ */ new WeakMap();\n    proto.open = function(...args) {\n      urls.set(this, String(args[1]));\n      return originalOpen.apply(this, args);\n    };\n    proto.send = function(body) {\n      const url = urls.get(this) ?? "";\n      if (parseSearchUrl(url)) {\n        this.addEventListener("load", () => {\n          if (this.status === 200) handleSearch(url, body, this.responseText, callbacks);\n        });\n      } else if (isFetchUrl(url)) {\n        this.addEventListener("load", () => {\n          if (this.status !== 200) return;\n          try {\n            handleListings(JSON.parse(this.responseText), callbacks);\n          } catch {\n          }\n        });\n      }\n      return originalSend.call(this, body);\n    };\n  }\n  function hookFetch(win, callbacks) {\n    const originalFetch = win.fetch;\n    win.fetch = async function(input, init) {\n      const response = await originalFetch.call(win, input, init);\n      const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;\n      if (response.ok && (isFetchUrl(url) || parseSearchUrl(url))) {\n        response.clone().text().then((text) => {\n          if (isFetchUrl(url)) handleListings(JSON.parse(text), callbacks);\n          else handleSearch(url, init?.body, text, callbacks);\n        }).catch(() => {\n        });\n      }\n      return response;\n    };\n  }\n\n  // src/site/page/vue.ts\n  function findTradeApp(win) {\n    const candidate = win.app ?? win.document.querySelector("#trade")?.__vue__;\n    return candidate?.$store ? candidate : null;\n  }\n  function waitForTradeApp(win, timeoutMs = 3e4) {\n    return new Promise((resolve, reject) => {\n      const started = Date.now();\n      const tick = () => {\n        const app = findTradeApp(win);\n        if (app) return resolve(app);\n        if (Date.now() - started > timeoutMs) return reject(new Error("trade app not found"));\n        win.setTimeout(tick, 100);\n      };\n      tick();\n    });\n  }\n\n  // src/site/page/index.ts\n  function post(message) {\n    window.dispatchEvent(new CustomEvent(PAGE_TO_CONTENT, { detail: JSON.stringify(message) }));\n  }\n  function handleCommand(app, command) {\n    const { requestId } = command;\n    try {\n      switch (command.kind) {\n        case "getState":\n          return { kind: "reply", requestId, ok: true, value: JSON.parse(JSON.stringify(app.$store.state.persistent)) };\n        case "commit":\n          app.$store.commit(command.mutation, command.payload);\n          return { kind: "reply", requestId, ok: true, value: null };\n      }\n    } catch (error) {\n      return { kind: "reply", requestId, ok: false, error: String(error) };\n    }\n  }\n  if (!window.__ptmPageBridge) {\n    window.__ptmPageBridge = true;\n    installNetworkHooks(window, {\n      onSearch: (captured) => post({ kind: "search", captured }),\n      onListings: (results) => post({ kind: "listings", results })\n    });\n    waitForTradeApp(window).then(\n      (app) => {\n        window.addEventListener(CONTENT_TO_PAGE, (event) => {\n          const detail = event.detail;\n          if (typeof detail !== "string") return;\n          post(handleCommand(app, JSON.parse(detail)));\n        });\n        app.$store.subscribe((mutation) => post({ kind: "mutation", type: mutation.type }));\n        post({ kind: "ready" });\n      },\n      () => {\n      }\n    );\n  }\n})();\n');
+  if (!window.__ptmLoaded) injectPageScript(`(${__ptmPageScript.toString()})();`);
   async function boot() {
     await domReady();
     const appReady = await Promise.race([bridge.whenReady().then(() => true), delay(3e4).then(() => false)]);
@@ -4408,7 +4598,7 @@
       renderApp();
       void host.restart();
     });
-    log.info(`v${"0.2.0"} ready with ${features.length} features`);
+    log.info(`v${"0.2.1"} ready with ${features.length} features`);
   }
   function applyLanguage(settings) {
     setLocale(settings.language === "auto" ? detectLocale(location.hostname) : settings.language);

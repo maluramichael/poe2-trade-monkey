@@ -1,7 +1,7 @@
 /** Injected by build.mjs. */
 declare const __VERSION__: string;
-/** Source of the page-context script (src/site/page), bundled separately by build.mjs. */
-declare const __PAGE_SCRIPT__: string;
+/** The page-context script (src/site/page) as a function, emitted by build.mjs above the bundle. */
+declare function __ptmPageScript(): void;
 
 declare module '*.css' {
   const css: string;

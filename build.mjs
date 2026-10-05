@@ -7,11 +7,15 @@ const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
 const REPO_RAW = 'https://raw.githubusercontent.com/maluramichael/poe2-trade-monkey/master';
 const NAME = 'poe2-trade-monkey';
 
+const preact = JSON.parse(readFileSync('node_modules/preact/package.json', 'utf8'));
+
 const metadata = [
   ['name', 'PoE2 Trade Monkey'],
+  ['name:de', 'PoE2 Trade Monkey'],
   ['namespace', 'https://github.com/maluramichael/poe2-trade-monkey'],
   ['version', pkg.version],
   ['description', pkg.description],
+  ['description:de', 'Erweitert die Trade-Seite von Path of Exile 2: Lesezeichen für jede Liga, Verlauf, Pins, Schnellfilter, Zwei-Spalten-Layout und Werkzeuge für die Ergebnisse.'],
   ['author', 'Michael Malura'],
   ['license', 'MIT'],
   ['homepageURL', 'https://github.com/maluramichael/poe2-trade-monkey'],
@@ -41,6 +45,13 @@ const header = [
   '',
 ].join('\n');
 
+// Inline libraries must name their source (Greasy Fork code rules).
+const attribution = [
+  `// Bundled library: Preact ${preact.version}, https://github.com/preactjs/preact, MIT License, (c) Jason Miller`,
+  '// Source of this script: https://github.com/maluramichael/poe2-trade-monkey',
+  '',
+].join('\n');
+
 const writeMetaFile = {
   name: 'meta-file',
   setup(build) {
@@ -54,7 +65,11 @@ const writeMetaFile = {
 
 mkdirSync('dist', { recursive: true });
 
-/** The page-context script is bundled on its own and embedded as a string (see site/page). */
+/**
+ * The page-context script (src/site/page) is bundled on its own and placed in the userscript as a
+ * readable function, `__ptmPageScript`. main.tsx injects its source into the page via toString(),
+ * so the code stays reviewable instead of becoming one long escaped string.
+ */
 async function buildPageScript() {
   const result = await esbuild.build({
     entryPoints: ['src/site/page/index.ts'],
@@ -67,6 +82,7 @@ async function buildPageScript() {
 }
 
 const pageScript = await buildPageScript();
+const pageFunction = `function __ptmPageScript() {\n${pageScript}}\n`;
 
 const options = {
   entryPoints: ['src/main.tsx'],
@@ -77,10 +93,10 @@ const options = {
   jsx: 'automatic',
   jsxImportSource: 'preact',
   loader: { '.css': 'text', '.png': 'dataurl' },
-  banner: { js: header },
+  banner: { js: header + attribution + pageFunction },
   legalComments: 'none',
   charset: 'utf8',
-  define: { __VERSION__: JSON.stringify(pkg.version), __PAGE_SCRIPT__: JSON.stringify(pageScript) },
+  define: { __VERSION__: JSON.stringify(pkg.version) },
   plugins: [writeMetaFile],
 };
 
