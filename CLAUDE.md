@@ -83,4 +83,7 @@ Account-Namen liegen in `e2e/fixtures/raw/` (gitignored), nie committen.
 - `@version` in `package.json` vor jedem Push mit Nutzer-Änderungen erhöhen, sonst kommt kein
   Auto-Update. `dist/` wird committed (Update-Quelle ist raw.githubusercontent.com).
 - Push immer auf beide Remotes: `git push origin master && git push vault master`.
+- `.githooks/pre-push` stoppt den Push, wenn `npm run check` scheitert, `dist/` nicht zum frischen
+  Build passt oder sich das Userscript ohne neue Version geändert hat. Pro Klon einmal aktivieren:
+  `git config core.hooksPath .githooks`. Ein Push auf master synct per Webhook sofort Greasy Fork.
 - npm-Pakete nur mit festen Versionen und `--ignore-scripts`, vorher auf Supply-Chain-Vorfälle prüfen.

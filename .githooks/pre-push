@@ -1,0 +1,24 @@
+#!/bin/sh
+# Blocks a push whose dist/ is stale or whose userscript changed without a version bump.
+# Greasy Fork and Violentmonkey install straight from the committed dist/, so both would ship.
+# Enable once per clone: git config core.hooksPath .githooks
+set -e
+
+npm run check >/dev/null || { echo "pre-push: npm run check failed" >&2; exit 1; }
+
+if ! git diff --quiet -- dist; then
+  echo "pre-push: dist/ differs from a fresh build. Commit the build, then push again." >&2
+  exit 1
+fi
+
+version() { git show "$1:package.json" 2>/dev/null | sed -n 's/^  "version": "\(.*\)",$/\1/p'; }
+
+# stdin: <local ref> <local sha> <remote ref> <remote sha>, one line per pushed ref
+while read -r _ local_sha _ remote_sha; do
+  git cat-file -e "$remote_sha" 2>/dev/null || continue # new branch or unknown remote state
+  git diff --quiet "$remote_sha" "$local_sha" -- dist/poe2-trade-monkey.user.js && continue
+  if [ "$(version "$remote_sha")" = "$(version "$local_sha")" ]; then
+    echo "pre-push: dist/ changed but version is still $(version "$local_sha"). Bump it, or nobody gets the update." >&2
+    exit 1
+  fi
+done
