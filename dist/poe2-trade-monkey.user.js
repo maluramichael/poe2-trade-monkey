@@ -2288,6 +2288,11 @@
       const names = useStore(ctx.searchNames);
       const current = useStore(ctx.leagues.current);
       const [confirming, setConfirming] = d2(false);
+      const [, setTick] = d2(0);
+      h2(() => {
+        const timer = setInterval(() => setTick((n2) => n2 + 1), 6e4);
+        return () => clearInterval(timer);
+      }, []);
       if (list.length === 0) return /* @__PURE__ */ u3("p", { class: "ptm-empty", children: t6("empty") });
       return /* @__PURE__ */ u3("div", { class: "ptm-history", children: [
         /* @__PURE__ */ u3("div", { class: "ptm-toolbar", children: /* @__PURE__ */ u3(Button, { variant: "gold", size: "sm", icon: /* @__PURE__ */ u3(IconTrash, {}), onClick: () => setConfirming(true), children: t6("clear") }) }),

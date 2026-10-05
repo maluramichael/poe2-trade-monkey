@@ -1,5 +1,5 @@
 import type { ComponentType } from 'preact';
-import { useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import type { AppContext } from '../../app/context';
 import { createTranslator, getLocale } from '../../core/i18n';
 import { type Store, useStore } from '../../core/store';
@@ -55,6 +55,12 @@ export function historyPanel(entries: Store<HistoryEntry[]>, ctx: Pick<AppContex
     const names = useStore(ctx.searchNames);
     const current = useStore(ctx.leagues.current);
     const [confirming, setConfirming] = useState(false);
+    // Re-render once a minute so "2 minutes ago" keeps counting.
+    const [, setTick] = useState(0);
+    useEffect(() => {
+      const timer = setInterval(() => setTick((n) => n + 1), 60_000);
+      return () => clearInterval(timer);
+    }, []);
 
     if (list.length === 0) return <p class="ptm-empty">{t('empty')}</p>;
 
