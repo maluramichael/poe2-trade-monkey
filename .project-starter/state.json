@@ -1,0 +1,14 @@
+{
+  "phase": 5,
+  "artefakte": ["userscript"],
+  "ambition": "klein-public",
+  "kanboardProjektId": 14,
+  "designVariante": "better-trading (DESIGN.md)",
+  "repo": "git@vault:maluramichael/poe2-trade-monkey.git",
+  "github": "https://github.com/maluramichael/poe2-trade-monkey",
+  "offen": [
+    "Phase B: Michael installiert in Firefox + Violentmonkey von GitHub raw und testet",
+    "Phase C: gebündelte Live-Checkliste (max. 10 Seitenladungen), dabei Original-HTML per fetch(location.href) für tools/replay sichern",
+    "Phase D: Version 1.0.0"
+  ]
+}
