@@ -299,9 +299,11 @@ function start(ctx: AppContext) {
 
   const host = doc.createElement('div');
   host.className = 'ptm-qf';
+  // First child of the site's control bar, so strip and Search/Clear form one block that the
+  // layout keeps at the bottom of the screen.
   const place = () => {
     const controls = doc.querySelector(sel.controls);
-    if (controls && host.nextElementSibling !== controls) controls.before(host);
+    if (controls && controls.firstElementChild !== host) controls.prepend(host);
   };
   // ponytail: watches the whole body because Vue may replace #trade itself; the callback is one querySelector.
   const observer = new MutationObserver(place);

@@ -17,7 +17,13 @@
   gap: 3px;
 }
 
-.ptm-price-equivalent__icon {
-  width: 16px;
-  height: 16px;
+/* The site sizes every image in the price box; keep ours square. */
+.ptm-price-equivalent .ptm-price-equivalent__icon {
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px;
+  max-width: none !important;
+  margin: 0 !important;
+  object-fit: contain;
+  vertical-align: middle;
 }

@@ -61,7 +61,6 @@ async function buildPageScript() {
     bundle: true,
     format: 'iife',
     target: ['firefox115', 'chrome115'],
-    minify: true,
     write: false,
   });
   return result.outputFiles[0].text;

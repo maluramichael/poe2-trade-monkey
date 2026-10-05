@@ -1,4 +1,8 @@
-/* Two rows of button groups above the search controls; buttons come from the UI kit. */
+/* Two rows of button groups at the top of the site's control bar; buttons come from the UI kit. */
+.ptm-qf {
+  width: 100%;
+}
+
 .ptm-qf__strip {
   display: grid;
   gap: 5px;

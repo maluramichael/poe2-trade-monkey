@@ -63,17 +63,29 @@ html.ptm-layout.ptm-layout-split #trade .top .search-bar .search-advanced-pane {
   width: 100%;
 }
 
-/* Search / Clear / Live stick to the bottom of the left column. */
-html.ptm-layout.ptm-layout-split #trade .top .controls {
+/*
+ * The control bar (quick filters + Search / Clear / Live) stays at the bottom of the screen while
+ * the filters scroll: in the left column in two-column mode, in the window otherwise.
+ */
+html.ptm-layout #trade .top .controls {
   position: sticky;
   bottom: 0;
   z-index: 3;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 6px;
   background: #000;
   border-top: 1px solid #5a3806;
+  box-shadow: 0 -6px 12px rgba(0, 0, 0, 0.6);
+}
+
+html.ptm-layout.ptm-layout-split #trade .top .controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 0 6px 8px;
+}
+
+html.ptm-layout.ptm-layout-split #trade .top .controls > .ptm-qf {
+  flex: 1 0 100%;
 }
 
 html.ptm-layout.ptm-layout-split #trade .top .controls > .controls-left,

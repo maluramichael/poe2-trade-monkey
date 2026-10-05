@@ -77,9 +77,9 @@ describe('quick filters strip', () => {
 
   afterEach(() => instance.dispose?.());
 
-  it('sits right before the controls, once', () => {
+  it('sits at the top of the control bar, once', () => {
     expect(document.querySelectorAll('.ptm-qf')).toHaveLength(1);
-    expect(strip().nextElementSibling).toBe(document.querySelector(sel.controls));
+    expect(document.querySelector(sel.controls)!.firstElementChild).toBe(strip());
   });
 
   it('re-inserts itself when Vue re-renders the controls', async () => {
@@ -91,7 +91,7 @@ describe('quick filters strip', () => {
     parent.append(fresh);
     await wait();
     expect(document.querySelectorAll('.ptm-qf')).toHaveLength(1);
-    expect(strip().nextElementSibling).toBe(fresh);
+    expect(fresh.firstElementChild).toBe(strip());
   });
 
   it('cycles a tri-state button any, yes, no, any', async () => {
