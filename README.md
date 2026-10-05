@@ -1,5 +1,11 @@
 # PoE2 Trade Monkey
 
+[![Install](https://img.shields.io/badge/install-userscript-c7a24b?style=for-the-badge)](https://raw.githubusercontent.com/maluramichael/poe2-trade-monkey/master/dist/poe2-trade-monkey.user.js)
+[![Greasy Fork](https://img.shields.io/badge/greasy%20fork-poe2%20trade%20monkey-670000?style=for-the-badge)](https://greasyfork.org/en/scripts/598884-poe2-trade-monkey)
+
+One click installs it if you have a userscript manager such as
+[Violentmonkey](https://violentmonkey.github.io/get-it/).
+
 A userscript for the [Path of Exile 2 trade site](https://www.pathofexile.com/trade2). It brings
 the features of the popular Chrome trade extensions to every browser, Firefox first.
 
