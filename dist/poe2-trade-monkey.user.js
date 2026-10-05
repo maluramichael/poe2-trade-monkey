@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PoE2 Trade Monkey
 // @namespace    https://github.com/maluramichael/poe2-trade-monkey
-// @version      0.1.0
+// @version      0.2.0
 // @description  Userscript that enhances the Path of Exile 2 trade site: bookmarks, history, pins, layout and result tools.
 // @author       Michael Malura
 // @license      MIT
@@ -4282,7 +4282,7 @@
         feature.id
       )) }),
       /* @__PURE__ */ u3("p", { class: "ptm-meta", children: [
-        t4("version", { version: "0.1.0" }),
+        t4("version", { version: "0.2.0" }),
         " ·",
         " ",
         /* @__PURE__ */ u3("a", { href: "https://github.com/maluramichael/poe2-trade-monkey", target: "_blank", rel: "noreferrer", children: t4("sourceCode") })
@@ -4408,7 +4408,7 @@
       renderApp();
       void host.restart();
     });
-    log.info(`v${"0.1.0"} ready with ${features.length} features`);
+    log.info(`v${"0.2.0"} ready with ${features.length} features`);
   }
   function applyLanguage(settings) {
     setLocale(settings.language === "auto" ? detectLocale(location.hostname) : settings.language);

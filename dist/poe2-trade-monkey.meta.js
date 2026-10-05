@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PoE2 Trade Monkey
 // @namespace    https://github.com/maluramichael/poe2-trade-monkey
-// @version      0.1.0
+// @version      0.2.0
 // @description  Userscript that enhances the Path of Exile 2 trade site: bookmarks, history, pins, layout and result tools.
 // @author       Michael Malura
 // @license      MIT
