@@ -2,7 +2,7 @@
 // @name            PoE2 Trade Monkey
 // @name:de         PoE2 Trade Monkey
 // @namespace       https://github.com/maluramichael/poe2-trade-monkey
-// @version         0.2.2
+// @version         0.2.3
 // @description     Userscript that enhances the Path of Exile 2 trade site: bookmarks, history, pins, layout and result tools.
 // @description:de  Erweitert die Trade-Seite von Path of Exile 2: Lesezeichen für jede Liga, Verlauf, Pins, Schnellfilter, Zwei-Spalten-Layout und Werkzeuge für die Ergebnisse.
 // @author          Michael Malura

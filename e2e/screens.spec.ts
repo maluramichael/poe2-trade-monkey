@@ -65,3 +65,18 @@ test('german interface', async ({ context, page }) => {
   await sidebar.getByRole('tab', { name: 'Verlauf' }).click();
   await page.screenshot({ path: `${DIR}/06-history-de.png` });
 });
+
+test('two columns at medium width: item card and price do not overlap', async ({ context, page }) => {
+  await page.setViewportSize({ width: 1720, height: 980 });
+  await setupFakeSite(context);
+  await context.route('https://web.poecdn.com/**', (route) => route.continue());
+  await page.goto(PAGE_URL);
+  for (const url of SITE_CSS) await page.addStyleTag({ url });
+  // The fake page's stand-in row CSS is for offline smoke tests; the real CSS decides here.
+  await page.evaluate(() => document.querySelector('head > style')?.remove());
+  await expect(page.locator('html.ptm-layout-split')).toBeAttached();
+  const row = page.locator('#vue3-portal .resultset > .row[data-id]').first();
+  const [card, price] = await Promise.all([row.locator('.item-popup').boundingBox(), row.locator('.right').boundingBox()]);
+  expect(card!.x + card!.width).toBeLessThanOrEqual(price!.x + 1);
+  await page.screenshot({ path: `${DIR}/06-split-1720.png` });
+});

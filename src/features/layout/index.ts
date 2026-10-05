@@ -9,8 +9,9 @@ const t = createTranslator({
   en: { label: 'Two-column layout', description: 'Filters on the left, results on the right, full width.' },
 });
 
-/** Width of #trade's parent (viewport minus our sidebar) from which two columns are used. */
-export const SPLIT_MIN_WIDTH = 1200;
+/** Width of #trade's parent (viewport minus our sidebar) from which two columns are used:
+ * both column minimums from feature.css (440 + 740) plus the gap. */
+export const SPLIT_MIN_WIDTH = 1188;
 /** Same threshold the site uses for its own "Back to top" button. */
 const SCROLLED_MIN = 88;
 

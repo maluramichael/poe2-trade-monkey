@@ -21,7 +21,8 @@ html.ptm-layout .logo a {
 /* Two columns: navigation on top, filters left, results right. */
 html.ptm-layout.ptm-layout-split #trade {
   display: grid;
-  grid-template-columns: minmax(480px, 1fr) minmax(0, 1fr);
+  /* Results need 740px: icon 120 + item card (min-width 400 in the site CSS) + price 200 + scrollbar. */
+  grid-template-columns: minmax(440px, 1fr) minmax(740px, 1fr);
   column-gap: 8px;
   margin-bottom: 0;
 }
@@ -49,6 +50,22 @@ html.ptm-layout.ptm-layout-split #trade > .top {
 html.ptm-layout.ptm-layout-split #trade > #vue3-portal {
   display: block !important;
   grid-column: 2;
+}
+
+/*
+ * The site splits a result row 25/50/25 %, which squeezes the item card below its 400px minimum in
+ * a half-width column, so the price overlapped it. Fixed side columns leave the card the rest.
+ */
+html.ptm-layout.ptm-layout-split #vue3-portal .resultset > .row > .left {
+  width: 120px;
+}
+
+html.ptm-layout.ptm-layout-split #vue3-portal .resultset > .row > .middle {
+  width: calc(100% - 320px);
+}
+
+html.ptm-layout.ptm-layout-split #vue3-portal .resultset > .row > .right {
+  width: 200px;
 }
 
 /* Clearfix divs would take grid cells. */
@@ -88,16 +105,17 @@ html.ptm-layout.ptm-layout-split #trade .top .controls > .ptm-qf {
   flex: 1 0 100%;
 }
 
+/* Live search and Clear keep their label width, Search takes the rest. */
 html.ptm-layout.ptm-layout-split #trade .top .controls > .controls-left,
 html.ptm-layout.ptm-layout-split #trade .top .controls > .controls-right {
   width: auto;
-  flex: 1 1 0;
+  flex: 0 0 auto;
   padding: 0;
 }
 
 html.ptm-layout.ptm-layout-split #trade .top .controls > .controls-center {
   width: auto;
-  flex: 2 1 0;
+  flex: 1 1 0;
   padding: 0;
 }
 
@@ -105,7 +123,10 @@ html.ptm-layout.ptm-layout-split #trade .top .controls > .clear {
   display: none;
 }
 
-html.ptm-layout.ptm-layout-split #trade .top .controls .livesearch-btn,
+html.ptm-layout.ptm-layout-split #trade .top .controls .livesearch-btn {
+  white-space: nowrap;
+}
+
 html.ptm-layout.ptm-layout-split #trade .top .controls .search-btn {
   width: 100%;
   min-width: 0;
