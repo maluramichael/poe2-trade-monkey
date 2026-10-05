@@ -1,7 +1,11 @@
 # PoE2 Trade Monkey
 
-[![Install](https://img.shields.io/badge/install-userscript-c7a24b?style=for-the-badge)](https://raw.githubusercontent.com/maluramichael/poe2-trade-monkey/master/dist/poe2-trade-monkey.user.js)
-[![Greasy Fork](https://img.shields.io/badge/greasy%20fork-poe2%20trade%20monkey-670000?style=for-the-badge)](https://greasyfork.org/en/scripts/598884-poe2-trade-monkey)
+[![Install](https://malura.de/badge/pill/Install%20%20Userscript/c7a24b.svg)](https://raw.githubusercontent.com/maluramichael/poe2-trade-monkey/master/dist/poe2-trade-monkey.user.js)
+[![Greasy Fork](https://malura.de/badge/pill/Greasy%20Fork%20%20PoE2%20Trade%20Monkey/670000.svg)](https://greasyfork.org/en/scripts/598884-poe2-trade-monkey)
+<!-- links:start -->
+[![Support me on Ko-fi](https://malura.de/assets/badge/kofi.svg)](https://malura.de/go/kofi?ref=poe2-trade-monkey)
+[![Check out my page](https://malura.de/assets/badge/malura.svg)](https://malura.de/go/site?ref=poe2-trade-monkey)
+<!-- links:end -->
 
 One click installs it if you have a userscript manager such as
 [Violentmonkey](https://violentmonkey.github.io/get-it/).
