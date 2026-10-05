@@ -1,5 +1,4 @@
-<!-- Zusätzliche Infos auf Greasy Fork (Deutsch), werden aus dieser Datei gesynct. Bilder als absolute https-URLs. -->
-Bringt die Funktionen der beliebten Chrome-Erweiterungen (Better Trading, TradeUX) auf die [Trade-Seite von Path of Exile 2](https://de.pathofexile.com/trade2), in jedem Browser, Firefox zuerst. Gemacht für Violentmonkey, Tampermonkey und Greasemonkey 4 sollten auch gehen.
+Bringt die Funktionen der beliebten Chrome-Erweiterungen (Better Trading, TradeUX) auf die [Trade-Seite von Path of Exile 2](https://de.pathofexile.com/trade2), in jedem Browser, Firefox zuerst. Gemacht für Violentmonkey. Tampermonkey und Greasemonkey 4 sollten auch gehen.
 
 ![Die Trade-Seite mit Schnellfiltern und der Lesezeichen-Leiste](https://raw.githubusercontent.com/maluramichael/poe2-trade-monkey/master/docs/screenshots/overview.png)
 
