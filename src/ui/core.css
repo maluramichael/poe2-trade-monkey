@@ -163,32 +163,51 @@ html:not(.ptm-sidebar-open) .ptm-sidebar {
   border-bottom-color: var(--ptm-gold-border);
 }
 
-/* Buttons */
+/* Buttons: one height, one font, no wrapping. Variants only change colours. */
 
 .ptm-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  height: 32px;
-  padding: 0 10px;
+  gap: 6px;
+  height: 30px;
+  min-width: 0;
+  padding: 0 12px;
   border: 1px solid;
+  border-radius: 0;
   font-family: var(--ptm-font-title) !important;
   font-size: 13px;
   line-height: 1;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
   color: var(--ptm-text);
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
   user-select: none;
 }
 
-.ptm-btn + .ptm-btn {
-  margin-left: 5px;
+.ptm-btn > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ptm-btn:focus-visible {
+  outline: 1px solid var(--ptm-beige);
+  outline-offset: 1px;
+  position: relative;
+  z-index: 1;
 }
 
 .ptm-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: default;
+}
+
+.ptm-btn--sm {
+  height: 26px;
+  padding: 0 9px;
+  font-size: 12px;
+  gap: 4px;
 }
 
 .ptm-btn--block {
@@ -202,8 +221,52 @@ html:not(.ptm-sidebar-open) .ptm-sidebar {
 .ptm-btn--gold:hover:not(:disabled) { background: var(--ptm-gold-hover); }
 .ptm-btn--red { background: var(--ptm-red); border-color: var(--ptm-red-border); }
 .ptm-btn--red:hover:not(:disabled) { background: var(--ptm-red-hover); }
-.ptm-btn--plain { background: transparent; border-color: var(--ptm-menu-border); }
-.ptm-btn--plain:hover:not(:disabled) { background: rgba(255, 255, 255, 0.06); }
+.ptm-btn--plain { background: rgba(255, 255, 255, 0.03); border-color: #3a3a3a; color: var(--ptm-beige); }
+.ptm-btn--plain:hover:not(:disabled) { background: rgba(255, 255, 255, 0.08); border-color: var(--ptm-menu-border); }
+
+/* Pressed toggles look the same in every variant. */
+.ptm-btn.ptm-btn--active {
+  background: var(--ptm-gold);
+  border-color: #c59a50;
+  color: #f3d278;
+}
+
+/* Groups: buttons share borders, no gaps, outer group decides the width. */
+.ptm-btn-group {
+  display: inline-flex;
+  max-width: 100%;
+}
+
+.ptm-btn-group > * + * {
+  margin-left: -1px;
+}
+
+.ptm-btn-group > .ptm-btn:hover:not(:disabled) {
+  position: relative;
+  z-index: 1;
+}
+
+.ptm-btn-group--block {
+  display: flex;
+  width: 100%;
+}
+
+.ptm-btn-group--block > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Stack of groups, e.g. a panel footer. */
+.ptm-actions {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+/* The site's CSS shows hidden file inputs; keep [hidden] meaning hidden inside our UI. */
+#ptm-root [hidden] {
+  display: none !important;
+}
 
 .ptm-icon-btn {
   display: inline-flex;
@@ -230,9 +293,6 @@ html:not(.ptm-sidebar-open) .ptm-sidebar {
   margin-bottom: 8px;
 }
 
-.ptm-toolbar .ptm-btn + .ptm-btn {
-  margin-left: 0;
-}
 
 /* Menu */
 

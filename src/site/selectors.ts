@@ -5,6 +5,10 @@
  */
 export const sel = {
   tradeRoot: '#trade',
+  topColumn: '#trade > .top',
+  portal: '#vue3-portal',
+  toggleFiltersButton: '#trade .controls .toggle-search-btn',
+  filtersHidden: '#trade .search-advanced-hidden',
   navigation: '#trade > .navigation',
   searchPanel: '#trade .search-panel',
   itemSearchInput: '#trade .search-bar .search-left .multiselect__input',

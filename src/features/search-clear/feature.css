@@ -1,0 +1,40 @@
+.search-left:has(> .ptm-search-clear) {
+  position: relative;
+}
+
+.search-left:has(> .ptm-search-clear:not([hidden])) .multiselect__tags {
+  padding-right: 68px;
+}
+
+/* Left of the multiselect caret (40px wide). */
+.ptm-search-clear {
+  position: absolute;
+  top: 50%;
+  right: 40px;
+  z-index: 51;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-top: -12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ptm-muted);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.ptm-search-clear[hidden] {
+  display: none;
+}
+
+.ptm-search-clear:hover,
+.ptm-search-clear:focus-visible {
+  color: var(--ptm-beige);
+}
+
+.ptm-search-clear:focus-visible {
+  outline: 1px solid var(--ptm-gold-border);
+}

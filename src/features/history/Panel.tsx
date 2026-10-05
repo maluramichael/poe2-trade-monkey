@@ -12,7 +12,7 @@ import type { HistoryEntry } from './index';
 const t = createTranslator({
   de: {
     search: 'Suche',
-    exchange: 'Tausch',
+    exchange: 'Große Mengen',
     openIn: 'in {league} öffnen',
     clear: 'Verlauf leeren',
     clearMessage: 'Alle {n} Einträge aus dem Verlauf löschen?',
@@ -21,7 +21,7 @@ const t = createTranslator({
   },
   en: {
     search: 'Search',
-    exchange: 'Exchange',
+    exchange: 'Bulk exchange',
     openIn: 'open in {league}',
     clear: 'Clear history',
     clearMessage: 'Delete all {n} entries from the history?',

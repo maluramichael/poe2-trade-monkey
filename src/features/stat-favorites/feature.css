@@ -1,0 +1,66 @@
+/* Favorites float to the top via `order`; vue-multiselect sets display: inline-block inline. */
+.ptm-stat-fav-list {
+  display: flex !important;
+  flex-direction: column;
+}
+
+.ptm-stat-fav-list > li.ptm-stat-fav {
+  order: -1;
+}
+
+.ptm-stat-fav-list.ptm-stat-has-fav::before {
+  content: attr(data-ptm-fav-label);
+  order: -2;
+  padding: 4px 12px;
+  font: 13px var(--ptm-font-title);
+  color: var(--ptm-muted);
+}
+
+/* Separator after the favorites block, before the first group header. */
+.ptm-stat-fav-list.ptm-stat-has-fav::after {
+  content: '';
+  order: -1;
+  border-bottom: 1px solid var(--ptm-gold-border);
+}
+
+.multiselect__option:has(> .ptm-stat-star) {
+  position: relative;
+  padding-right: 32px;
+}
+
+.ptm-stat-star {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-top: -12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ptm-muted);
+  cursor: pointer;
+  opacity: 0.45;
+  transition: opacity 0.2s, color 0.2s;
+}
+
+.multiselect__option:hover > .ptm-stat-star,
+.ptm-stat-star[aria-pressed='true'] {
+  opacity: 1;
+}
+
+.ptm-stat-star:hover {
+  color: var(--ptm-beige);
+}
+
+.ptm-stat-star[aria-pressed='true'] {
+  color: var(--ptm-gold-border);
+  filter: brightness(1.6);
+}
+
+.ptm-stat-star[aria-pressed='true'] svg {
+  fill: currentColor;
+}

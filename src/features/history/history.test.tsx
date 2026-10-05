@@ -125,7 +125,7 @@ describe('history panel', () => {
     const other = first!.querySelector('.ptm-history__other')!;
     expect(other.textContent).toBe('in Standard öffnen');
     expect(other.getAttribute('href')).toBe('/trade2/search/poe2/Standard/a/live');
-    expect(second!.querySelector('.ptm-meta')!.textContent).toContain('Tausch · Standard');
+    expect(second!.querySelector('.ptm-meta')!.textContent).toContain('Große Mengen · Standard');
     expect(second!.querySelector('.ptm-history__other')).toBeNull();
 
     ctx.searchNames.set({ b: 'Meine Divines' });

@@ -10,7 +10,7 @@ export function Field({ label, children, hint }: { label: string; children: Comp
   );
 }
 
-export function TextInput(props: JSX.HTMLAttributes<HTMLInputElement> & { value: string; onValue: (value: string) => void }) {
+export function TextInput(props: JSX.InputHTMLAttributes<HTMLInputElement> & { value: string; onValue: (value: string) => void }) {
   const { onValue, class: className, ...rest } = props;
   return (
     <input
@@ -22,7 +22,7 @@ export function TextInput(props: JSX.HTMLAttributes<HTMLInputElement> & { value:
   );
 }
 
-export function TextArea(props: JSX.HTMLAttributes<HTMLTextAreaElement> & { value: string; onValue: (value: string) => void }) {
+export function TextArea(props: JSX.TextareaHTMLAttributes<HTMLTextAreaElement> & { value: string; onValue: (value: string) => void }) {
   const { onValue, class: className, ...rest } = props;
   return (
     <textarea

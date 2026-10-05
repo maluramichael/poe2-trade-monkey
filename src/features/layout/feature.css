@@ -1,0 +1,140 @@
+/*
+ * Layout feature. Everything is scoped under html.ptm-layout (set while the feature runs).
+ * html.ptm-layout-split is set by JS when there is room for two columns (see index.ts).
+ * --ptm-layout-top is the document offset of the columns, measured by JS.
+ */
+
+/* Always: full width, no background art, smaller header. */
+html.ptm-layout body {
+  background: #0e1115;
+}
+
+html.ptm-layout #trade {
+  max-width: 1920px;
+}
+
+/* Live tuning: header height comes from the logo, the status bar is absolute. */
+html.ptm-layout .logo a {
+  max-width: 110px;
+}
+
+/* Two columns: navigation on top, filters left, results right. */
+html.ptm-layout.ptm-layout-split #trade {
+  display: grid;
+  grid-template-columns: minmax(480px, 1fr) minmax(0, 1fr);
+  column-gap: 8px;
+  margin-bottom: 0;
+}
+
+html.ptm-layout.ptm-layout-split #trade > .navigation {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
+html.ptm-layout.ptm-layout-split #trade > .top,
+html.ptm-layout.ptm-layout-split #trade > #vue3-portal {
+  grid-row: 2;
+  /* Leaves room for the site footer (GGG copyright and legal links) below the columns. */
+  height: calc(100vh - var(--ptm-layout-top, 0px) - 48px);
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+html.ptm-layout.ptm-layout-split #trade > .top {
+  grid-column: 1;
+}
+
+/* Vue sets display: contents inline on the portal; it must be a real box to be the right column. */
+html.ptm-layout.ptm-layout-split #trade > #vue3-portal {
+  display: block !important;
+  grid-column: 2;
+}
+
+/* Clearfix divs would take grid cells. */
+html.ptm-layout.ptm-layout-split #trade > .clear {
+  display: none;
+}
+
+/* Left column: one filter pane per row, item search above league and status. */
+html.ptm-layout.ptm-layout-split #trade .top .search-bar .search-left,
+html.ptm-layout.ptm-layout-split #trade .top .search-bar .search-right,
+html.ptm-layout.ptm-layout-split #trade .top .search-bar .search-advanced-pane {
+  width: 100%;
+}
+
+/* Search / Clear / Live stick to the bottom of the left column. */
+html.ptm-layout.ptm-layout-split #trade .top .controls {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 6px;
+  background: #000;
+  border-top: 1px solid #5a3806;
+}
+
+html.ptm-layout.ptm-layout-split #trade .top .controls > .controls-left,
+html.ptm-layout.ptm-layout-split #trade .top .controls > .controls-right {
+  width: auto;
+  flex: 1 1 0;
+  padding: 0;
+}
+
+html.ptm-layout.ptm-layout-split #trade .top .controls > .controls-center {
+  width: auto;
+  flex: 2 1 0;
+  padding: 0;
+}
+
+html.ptm-layout.ptm-layout-split #trade .top .controls > .clear {
+  display: none;
+}
+
+html.ptm-layout.ptm-layout-split #trade .top .controls .livesearch-btn,
+html.ptm-layout.ptm-layout-split #trade .top .controls .search-btn {
+  width: 100%;
+  min-width: 0;
+}
+
+html.ptm-layout.ptm-layout-split #trade .top .controls .controls-right {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+html.ptm-layout.ptm-layout-split #trade .top .controls .clear-btn,
+html.ptm-layout.ptm-layout-split #trade .top .controls .toggle-search-btn {
+  min-width: 0;
+}
+
+/* The window does not scroll in split mode, so JS shows "Back to top" for the results column. */
+html.ptm-layout.ptm-layout-split #trade > .top-btn {
+  display: none !important;
+}
+
+html.ptm-layout.ptm-layout-split.ptm-layout-scrolled #trade > .top-btn {
+  display: block !important;
+  opacity: 1 !important;
+}
+
+/* Keep "Back to top" clear of our sidebar. */
+html.ptm-layout.ptm-sidebar-open #trade > .top-btn {
+  right: calc(var(--ptm-sidebar-width, 400px) + 20px);
+}
+
+/*
+ * In two columns the filters always stay open: the site collapses them after every search, which
+ * makes no sense when they have their own column. Its show/hide toggle is hidden for that reason.
+ */
+html.ptm-layout.ptm-layout-split #trade .search-advanced.search-advanced-hidden,
+html.ptm-layout.ptm-layout-split #trade .search-advanced.search-advanced-hidden .search-advanced-items {
+  height: auto !important;
+  overflow: visible !important;
+}
+
+html.ptm-layout.ptm-layout-split #trade .controls .toggle-search-btn {
+  display: none;
+}

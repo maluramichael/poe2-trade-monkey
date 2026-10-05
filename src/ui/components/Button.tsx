@@ -7,13 +7,25 @@ type ButtonProps = Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'icon' | 't
   icon?: ComponentChildren;
   /** Stretches the button to the full width of its container. */
   block?: boolean;
+  /** Pressed state for toggle buttons (gold highlight, aria-pressed). */
+  active?: boolean;
+  size?: 'md' | 'sm';
   type?: 'button' | 'submit';
 };
 
-export function Button({ variant = 'blue', icon, block, children, class: className, type = 'button', ...rest }: ButtonProps) {
-  const classes = ['ptm-btn', `ptm-btn--${variant}`, block && 'ptm-btn--block', className].filter(Boolean).join(' ');
+export function Button({ variant = 'blue', icon, block, active, size = 'md', children, class: className, type = 'button', ...rest }: ButtonProps) {
+  const classes = [
+    'ptm-btn',
+    `ptm-btn--${variant}`,
+    size === 'sm' && 'ptm-btn--sm',
+    block && 'ptm-btn--block',
+    active && 'ptm-btn--active',
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
   return (
-    <button type={type} class={classes} {...rest}>
+    <button type={type} class={classes} aria-pressed={active === undefined ? undefined : active} {...rest}>
       {icon}
       {children !== undefined && <span>{children}</span>}
     </button>
@@ -28,5 +40,23 @@ export function IconButton({ label, children, class: className, ...rest }: IconB
     <button type="button" class={['ptm-icon-btn', className].filter(Boolean).join(' ')} title={label} aria-label={label} {...rest}>
       {children}
     </button>
+  );
+}
+
+/**
+ * Joined buttons (segmented control). `block` stretches the group to the container and gives every
+ * button the same width. Use it whenever two or more related actions sit next to each other.
+ */
+export function ButtonGroup({ children, block, label, class: className }: {
+  children: ComponentChildren;
+  block?: boolean;
+  /** Accessible name of the group. */
+  label?: string;
+  class?: string;
+}) {
+  return (
+    <div role="group" aria-label={label} class={['ptm-btn-group', block && 'ptm-btn-group--block', className].filter(Boolean).join(' ')}>
+      {children}
+    </div>
   );
 }

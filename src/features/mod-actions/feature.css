@@ -1,0 +1,60 @@
+.item-mod:has(> .ptm-mod-action) {
+  position: relative;
+}
+
+/* Sits just outside the left edge of the item card, so the site's tier labels stay readable. */
+.ptm-mod-action {
+  position: absolute;
+  top: 50%;
+  left: -41px;
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  padding: 0;
+  border: 1px solid var(--ptm-blue-border);
+  background: var(--ptm-blue);
+  color: var(--ptm-text);
+  font: 13px/18px var(--ptm-font-title);
+  text-align: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s;
+}
+
+.ptm-mod-action--exclude {
+  left: -22px;
+  border-color: var(--ptm-red-border);
+  background: var(--ptm-red);
+}
+
+.item-mod:hover > .ptm-mod-action,
+.ptm-mod-action:focus-visible {
+  opacity: 1;
+}
+
+.ptm-mod-action--add:hover {
+  background: var(--ptm-blue-hover);
+}
+
+.ptm-mod-action--exclude:hover {
+  background: var(--ptm-red-hover);
+}
+
+.ptm-mod-flash-ok {
+  animation: ptm-mod-flash-ok 0.9s ease;
+}
+
+.ptm-mod-flash-fail {
+  animation: ptm-mod-flash-fail 0.9s ease;
+}
+
+@keyframes ptm-mod-flash-ok {
+  0%, 60% { background: var(--ptm-green); }
+  100% { background: transparent; }
+}
+
+@keyframes ptm-mod-flash-fail {
+  0%, 60% { background: var(--ptm-red-border); }
+  100% { background: transparent; }
+}

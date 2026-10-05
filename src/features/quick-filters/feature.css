@@ -1,0 +1,126 @@
+/* Two rows of button groups above the search controls; buttons come from the UI kit. */
+.ptm-qf__strip {
+  display: grid;
+  gap: 5px;
+  padding: 6px 0;
+}
+
+.ptm-qf__row {
+  display: flex;
+  gap: 5px;
+}
+
+.ptm-qf__anchor {
+  position: relative;
+  display: flex;
+}
+
+.ptm-qf__anchor > .ptm-btn {
+  width: 100%;
+}
+
+.ptm-qf__btn {
+  position: relative;
+  overflow: hidden;
+}
+
+/* "No": red border and a red diagonal strike. */
+.ptm-qf__btn--no {
+  border-color: var(--ptm-red-border);
+  color: var(--ptm-muted);
+}
+
+.ptm-qf__btn--no::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top right, transparent calc(50% - 1px), #d02020 calc(50% - 1px), #d02020 calc(50% + 1px), transparent calc(50% + 1px));
+  pointer-events: none;
+}
+
+.ptm-qf__clear {
+  flex: none;
+  width: 30px;
+  padding: 0;
+}
+
+.ptm-qf__badge {
+  padding: 1px 4px;
+  background: rgba(0, 0, 0, 0.45);
+  font-family: var(--ptm-font-body);
+  font-size: 11px;
+  color: var(--ptm-text);
+}
+
+.ptm-qf__btn[data-rarity='normal'],
+.ptm-qf__option[data-rarity='normal'] { color: #c8c8c8; }
+.ptm-qf__btn[data-rarity='magic'],
+.ptm-qf__option[data-rarity='magic'] { color: #8888ff; }
+.ptm-qf__btn[data-rarity='rare'],
+.ptm-qf__option[data-rarity='rare'] { color: #ffff77; }
+.ptm-qf__btn[data-rarity^='unique'],
+.ptm-qf__option[data-rarity^='unique'] { color: #af6025; }
+
+/* Opens upwards: the search bar below may be sticky at the bottom of the screen. */
+.ptm-qf__pop {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px;
+  background: var(--ptm-surface);
+  border: 1px solid var(--ptm-gold-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.ptm-qf__pop--list {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  min-width: 160px;
+}
+
+.ptm-qf__input {
+  width: 64px;
+  height: 26px;
+  padding: 0 6px;
+  border: 0;
+  background: var(--ptm-input);
+  color: var(--ptm-text);
+  font-family: var(--ptm-font-body);
+  font-size: 13px;
+}
+
+.ptm-qf__quick,
+.ptm-qf__option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  min-width: 28px;
+  padding: 0 6px;
+  border: 1px solid var(--ptm-blue-border);
+  background: var(--ptm-blue);
+  color: var(--ptm-text);
+  font-family: var(--ptm-font-body);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.ptm-qf__option {
+  justify-content: flex-start;
+  border: 0;
+  background: transparent;
+  font-family: var(--ptm-font-title);
+  font-size: 13px;
+  text-align: left;
+}
+
+.ptm-qf__quick:hover,
+.ptm-qf__option:hover,
+.ptm-qf__option[aria-checked='true'] {
+  background: rgba(138, 86, 9, 0.4);
+}
