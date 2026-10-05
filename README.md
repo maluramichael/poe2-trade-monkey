@@ -19,6 +19,9 @@ API that Tampermonkey and Greasemonkey 4 share, so those should work too.
 
 Updates install automatically.
 
+How it came together: [blog post on malura.de](https://malura.de/en/blog/poe2-trade-monkey-the-chrome-trade-extensions-as-a-userscript-for-firefox)
+([Deutsch](https://malura.de/blog/poe2-trade-monkey)).
+
 ## Features
 
 Every feature can be switched off in the settings (gear icon in the sidebar).
