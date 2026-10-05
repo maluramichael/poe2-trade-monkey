@@ -44,3 +44,24 @@ test('bookmarks, pins and settings', async ({ context, page }) => {
   await sidebar.getByRole('button', { name: 'Settings' }).click();
   await page.screenshot({ path: `${DIR}/03-settings.png` });
 });
+
+test('german interface', async ({ context, page }) => {
+  await setupFakeSite(context);
+  await context.route('https://web.poecdn.com/**', (route) => route.continue());
+  await page.goto(PAGE_URL);
+  for (const url of SITE_CSS) await page.addStyleTag({ url });
+  const sidebar = page.locator('.ptm-sidebar');
+  await expect(sidebar).toBeVisible();
+  await page.evaluate(() => (window as unknown as { __fakeSite: { search(): Promise<unknown> } }).__fakeSite.search());
+
+  await sidebar.getByRole('button', { name: 'Settings' }).click();
+  await page.getByRole('dialog').locator('select').selectOption('de');
+  await page.screenshot({ path: `${DIR}/04-settings-de.png` });
+  await page.keyboard.press('Escape');
+
+  await sidebar.getByRole('button', { name: 'Neuer Ordner' }).click();
+  await page.screenshot({ path: `${DIR}/05-folder-modal-de.png` });
+  await page.keyboard.press('Escape');
+  await sidebar.getByRole('tab', { name: 'Verlauf' }).click();
+  await page.screenshot({ path: `${DIR}/06-history-de.png` });
+});

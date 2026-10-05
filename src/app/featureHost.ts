@@ -41,6 +41,16 @@ export class FeatureHost {
     };
   }
 
+  /**
+   * Stops and starts every running feature again, e.g. after a language switch: features that
+   * render into the trade page resolve their texts when they start.
+   */
+  async restart(): Promise<void> {
+    const running = this.features.filter((feature) => this.#instances.has(feature.id));
+    for (const feature of running) this.#stopFeature(feature);
+    await Promise.all(running.map((feature) => this.#startFeature(feature)));
+  }
+
   async #startFeature(feature: Feature): Promise<void> {
     this.#starting.add(feature.id);
     let style: HTMLStyleElement | undefined;

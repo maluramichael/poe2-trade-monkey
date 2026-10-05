@@ -38,4 +38,15 @@ describe('FeatureHost', () => {
     expect(document.querySelector('style[data-ptm-feature="a"]')).toBeNull();
     expect(host.running.get().map((entry) => entry.feature.id)).toEqual(['b']);
   });
+
+  it('restarts running features only', async () => {
+    const log: string[] = [];
+    const settings = new Store<Settings>(DEFAULT_SETTINGS);
+    const ctx = { doc: document, settings, storage: new MemoryStorage() } as unknown as AppContext;
+    const host = new FeatureHost([feature('a', log), feature('b', log, false)], ctx);
+    host.start();
+    await Promise.resolve();
+    await host.restart();
+    expect(log).toEqual(['start a', 'stop a', 'start a']);
+  });
 });

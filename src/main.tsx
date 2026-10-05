@@ -74,9 +74,12 @@ async function boot(): Promise<void> {
   document.body.append(root);
   const renderApp = () => render(<App ctx={ctx} host={host} />, root);
   renderApp();
-  // Strings are resolved at render time, so a language switch only needs a re-render.
+  // Strings are resolved at render time: re-render the shell and restart features that render
+  // into the trade page themselves.
   settings.subscribe((next, previous) => {
-    if (next.language !== previous.language) renderApp();
+    if (next.language === previous.language) return;
+    renderApp();
+    void host.restart();
   });
 
   log.info(`v${__VERSION__} ready with ${features.length} features`);

@@ -644,6 +644,15 @@
         for (const feature of this.features) this.#stopFeature(feature);
       };
     }
+    /**
+     * Stops and starts every running feature again, e.g. after a language switch: features that
+     * render into the trade page resolve their texts when they start.
+     */
+    async restart() {
+      const running = this.features.filter((feature) => this.#instances.has(feature.id));
+      for (const feature of running) this.#stopFeature(feature);
+      await Promise.all(running.map((feature) => this.#startFeature(feature)));
+    }
     async #startFeature(feature) {
       this.#starting.add(feature.id);
       let style;
@@ -4368,7 +4377,9 @@
     const renderApp = () => R(/* @__PURE__ */ u3(App, { ctx, host }), root);
     renderApp();
     settings.subscribe((next, previous) => {
-      if (next.language !== previous.language) renderApp();
+      if (next.language === previous.language) return;
+      renderApp();
+      void host.restart();
     });
     log.info(`v${"0.1.0"} ready with ${features.length} features`);
   }
