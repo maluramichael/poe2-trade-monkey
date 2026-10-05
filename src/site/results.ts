@@ -13,6 +13,8 @@ export interface ResultRow {
 export type RowDecorator = (row: ResultRow) => void;
 
 const MAX_CACHED_LISTINGS = 2000;
+/** How long a row without captured API data waits for it before decorators run without data. */
+const DATA_WAIT_MS = 1500;
 
 /**
  * Watches the result list and hands every row to the registered decorators exactly once per
@@ -25,10 +27,14 @@ export class ResultsObserver {
   #observer: MutationObserver | null = null;
   #scheduled = false;
   #hadRows = false;
+  readonly #firstSeen = new WeakMap<Element, number>();
+  #retryTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     bridge: PageBridge,
     private readonly doc: Document = document,
+    /** Wait for late API data per row; tests pass 0 to decorate immediately. */
+    private readonly dataWaitMs = DATA_WAIT_MS,
   ) {
     bridge.events.on('listings', (results) => {
       for (const result of results) this.#listings.set(result.id, result);
@@ -47,6 +53,8 @@ export class ResultsObserver {
   stop(): void {
     this.#observer?.disconnect();
     this.#observer = null;
+    if (this.#retryTimer) clearTimeout(this.#retryTimer);
+    this.#retryTimer = null;
   }
 
   /** Registers a decorator. Returns a function that unregisters it. */
@@ -85,7 +93,18 @@ export class ResultsObserver {
       return;
     }
     this.#hadRows = true;
+    const now = Date.now();
     for (const element of elements) {
+      // The listing fetch is captured asynchronously and may land a frame after the row renders.
+      // Wait briefly for the data so features like price equivalents see it.
+      if (!this.#listings.has(element.dataset.id ?? '')) {
+        const seen = this.#firstSeen.get(element) ?? now;
+        this.#firstSeen.set(element, seen);
+        if (now - seen < this.dataWaitMs) {
+          this.#retryLater(this.dataWaitMs - (now - seen));
+          continue;
+        }
+      }
       for (const [key, decorator] of this.#decorators) {
         const marker = markerFor(key);
         if (element.hasAttribute(marker)) continue;
@@ -97,6 +116,14 @@ export class ResultsObserver {
         }
       }
     }
+  }
+
+  #retryLater(ms: number): void {
+    if (this.#retryTimer) return;
+    this.#retryTimer = setTimeout(() => {
+      this.#retryTimer = null;
+      this.#schedule();
+    }, ms);
   }
 
   #toRow(element: HTMLElement): ResultRow {

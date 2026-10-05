@@ -65,7 +65,7 @@ export function createTestContext(options: {
     currentSearch: new Store<CurrentSearch | null>(null),
     leagues: new LeagueService(storage, location, fetchJson),
     searchNames: new Store<Record<string, string>>({}),
-    results: new ResultsObserver(bridge, document),
+    results: new ResultsObserver(bridge, document, 0),
     data: new TradeData(fetchJson),
     toast: createToaster(),
     commits,

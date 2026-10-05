@@ -4016,9 +4016,11 @@
 
   // src/site/results.ts
   var MAX_CACHED_LISTINGS = 2e3;
+  var DATA_WAIT_MS = 1500;
   var ResultsObserver = class {
-    constructor(bridge2, doc = document) {
+    constructor(bridge2, doc = document, dataWaitMs = DATA_WAIT_MS) {
       this.doc = doc;
+      this.dataWaitMs = dataWaitMs;
       bridge2.events.on("listings", (results) => {
         for (const result of results) this.#listings.set(result.id, result);
         this.#trimCache();
@@ -4026,12 +4028,15 @@
       });
     }
     doc;
+    dataWaitMs;
     #listings = /* @__PURE__ */ new Map();
     #decorators = /* @__PURE__ */ new Map();
     #clearHandlers = /* @__PURE__ */ new Set();
     #observer = null;
     #scheduled = false;
     #hadRows = false;
+    #firstSeen = /* @__PURE__ */ new WeakMap();
+    #retryTimer = null;
     start() {
       if (this.#observer) return;
       this.#observer = new MutationObserver(() => this.#schedule());
@@ -4041,6 +4046,8 @@
     stop() {
       this.#observer?.disconnect();
       this.#observer = null;
+      if (this.#retryTimer) clearTimeout(this.#retryTimer);
+      this.#retryTimer = null;
     }
     /** Registers a decorator. Returns a function that unregisters it. */
     decorate(key, decorator) {
@@ -4074,7 +4081,16 @@
         return;
       }
       this.#hadRows = true;
+      const now = Date.now();
       for (const element of elements) {
+        if (!this.#listings.has(element.dataset.id ?? "")) {
+          const seen = this.#firstSeen.get(element) ?? now;
+          this.#firstSeen.set(element, seen);
+          if (now - seen < this.dataWaitMs) {
+            this.#retryLater(this.dataWaitMs - (now - seen));
+            continue;
+          }
+        }
         for (const [key, decorator] of this.#decorators) {
           const marker = markerFor(key);
           if (element.hasAttribute(marker)) continue;
@@ -4086,6 +4102,13 @@
           }
         }
       }
+    }
+    #retryLater(ms) {
+      if (this.#retryTimer) return;
+      this.#retryTimer = setTimeout(() => {
+        this.#retryTimer = null;
+        this.#schedule();
+      }, ms);
     }
     #toRow(element) {
       const id = element.dataset.id ?? "";

@@ -9,9 +9,33 @@ function renderRows(ids: string[]) {
 }
 
 describe('ResultsObserver', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('waits for late listing data before decorating, then gives up after a timeout', () => {
+    vi.useFakeTimers();
+    const results = new ResultsObserver(new PageBridge(window), document);
+    renderRows(['late', 'never']);
+    const seen: string[] = [];
+    results.decorate('t', (row) => seen.push(`${row.id}:${row.data ? 'data' : '-'}`));
+    results.flush();
+    expect(seen).toEqual([]);
+
+    window.dispatchEvent(
+      new CustomEvent(PAGE_TO_CONTENT, {
+        detail: JSON.stringify({ kind: 'listings', results: [{ id: 'late', listing: {}, item: { name: 'X' } }] }),
+      }),
+    );
+    results.flush();
+    expect(seen).toEqual(['late:data']);
+
+    vi.advanceTimersByTime(1600);
+    results.flush();
+    expect(seen).toEqual(['late:data', 'never:-']);
+  });
+
   it('decorates each row once per decorator and attaches captured listing data', () => {
     const bridge = new PageBridge(window);
-    const results = new ResultsObserver(bridge, document);
+    const results = new ResultsObserver(bridge, document, 0);
     window.dispatchEvent(
       new CustomEvent(PAGE_TO_CONTENT, {
         detail: JSON.stringify({ kind: 'listings', results: [{ id: 'a', listing: {}, item: { name: 'X' } }] }),
@@ -26,7 +50,7 @@ describe('ResultsObserver', () => {
   });
 
   it('re-offers rows after the decorator is removed and fires clear once', () => {
-    const results = new ResultsObserver(new PageBridge(window), document);
+    const results = new ResultsObserver(new PageBridge(window), document, 0);
     renderRows(['a']);
     let calls = 0;
     let clears = 0;
