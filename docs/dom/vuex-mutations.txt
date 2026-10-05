@@ -1,0 +1,123 @@
+## persistent/setTab
+function(t,e){t.tab=e}
+
+## persistent/setRealm
+function(t,e){t.realm=e}
+
+## persistent/setLeague
+function(t,e){t.league=e}
+
+## persistent/setItem
+function(t,e){t.name=e.name||null,t.type=e.type||null,t.disc=e.disc||null,t.term=e.term||null}
+
+## persistent/setStatus
+function(t,e){t.status=e}
+
+## persistent/setExchangeStock
+function(t,n){n?e.set(t.exchange,"stock",n):e.delete(t.exchange,"stock")}
+
+## persistent/setExchangeFulfillableTrade
+function(t,n){e.set(t.exchange,"fulfillable",n)}
+
+## persistent/setExchangeCollapse
+function(t,n){n?e.set(t.exchange,"collapse",n):e.delete(t.exchange,"collapse")}
+
+## persistent/setExchangeSellerAccount
+function(t,n){n&&n.length?e.set(t.exchange,"account",n):e.delete(t.exchange,"account")}
+
+## persistent/removeExchangeItem
+function(t,n){e.delete(t.exchange[n.type],n.id)}
+
+## persistent/setExchangeItem
+function(t,n){e.set(t.exchange[n.type],n.id,!0)}
+
+## persistent/swapExchangeItems
+function(t){var e=t.exchange.have;t.exchange.have=t.exchange.want,t.exchange.want=e}
+
+## persistent/clearPropertyGroup
+function(t,n){e.set(t.filters[n.group],"filters",{})}
+
+## persistent/setPropertyFilter
+function(t,n){t.filters[n.group]||e.set(t.filters,n.group,{filters:{}}),l.isObject(t.filters[n.group].filters)&&!l.isArray(t.filters[n.group].filters)||e.set(t.filters[n.group],"filters",{}),l.isEmpty(n.value)?e.delete(t.filters[n.group].filters,n.index):e.set(t.filters[n.group].filters,n.index,n.value)}
+
+## persistent/setFilterGroupDisabled
+function(t,n){t[n.type][n.group]||e.set(t[n.type],n.group,{}),e.set(t[n.type][n.group],"disabled",n.disable)}
+
+## persistent/resetStatGroup
+function(t,n){e.set(t.stats[n.group],"type","and"),e.set(t.stats[n.group],"filters",[])}
+
+## persistent/setStatFilter
+function(t,e){void 0!==e.index?t.stats[e.group].filters.splice(e.index,1,e.value):t.stats[e.group].filters.push(e.value)}
+
+## persistent/removeStatFilter
+function(t,e){t.stats[e.group].filters.splice(e.index,1)}
+
+## persistent/setStatGroupValue
+function(t,n){l.isEmpty(n.value)?e.delete(t.stats[n.group],"value"):e.set(t.stats[n.group],"value",n.value)}
+
+## persistent/setStatGroupType
+function(t,n){e.set(t.stats[n.group],"type",n.type),e.delete(t.stats[n.group],"value")}
+
+## persistent/removeStatGroup
+function(t,e){t.stats.splice(e.group,1)}
+
+## persistent/pushStatGroup
+function(t,e){t.stats.push({filters:e.filters||[],type:e.type})}
+
+## persistent/clearSearchForm
+function(t,e){("exchange"===t.tab||e)&&(t.exchange={want:{},have:{},fulfillable:!0}),("search"===t.tab||e)&&(t.name=null,t.type=null,t.disc=null,t.term=null,t.filters={},t.stats=[{type:"and",filters:[]}])}
+
+## transient/setExchangeHighlight
+function(t,e){t.exchange.highlight=e}
+
+## transient/updateBlurred
+function(t,e){t.blurred=e}
+
+## transient/resetActiveUnreadHits
+function(t){t.search.active&&(t.search.active.unreadHits=0)}
+
+## transient/incrementActiveUnreadHits
+function(t){t.blurred&&t.search.active&&t.search.active.unreadHits++}
+
+## transient/addSearchQuery
+function(t,e){var n=a.extend({},{localId:e.localId,id:null,type:null,live:!1,status:!1,realm:e.realm,league:e.league,query:e.query,sort:e.sort,results:[],total:null,inexact:!1,collapse:!1,dirty:!1,unreadHits:0},e);t.searches.unshift(n)}
+
+## transient/updateSearchQuery
+function(t,n){var i=l.findWhere(t.searches,{localId:n.localId});i&&(n.realm&&e.set(i,"realm",n.realm),n.league&&e.set(i,"league",n.league),n.type&&e.set(i,"type",n.type),n.query&&e.set(i,"query",n.query),n.sort&&e.set(i,"sort",n.sort),"search"===i.type&&void 0!==n.live&&e.set(i,"live",n.live))}
+
+## transient/addSearchResult
+function(t,n){var i=l.findWhere(t.searches,{localId:n.localId});if(i){e.set(i,"id",n.id),e.set(i,"inexact",i.inexact||n.inexact);var r=n.total;if(0==i.results.length&&r>0&&!i.live&&(t.advancedSearchHidden=!0),i.live)for(r=i.total+n.total;r>f.liveResultTotalLimit;){r-=i.results.pop().total}e.set(i,"total",r),i.results.unshift({id:n.resultId,result:n.result,items:n.items||{},total:n.total})}}
+
+## transient/updateSearchResult
+function(t,n){var i=l.findWhere(t.searches,{localId:n.localId});if(i){var r=l.findWhere(i.results,{id:n.id});r&&e.set(r,"result",n.result)}}
+
+## transient/setItemForSearchResult
+function(t,n){var i=l.findWhere(t.searches,{localId:n.localId});if(i){var r=l.findWhere(i.results,{id:n.id});r&&e.set(r.items,n.itemId,n.itemData)}}
+
+## transient/clearSearchResults
+function(t,n){var i=l.findWhere(t.searches,{localId:n.localId});i&&(e.set(i,"results",[]),e.set(i,"total",null))}
+
+## transient/updatePseudoStats
+function(t,e){t.search.pseudo=e}
+
+## transient/setSearchActive
+function(t,e){e.localId?(t.search.active=l.findWhere(t.searches,{localId:e.localId}),t.search.active.live&&(t.advancedSearchHidden=!0)):t.search.active=null}
+
+## transient/setLiveSearchStatus
+function(t,e){t.search.active&&(t.search.active.status=e)}
+
+## transient/setSearchDirty
+function(t){t.search.active&&(t.search.active.dirty=!0)}
+
+## transient/removeCurrentSearch
+function(t){var e=t.search.active;if(e){t.search.active=null;var n=l.indexOf(t.searches,e);n>=0&&t.searches.splice(n,1)}}
+
+## transient/toggleSearch
+function(t){t.advancedSearchHidden=!t.advancedSearchHidden}
+
+## transient/showAdvancedSearch
+function(t,e){t.advancedSearchHidden=!e}
+
+## transient/clearExchangeHighlight
+function(t){t.exchange.highlight=null}
+
