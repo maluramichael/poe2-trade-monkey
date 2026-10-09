@@ -113,6 +113,7 @@ the folder icons from this repository. Your bookmarks stay in your userscript ma
 
 ```bash
 npm install --ignore-scripts
+npm run setup     # git hooks and Playwright browsers, once per clone
 npm run check      # typecheck, unit tests, build
 npm run test:e2e   # Playwright against a recorded copy of the trade page
 npm run dev        # rebuild on change

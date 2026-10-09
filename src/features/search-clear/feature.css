@@ -34,7 +34,3 @@
 .ptm-search-clear:focus-visible {
   color: var(--ptm-beige);
 }
-
-.ptm-search-clear:focus-visible {
-  outline: 1px solid var(--ptm-gold-border);
-}

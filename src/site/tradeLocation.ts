@@ -22,7 +22,11 @@ export interface TradeLocation {
 }
 
 export const DEFAULT_REALM = 'poe2';
-const REALMS = new Set(['poe2', 'xbox', 'sony']);
+export const REALMS = new Set(['poe2', 'xbox', 'sony']);
+
+export function isRealm(value: string): boolean {
+  return REALMS.has(value);
+}
 const TYPES = new Set<string>(['search', 'exchange']);
 
 export function parseTradeLocation(url: string | URL): TradeLocation | null {
@@ -50,9 +54,9 @@ export function parseTradeLocation(url: string | URL): TradeLocation | null {
 }
 
 export function buildTradePath(location: TradeLocation): string {
-  const segments = ['trade2', location.type, location.realm, encodeURIComponent(location.league)];
+  const segments = ['trade2', location.type, encodeURIComponent(location.realm), encodeURIComponent(location.league)];
   if (location.id) {
-    segments.push(location.id);
+    segments.push(encodeURIComponent(location.id));
     if (location.live && location.type === 'search') segments.push('live');
   }
   return '/' + segments.join('/');

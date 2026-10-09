@@ -4,8 +4,9 @@
  * commands and reports back via CustomEvents.
  */
 import { CONTENT_TO_PAGE, PAGE_TO_CONTENT, type CommandEnvelope, type PageMessage } from '../bridge/protocol';
+import { handleCommand } from './commands';
 import { installNetworkHooks } from './network';
-import { waitForTradeApp, type TradeApp } from './vue';
+import { waitForTradeApp } from './vue';
 
 declare global {
   interface Window {
@@ -17,27 +18,13 @@ function post(message: PageMessage): void {
   window.dispatchEvent(new CustomEvent(PAGE_TO_CONTENT, { detail: JSON.stringify(message) }));
 }
 
-function handleCommand(app: TradeApp, command: CommandEnvelope): PageMessage {
-  const { requestId } = command;
-  try {
-    switch (command.kind) {
-      case 'getState':
-        return { kind: 'reply', requestId, ok: true, value: JSON.parse(JSON.stringify(app.$store.state.persistent)) };
-      case 'commit':
-        app.$store.commit(command.mutation, command.payload);
-        return { kind: 'reply', requestId, ok: true, value: null };
-    }
-  } catch (error) {
-    return { kind: 'reply', requestId, ok: false, error: String(error) };
-  }
-}
-
 if (!window.__ptmPageBridge) {
   window.__ptmPageBridge = true;
 
   installNetworkHooks(window, {
     onSearch: (captured) => post({ kind: 'search', captured }),
     onListings: (results) => post({ kind: 'listings', results }),
+    onRateLimited: (retryAfterMs) => post({ kind: 'rateLimited', retryAfterMs }),
   });
 
   waitForTradeApp(window).then(
@@ -45,7 +32,13 @@ if (!window.__ptmPageBridge) {
       window.addEventListener(CONTENT_TO_PAGE, (event) => {
         const detail = (event as CustomEvent<string>).detail;
         if (typeof detail !== 'string') return;
-        post(handleCommand(app, JSON.parse(detail) as CommandEnvelope));
+        let command: CommandEnvelope;
+        try {
+          command = JSON.parse(detail) as CommandEnvelope;
+        } catch {
+          return; // Broken message: ignore silently, nothing on the page may throw because of us.
+        }
+        post(handleCommand(app, command));
       });
       app.$store.subscribe((mutation) => post({ kind: 'mutation', type: mutation.type }));
       post({ kind: 'ready' });

@@ -6,6 +6,9 @@ export function isEncodedSearchId(id: string): boolean {
   return id.startsWith('H4sI');
 }
 
+/** Ids decompressing to more than this are rejected (zip bombs in imported folder codes). */
+export const MAX_DECODED_BYTES = 256 * 1024;
+
 export async function decodeSearchId(id: string): Promise<unknown | null> {
   if (!isEncodedSearchId(id)) return null;
   try {
@@ -13,7 +16,21 @@ export async function decodeSearchId(id: string): Promise<unknown | null> {
     const binary = atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, '='));
     const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
     const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
-    return JSON.parse(await new Response(stream).text());
+    const reader = stream.getReader();
+    const decoder = new TextDecoder();
+    let text = '';
+    let size = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > MAX_DECODED_BYTES) {
+        void reader.cancel().catch(() => {});
+        return null;
+      }
+      text += decoder.decode(value, { stream: true });
+    }
+    return JSON.parse(text + decoder.decode());
   } catch {
     return null;
   }

@@ -13,21 +13,33 @@ export interface BridgeEvents extends Record<string, unknown> {
   ready: undefined;
   search: CapturedSearch;
   listings: FetchResult[];
-  /** A Vuex mutation happened on the site, e.g. "persistent/setStatFilter". */
+  /** A Vuex mutation happened on the site, e.g. "setStatFilter". */
   mutation: string;
+  /** The site hit the trade API rate limit; wait time in ms. */
+  rateLimited: number;
 }
 
 /** Userscript side of the page bridge. */
 export class PageBridge {
   readonly events = new EventBus<BridgeEvents>();
-  #nextRequestId = 1;
+  // Random start so two script instances (two userscript managers) do not take each other's replies.
+  #nextRequestId = Math.floor(Math.random() * 1e9);
   #ready = false;
   readonly #pending = new Map<number, { resolve(value: unknown): void; reject(error: Error): void }>();
 
   constructor(private readonly win: Window = window) {
     win.addEventListener(PAGE_TO_CONTENT, (event) => {
       const detail = (event as CustomEvent<string>).detail;
-      if (typeof detail === 'string') this.#receive(JSON.parse(detail) as PageMessage);
+      if (typeof detail !== 'string') return;
+      let message: unknown;
+      try {
+        message = JSON.parse(detail);
+      } catch {
+        return;
+      }
+      if (message && typeof message === 'object' && typeof (message as { kind?: unknown }).kind === 'string') {
+        this.#receive(message as PageMessage);
+      }
     });
   }
 
@@ -50,7 +62,7 @@ export class PageBridge {
     return this.send({ kind: 'getState' });
   }
 
-  /** Commits a Vuex mutation, e.g. `commit('persistent/setStatFilter', { group: 0, value })`. */
+  /** Commits a Vuex mutation, e.g. `commit('setStatFilter', { group: 0, value })`. */
   commit(mutation: string, payload: unknown): Promise<null> {
     return this.send({ kind: 'commit', mutation, payload });
   }
@@ -92,6 +104,9 @@ export class PageBridge {
         break;
       case 'mutation':
         this.events.emit('mutation', message.type);
+        break;
+      case 'rateLimited':
+        this.events.emit('rateLimited', message.retryAfterMs);
         break;
       case 'reply': {
         const pending = this.#pending.get(message.requestId);

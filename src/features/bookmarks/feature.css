@@ -141,6 +141,14 @@
   color: var(--ptm-beige);
 }
 
+.ptm-bm-trade--current {
+  box-shadow: inset 3px 0 0 var(--ptm-gold-border);
+}
+
+.ptm-bm-trade--current .ptm-bm-trade__title {
+  color: var(--ptm-beige);
+}
+
 .ptm-bm-trade--completed .ptm-bm-trade__title {
   opacity: 0.5;
 }
@@ -177,13 +185,6 @@ html.ptm-bm-sorting * {
   background: var(--ptm-gold-border);
   box-shadow: 0 0 4px var(--ptm-gold-border);
   pointer-events: none;
-}
-
-.ptm-bm a:focus-visible,
-.ptm-bm button:focus-visible,
-.ptm-bm-icons__cell:focus-visible {
-  outline: 1px solid var(--ptm-gold-border);
-  outline-offset: -1px;
 }
 
 /* Actions and backup (layout comes from .ptm-actions and .ptm-btn-group in core.css) */

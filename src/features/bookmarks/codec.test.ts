@@ -95,6 +95,10 @@ describe('folder code (Better Trading format)', () => {
     expect(reason(() => decodeFolderCode('foobar'))).toBe('invalid-code');
     expect(reason(() => decodeFolderCode(btoa(JSON.stringify({ title: 'incomplete payload' }))))).toBe('invalid-code');
     expect(reason(() => decodeFolderCode('3:' + btoa(JSON.stringify({ tit: 'x', ver: '2', trs: [{ tit: 'y', loc: '2:weird:z' }] }))))).toBe('invalid-code');
+    for (const loc of ['2:search:H4sI/evil', '2:search:H4sI?x=1', '2:search:a b']) {
+      expect(reason(() => decodeFolderCode('3:' + btoa(JSON.stringify({ tit: 'x', ver: '2', trs: [{ tit: 'y', loc }] }))))).toBe('invalid-code');
+    }
+    expect(reason(() => decodeFolderCode(btoa(JSON.stringify({ tit: 'x', trs: [{ tit: 'y', loc: 'search:../H4sI' }] }))))).toBe('invalid-code');
     expect(new BookmarkImportError('invalid-code').message).toBe('The folder code is invalid.');
   });
 });
@@ -145,5 +149,10 @@ describe('own backup', () => {
     broken.folders[0].trades[0].type = 'bulk';
     expect(reason(() => decodeBackupFile(JSON.stringify(broken), NOW))).toBe('invalid-backup');
     expect(reason(() => decodeBackupFile('{oops', NOW))).toBe('invalid-backup');
+    for (const [field, value] of <[string, string][]>[['searchId', '../x'], ['searchId', 'H4sI?q=1'], ['realm', 'evil'], ['realm', 'poe2/../x']]) {
+      const tampered = JSON.parse(encodeBackup({ folders: [folder] }, NOW));
+      tampered.folders[0].trades[0][field] = value;
+      expect(reason(() => decodeBackupFile(JSON.stringify(tampered), NOW))).toBe('invalid-backup');
+    }
   });
 });

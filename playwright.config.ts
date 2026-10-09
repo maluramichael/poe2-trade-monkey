@@ -8,5 +8,9 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   reporter: 'list',
   use: { trace: 'retain-on-failure' },
-  projects: [{ name: 'firefox', use: { ...devices['Desktop Firefox'] } }],
+  projects: [
+    { name: 'firefox', use: { ...devices['Desktop Firefox'] }, testIgnore: /perf\.spec\.ts/ },
+    // layout-shift entries exist only in Chromium.
+    { name: 'chromium-perf', use: { ...devices['Desktop Chrome'] }, testMatch: /perf\.spec\.ts/ },
+  ],
 });

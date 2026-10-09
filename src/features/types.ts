@@ -13,6 +13,11 @@ export interface Feature {
   /** `false` means always on and not listed in settings. */
   toggleable: boolean;
   defaultEnabled: boolean;
+  /**
+   * Starts right after DOMContentLoaded, before the page's Vue app is ready. May only use
+   * ctx.doc, ctx.win, ctx.settings and ctx.location.
+   */
+  early?: boolean;
   /** Styles injected while the feature runs. Scope them with `ptm-` prefixed classes. */
   css?: string;
   /** Adds a tab to the sidebar while the feature runs. The panel comes from `start`. */

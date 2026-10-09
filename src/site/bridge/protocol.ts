@@ -9,12 +9,17 @@ import type { TradeType } from '../tradeLocation';
 export const PAGE_TO_CONTENT = 'ptm:page';
 export const CONTENT_TO_PAGE = 'ptm:content';
 
+/** Error prefix when the page's store has no mutation with the requested name. */
+export const UNKNOWN_MUTATION = 'unknown-mutation';
+
 /** Fired by the page script. */
 export type PageMessage =
   | { kind: 'ready' }
   | { kind: 'search'; captured: CapturedSearch }
   | { kind: 'listings'; results: FetchResult[] }
   | { kind: 'mutation'; type: string }
+  /** The page got HTTP 429 from the trade API. */
+  | { kind: 'rateLimited'; retryAfterMs: number }
   | { kind: 'reply'; requestId: number; ok: true; value: unknown }
   | { kind: 'reply'; requestId: number; ok: false; error: string };
 

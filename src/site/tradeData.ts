@@ -1,7 +1,8 @@
 /**
  * Static trade data from the public `/api/trade2/data/*` endpoints: stat texts, currencies and
  * filter labels. The site loads the same URLs on start, so these requests are usually served
- * from the browser cache. Each endpoint is fetched at most once per page load.
+ * from the browser cache. Each endpoint is fetched at most once per page load, a failed request
+ * is retried on the next call.
  * Texts are in the site's language because we request from `location.origin`.
  */
 export interface StatEntry {
@@ -42,6 +43,9 @@ export class TradeData {
         for (const entry of group.entries) map.set(entry.id, entry);
       }
       return map;
+    }).catch((error: unknown) => {
+      this.#stats = undefined;
+      throw error;
     });
     return this.#stats;
   }
@@ -60,6 +64,9 @@ export class TradeData {
         }
       }
       return map;
+    }).catch((error: unknown) => {
+      this.#currencies = undefined;
+      throw error;
     });
     return this.#currencies;
   }
@@ -75,6 +82,9 @@ export class TradeData {
         }
       }
       return map;
+    }).catch((error: unknown) => {
+      this.#filterOptions = undefined;
+      throw error;
     });
     return this.#filterOptions;
   }

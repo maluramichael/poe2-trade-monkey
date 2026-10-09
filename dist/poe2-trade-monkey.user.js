@@ -2,7 +2,7 @@
 // @name            PoE2 Trade Monkey
 // @name:de         PoE2 Trade Monkey
 // @namespace       https://github.com/maluramichael/poe2-trade-monkey
-// @version         0.2.3
+// @version         0.3.0
 // @description     Userscript that enhances the Path of Exile 2 trade site: bookmarks, history, pins, layout and result tools.
 // @description:de  Erweitert die Trade-Seite von Path of Exile 2: Lesezeichen für jede Liga, Verlauf, Pins, Schnellfilter, Zwei-Spalten-Layout und Werkzeuge für die Ergebnisse.
 // @author          Michael Malura
@@ -17,12 +17,10 @@
 // @grant           GM.getValue
 // @grant           GM.setValue
 // @grant           GM.deleteValue
-// @grant           GM.listValues
 // @grant           GM.xmlHttpRequest
 // @grant           GM.setClipboard
 // @grant           GM_addValueChangeListener
 // @grant           GM_removeValueChangeListener
-// @grant           unsafeWindow
 // @connect         poe.ninja
 // @updateURL       https://raw.githubusercontent.com/maluramichael/poe2-trade-monkey/master/dist/poe2-trade-monkey.meta.js
 // @downloadURL     https://raw.githubusercontent.com/maluramichael/poe2-trade-monkey/master/dist/poe2-trade-monkey.user.js
@@ -35,6 +33,28 @@ function __ptmPageScript() {
   // src/site/bridge/protocol.ts
   var PAGE_TO_CONTENT = "ptm:page";
   var CONTENT_TO_PAGE = "ptm:content";
+  var UNKNOWN_MUTATION = "unknown-mutation";
+
+  // src/site/page/commands.ts
+  function handleCommand(app, command) {
+    const { requestId } = command;
+    try {
+      switch (command.kind) {
+        case "getState":
+          return { kind: "reply", requestId, ok: true, value: JSON.parse(JSON.stringify(app.$store.state.persistent)) };
+        case "commit": {
+          const known = app.$store._mutations;
+          if (known && !(command.mutation in known)) {
+            return { kind: "reply", requestId, ok: false, error: `${UNKNOWN_MUTATION}: ${command.mutation}` };
+          }
+          app.$store.commit(command.mutation, command.payload);
+          return { kind: "reply", requestId, ok: true, value: null };
+        }
+      }
+    } catch (error) {
+      return { kind: "reply", requestId, ok: false, error: String(error) };
+    }
+  }
 
   // src/site/page/network.ts
   var SEARCH_URL = /\/api\/trade2\/(search|exchange)\/(?:(poe2|xbox|sony)\/)?([^/?#]+)\/?(?:[?#]|$)/;
@@ -50,6 +70,11 @@ function __ptmPageScript() {
   }
   function isFetchUrl(url) {
     return FETCH_URL.test(url);
+  }
+  function retryAfterMs(header) {
+    const seconds = header === null || header.trim() === "" ? NaN : Number(header);
+    if (!Number.isFinite(seconds)) return 6e4;
+    return Math.min(6e5, Math.max(1e3, seconds * 1e3));
   }
   function installNetworkHooks(win, callbacks) {
     hookXhr(win, callbacks);
@@ -80,6 +105,11 @@ function __ptmPageScript() {
     };
     proto.send = function(body) {
       const url = urls.get(this) ?? "";
+      if (parseSearchUrl(url) || isFetchUrl(url)) {
+        this.addEventListener("load", () => {
+          if (this.status === 429) callbacks.onRateLimited(retryAfterMs(this.getResponseHeader("Retry-After")));
+        });
+      }
       if (parseSearchUrl(url)) {
         this.addEventListener("load", () => {
           if (this.status === 200) handleSearch(url, body, this.responseText, callbacks);
@@ -99,12 +129,23 @@ function __ptmPageScript() {
   function hookFetch(win, callbacks) {
     const originalFetch = win.fetch;
     win.fetch = async function(input, init) {
-      const response = await originalFetch.call(win, input, init);
       const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+      let requestBody = Promise.resolve(init?.body);
+      if (init?.body === void 0 && typeof input === "object" && "clone" in input && parseSearchUrl(url)) {
+        try {
+          requestBody = input.clone().text().catch(() => void 0);
+        } catch {
+          requestBody = Promise.resolve(void 0);
+        }
+      }
+      const response = await originalFetch.call(win, input, init);
+      if (response.status === 429 && (isFetchUrl(url) || parseSearchUrl(url))) {
+        callbacks.onRateLimited(retryAfterMs(response.headers.get("Retry-After")));
+      }
       if (response.ok && (isFetchUrl(url) || parseSearchUrl(url))) {
-        response.clone().text().then((text) => {
+        Promise.all([response.clone().text(), requestBody]).then(([text, body]) => {
           if (isFetchUrl(url)) handleListings(JSON.parse(text), callbacks);
-          else handleSearch(url, init?.body, text, callbacks);
+          else handleSearch(url, body, text, callbacks);
         }).catch(() => {
         });
       }
@@ -134,32 +175,25 @@ function __ptmPageScript() {
   function post(message) {
     window.dispatchEvent(new CustomEvent(PAGE_TO_CONTENT, { detail: JSON.stringify(message) }));
   }
-  function handleCommand(app, command) {
-    const { requestId } = command;
-    try {
-      switch (command.kind) {
-        case "getState":
-          return { kind: "reply", requestId, ok: true, value: JSON.parse(JSON.stringify(app.$store.state.persistent)) };
-        case "commit":
-          app.$store.commit(command.mutation, command.payload);
-          return { kind: "reply", requestId, ok: true, value: null };
-      }
-    } catch (error) {
-      return { kind: "reply", requestId, ok: false, error: String(error) };
-    }
-  }
   if (!window.__ptmPageBridge) {
     window.__ptmPageBridge = true;
     installNetworkHooks(window, {
       onSearch: (captured) => post({ kind: "search", captured }),
-      onListings: (results) => post({ kind: "listings", results })
+      onListings: (results) => post({ kind: "listings", results }),
+      onRateLimited: (retryAfterMs2) => post({ kind: "rateLimited", retryAfterMs: retryAfterMs2 })
     });
     waitForTradeApp(window).then(
       (app) => {
         window.addEventListener(CONTENT_TO_PAGE, (event) => {
           const detail = event.detail;
           if (typeof detail !== "string") return;
-          post(handleCommand(app, JSON.parse(detail)));
+          let command;
+          try {
+            command = JSON.parse(detail);
+          } catch {
+            return;
+          }
+          post(handleCommand(app, command));
         });
         app.$store.subscribe((mutation) => post({ kind: "mutation", type: mutation.type }));
         post({ kind: "ready" });
@@ -636,6 +670,7 @@ function __ptmPageScript() {
   function isEncodedSearchId(id) {
     return id.startsWith("H4sI");
   }
+  var MAX_DECODED_BYTES = 256 * 1024;
   async function decodeSearchId(id) {
     if (!isEncodedSearchId(id)) return null;
     try {
@@ -643,7 +678,22 @@ function __ptmPageScript() {
       const binary = atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, "="));
       const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
       const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
-      return JSON.parse(await new Response(stream).text());
+      const reader = stream.getReader();
+      const decoder = new TextDecoder();
+      let text2 = "";
+      let size = 0;
+      for (; ; ) {
+        const { done, value: value2 } = await reader.read();
+        if (done) break;
+        size += value2.byteLength;
+        if (size > MAX_DECODED_BYTES) {
+          void reader.cancel().catch(() => {
+          });
+          return null;
+        }
+        text2 += decoder.decode(value2, { stream: true });
+      }
+      return JSON.parse(text2 + decoder.decode());
     } catch {
       return null;
     }
@@ -687,19 +737,42 @@ function __ptmPageScript() {
   // src/core/storage.ts
   var PREFIX2 = "ptm:";
   var GmStorage = class {
+    /** Last raw string this tab read or wrote per key, to detect changes from other tabs. */
+    #known = /* @__PURE__ */ new Map();
     async get(key) {
+      return parse(key, await this.getRaw(key));
+    }
+    async getRaw(key) {
       const raw = await GM.getValue(PREFIX2 + key, void 0);
-      return parse(key, raw);
+      this.#known.set(key, raw);
+      return raw;
     }
     async set(key, value2) {
-      await GM.setValue(PREFIX2 + key, JSON.stringify(value2));
+      const raw = JSON.stringify(value2);
+      this.#known.set(key, raw);
+      await GM.setValue(PREFIX2 + key, raw);
     }
     async delete(key) {
+      this.#known.set(key, void 0);
       await GM.deleteValue(PREFIX2 + key);
     }
     onRemoteChange(key, callback) {
-      if (typeof GM_addValueChangeListener !== "function") return () => {
-      };
+      if (typeof GM_addValueChangeListener !== "function") {
+        const check = async () => {
+          if (document.visibilityState !== "visible") return;
+          const raw = await GM.getValue(PREFIX2 + key, void 0);
+          if (raw === this.#known.get(key)) return;
+          this.#known.set(key, raw);
+          callback(parse(key, raw));
+        };
+        const onEvent = () => void check().catch((error) => log.error(`re-reading "${key}" failed`, error));
+        window.addEventListener("focus", onEvent);
+        document.addEventListener("visibilitychange", onEvent);
+        return () => {
+          window.removeEventListener("focus", onEvent);
+          document.removeEventListener("visibilitychange", onEvent);
+        };
+      }
       const id = GM_addValueChangeListener(PREFIX2 + key, (_name, _old, value2, remote) => {
         if (remote) callback(parse(key, value2));
       });
@@ -716,19 +789,37 @@ function __ptmPageScript() {
     }
   }
   async function persistedStore(storage, key, options) {
-    const read = (envelope) => {
-      if (!envelope || typeof envelope !== "object" || !("data" in envelope)) return options.defaultValue;
-      if (envelope.schema === options.schema) return envelope.data;
-      if (options.migrate) {
-        try {
-          return options.migrate(envelope.data, envelope.schema);
-        } catch (error) {
-          log.error(`migration of "${key}" from schema ${envelope.schema} failed`, error);
-        }
+    const decode = (envelope) => {
+      if (!envelope || typeof envelope !== "object" || !("data" in envelope)) return { ok: false };
+      const { schema, data } = envelope;
+      if (schema === options.schema) return { ok: true, value: data };
+      if (!(schema < options.schema) || !options.migrate) return { ok: false };
+      try {
+        return { ok: true, value: options.migrate(data, schema) };
+      } catch (error) {
+        log.error(`migration of "${key}" from schema ${schema} failed`, error);
+        return { ok: false };
       }
-      return options.defaultValue;
     };
-    const store = new Store(read(await storage.get(key)));
+    let initial = options.defaultValue;
+    const raw = await storage.getRaw(key);
+    if (raw !== void 0 && raw !== null) {
+      let reason;
+      try {
+        const result = decode(JSON.parse(raw));
+        if (result.ok) initial = result.value;
+        else reason = "unknown schema or shape";
+      } catch {
+        reason = "invalid JSON";
+      }
+      if (reason) {
+        log.error(`stored value "${key}" could not be loaded (${reason}), backed up to "${key}:backup"`);
+        await storage.set(`${key}:backup`, raw).catch((error) => {
+          log.error(`backing up "${key}" failed`, error);
+        });
+      }
+    }
+    const store = new Store(initial);
     let applyingRemote = false;
     store.subscribe((value2) => {
       if (applyingRemote) return;
@@ -737,9 +828,14 @@ function __ptmPageScript() {
       });
     });
     storage.onRemoteChange(key, (envelope) => {
+      const result = decode(envelope);
+      if (!result.ok) {
+        log.warn(`ignoring remote change of "${key}" with unknown schema or shape`);
+        return;
+      }
       applyingRemote = true;
       try {
-        store.set(read(envelope));
+        store.set(result.value);
       } finally {
         applyingRemote = false;
       }
@@ -775,10 +871,19 @@ function __ptmPageScript() {
     running = new Store([]);
     #instances = /* @__PURE__ */ new Map();
     #starting = /* @__PURE__ */ new Set();
+    #stopped = false;
+    /** Starts the enabled `early` features before the page's Vue app is ready. No settings subscription. */
+    startEarly() {
+      for (const feature of this.features) {
+        if (feature.early && this.#wanted(feature) && !this.#instances.has(feature.id) && !this.#starting.has(feature.id)) {
+          void this.#startFeature(feature);
+        }
+      }
+    }
     start() {
       const sync = () => {
         for (const feature of this.features) {
-          const enabled = !feature.toggleable || isFeatureEnabled(this.ctx.settings.get(), feature.id, feature.defaultEnabled);
+          const enabled = this.#wanted(feature);
           const running = this.#instances.has(feature.id) || this.#starting.has(feature.id);
           if (enabled && !running) void this.#startFeature(feature);
           if (!enabled && running) this.#stopFeature(feature);
@@ -790,6 +895,11 @@ function __ptmPageScript() {
         off();
         for (const feature of this.features) this.#stopFeature(feature);
       };
+    }
+    /** Stops every feature for good, e.g. when the trade app never becomes ready. */
+    stop() {
+      this.#stopped = true;
+      for (const feature of this.features) this.#stopFeature(feature);
     }
     /**
      * Stops and starts every running feature again, e.g. after a language switch: features that
@@ -811,6 +921,14 @@ function __ptmPageScript() {
           this.ctx.doc.head.append(style);
         }
         const instance = await feature.start(this.ctx);
+        if (this.#stopped || !this.#wanted(feature)) {
+          try {
+            instance?.dispose?.();
+          } finally {
+            style?.remove();
+          }
+          return;
+        }
         this.#instances.set(feature.id, { instance, style });
         this.#publish();
       } catch (error) {
@@ -819,6 +937,9 @@ function __ptmPageScript() {
       } finally {
         this.#starting.delete(feature.id);
       }
+    }
+    #wanted(feature) {
+      return !feature.toggleable || isFeatureEnabled(this.ctx.settings.get(), feature.id, feature.defaultEnabled);
     }
     #stopFeature(feature) {
       const entry = this.#instances.get(feature.id);
@@ -840,59 +961,29 @@ function __ptmPageScript() {
   };
 
   // src/app/leagues.ts
-  var CACHE_KEY = "cache:leagues";
-  var CACHE_TTL_MS = 6 * 60 * 60 * 1e3;
   var LeagueService = class {
-    constructor(storage, location2, fetchJson = defaultFetchJson) {
-      this.storage = storage;
-      this.fetchJson = fetchJson;
+    /** League of the trade page the user is on. Remembered when visiting history or settings. */
+    current;
+    constructor(location2) {
       this.current = new Store(location2.get()?.league ?? null);
       location2.subscribe((next) => {
         if (next) this.current.set(next.league);
       });
     }
-    storage;
-    fetchJson;
-    list = new Store([]);
-    /** League of the trade page the user is on. Remembered when visiting history or settings. */
-    current;
-    async load() {
-      const cached = await this.storage.get(CACHE_KEY);
-      if (cached && Date.now() - cached.at < CACHE_TTL_MS) {
-        this.list.set(cached.leagues);
-        return;
-      }
-      try {
-        const json = await this.fetchJson("/api/trade2/data/leagues");
-        const leagues = (json.result ?? []).filter((league) => league.realm === "poe2");
-        this.list.set(leagues);
-        await this.storage.set(CACHE_KEY, { at: Date.now(), leagues });
-      } catch {
-        if (cached) this.list.set(cached.leagues);
-      }
-    }
-    /** True if the league is still listed (ended challenge leagues disappear from the list). */
-    isActive(league) {
-      const list = this.list.get();
-      return list.length === 0 || list.some((entry) => entry.id === league);
-    }
   };
-  async function defaultFetchJson(url) {
-    const response = await fetch(url, { credentials: "same-origin" });
-    if (!response.ok) throw new Error(`${url}: ${response.status}`);
-    return response.json();
-  }
 
   // src/app/toaster.ts
-  var DURATION_MS = 4500;
+  var DURATIONS = { success: 4500, warning: 8e3, error: void 0 };
   function createToaster() {
     const toasts = new Store([]);
     let nextId = 1;
     const dismiss = (id) => toasts.update((list) => list.filter((toast2) => toast2.id !== id));
     const toast = ((message, kind = "success") => {
+      if (toasts.get().some((entry) => entry.kind === kind && entry.message === message)) return;
       const id = nextId++;
       toasts.update((list) => [...list, { id, kind, message }]);
-      setTimeout(() => dismiss(id), DURATION_MS);
+      const duration = DURATIONS[kind];
+      if (duration !== void 0) setTimeout(() => dismiss(id), duration);
     });
     toast.toasts = toasts;
     toast.dismiss = dismiss;
@@ -966,7 +1057,9 @@ function __ptmPageScript() {
       /* @__PURE__ */ u3("circle", { cx: "19", cy: "12", r: "1.2" })
     ] })
   );
-  var IconGrip = icon(/* @__PURE__ */ u3("path", { d: "M8 9l4-4 4 4M8 15l4 4 4-4" }));
+  var IconGrip = icon(
+    /* @__PURE__ */ u3(S, { children: [6, 12, 18].map((cy) => [9, 15].map((cx) => /* @__PURE__ */ u3("circle", { cx, cy, r: "1.5", fill: "currentColor", stroke: "none" }, `${cx}-${cy}`))) })
+  );
   var IconFolder = icon(/* @__PURE__ */ u3("path", { d: "M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.8-1.2A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" }));
   var IconFolderPlus = icon(
     /* @__PURE__ */ u3(S, { children: [
@@ -1017,7 +1110,7 @@ function __ptmPageScript() {
   var IconWarning = icon(/* @__PURE__ */ u3("path", { d: "m21.7 18-8-14a2 2 0 0 0-3.4 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3ZM12 9v4M12 17h.01" }));
 
   // src/features/bookmarks/feature.css
-  var feature_default = ".ptm-bm {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n\n.ptm-bm .ptm-toolbar {\n  margin-bottom: 0;\n}\n\n.ptm-bm-folders,\n.ptm-bm-trades {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n\n.ptm-bm-folders {\n  display: grid;\n  gap: 6px;\n}\n\n/* Folder */\n\n.ptm-bm-folder {\n  border: 1px solid var(--ptm-blue-border);\n  background: var(--ptm-surface);\n}\n\n.ptm-bm-folder__header {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  padding-right: 4px;\n  background: var(--ptm-blue);\n  transition: background-color 0.2s;\n}\n\n.ptm-bm-folder__header:hover {\n  background: var(--ptm-blue-hover);\n}\n\n.ptm-bm-folder__toggle {\n  flex: 1;\n  min-width: 0;\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  min-height: 36px;\n  padding: 4px 6px 4px 8px;\n  border: 0;\n  background: none;\n  font-family: var(--ptm-font-title) !important;\n  font-size: 15px;\n  text-align: left;\n  cursor: pointer;\n}\n\n.ptm-bm-folder__icon {\n  flex: none;\n  width: 26px;\n  height: 26px;\n  object-fit: contain;\n}\n\n.ptm-bm-folder__title {\n  flex: 1;\n  min-width: 0;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n.ptm-bm-chevron {\n  display: inline-flex;\n  transition: transform 0.2s;\n}\n\n.ptm-bm-chevron--open {\n  transform: rotate(180deg);\n}\n\n.ptm-bm-folder__divider {\n  flex: none;\n  width: 1px;\n  height: 15px;\n  background: var(--ptm-blue-border);\n}\n\n.ptm-bm-folder__body {\n  display: grid;\n  gap: 6px;\n  padding-bottom: 6px;\n}\n\n.ptm-bm-folder__empty {\n  margin: 0;\n  padding: 6px 7px 0;\n  font-size: 11px;\n  color: var(--ptm-muted);\n}\n\n.ptm-bm-save {\n  display: block;\n  padding: 0 6px;\n}\n\n/* Trades */\n\n.ptm-bm-trade {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  padding: 6px 4px 6px 7px;\n  border-bottom: 1px solid var(--ptm-blue-line);\n}\n\n.ptm-bm-trade:hover,\n.ptm-bm-trade:focus-within {\n  background: linear-gradient(to right, rgba(138, 86, 9, 0.4), transparent);\n}\n\n.ptm-bm-trade__check {\n  display: inline-flex;\n  color: var(--ptm-green-border);\n}\n\n.ptm-bm-trade__title {\n  flex: 1;\n  min-width: 0;\n  overflow: hidden;\n  font-family: var(--ptm-font-title);\n  font-size: 14px;\n  color: var(--ptm-text);\n  text-decoration: none;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n.ptm-bm-trade__title:hover {\n  color: var(--ptm-beige);\n}\n\n.ptm-bm-trade--completed .ptm-bm-trade__title {\n  opacity: 0.5;\n}\n\n.ptm-bm-badge {\n  flex: none;\n  padding: 1px 5px;\n  border: 1px solid var(--ptm-yellow-border);\n  background: var(--ptm-yellow);\n  font-size: 11px;\n  color: var(--ptm-text);\n  white-space: nowrap;\n}\n\n.ptm-bm-handle {\n  cursor: grab;\n  touch-action: none;\n}\n\n.ptm-bm-dragging {\n  opacity: 0.4;\n}\n\nhtml.ptm-bm-sorting,\nhtml.ptm-bm-sorting * {\n  cursor: grabbing !important;\n  user-select: none !important;\n}\n\n.ptm-bm-drop-line {\n  position: fixed;\n  z-index: 1300;\n  height: 2px;\n  background: var(--ptm-gold-border);\n  box-shadow: 0 0 4px var(--ptm-gold-border);\n  pointer-events: none;\n}\n\n.ptm-bm a:focus-visible,\n.ptm-bm button:focus-visible,\n.ptm-bm-icons__cell:focus-visible {\n  outline: 1px solid var(--ptm-gold-border);\n  outline-offset: -1px;\n}\n\n/* Actions and backup (layout comes from .ptm-actions and .ptm-btn-group in core.css) */\n\n.ptm-bm-backup {\n  padding-top: 10px;\n  border-top: 1px solid var(--ptm-blue-line);\n}\n\n/* Modals */\n\n.ptm-bm-form {\n  display: grid;\n  gap: 14px;\n}\n\n.ptm-bm-preview {\n  margin: 0;\n  font-family: var(--ptm-font-title);\n  font-size: 15px;\n  color: var(--ptm-beige);\n}\n\n.ptm-bm-icons {\n  display: grid;\n  gap: 10px;\n}\n\n.ptm-bm-icons__grid {\n  display: grid;\n  gap: 6px;\n}\n\n.ptm-bm-icons__grid--currency {\n  grid-template-columns: repeat(auto-fill, 50px);\n}\n\n.ptm-bm-icons__grid--ascendancy {\n  grid-template-columns: repeat(auto-fill, 75px);\n}\n\n.ptm-bm-icons__cell {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  padding: 4px;\n  border: 1px solid transparent;\n  background: rgba(255, 255, 255, 0.04);\n  cursor: pointer;\n  transition: background-color 0.2s, border-color 0.2s;\n}\n\n.ptm-bm-icons__grid--currency .ptm-bm-icons__cell {\n  width: 50px;\n  height: 50px;\n}\n\n.ptm-bm-icons__grid--ascendancy .ptm-bm-icons__cell {\n  width: 75px;\n  height: 75px;\n}\n\n.ptm-bm-icons__cell img {\n  max-width: 100%;\n  max-height: 100%;\n  object-fit: contain;\n}\n\n.ptm-bm-icons__cell:hover {\n  background: rgba(138, 86, 9, 0.25);\n}\n\n.ptm-bm-icons__cell[aria-pressed='true'] {\n  border-color: var(--ptm-gold-border);\n  background: rgba(138, 86, 9, 0.5);\n}\n";
+  var feature_default = ".ptm-bm {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n\n.ptm-bm .ptm-toolbar {\n  margin-bottom: 0;\n}\n\n.ptm-bm-folders,\n.ptm-bm-trades {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n\n.ptm-bm-folders {\n  display: grid;\n  gap: 6px;\n}\n\n/* Folder */\n\n.ptm-bm-folder {\n  border: 1px solid var(--ptm-blue-border);\n  background: var(--ptm-surface);\n}\n\n.ptm-bm-folder__header {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  padding-right: 4px;\n  background: var(--ptm-blue);\n  transition: background-color 0.2s;\n}\n\n.ptm-bm-folder__header:hover {\n  background: var(--ptm-blue-hover);\n}\n\n.ptm-bm-folder__toggle {\n  flex: 1;\n  min-width: 0;\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  min-height: 36px;\n  padding: 4px 6px 4px 8px;\n  border: 0;\n  background: none;\n  font-family: var(--ptm-font-title) !important;\n  font-size: 15px;\n  text-align: left;\n  cursor: pointer;\n}\n\n.ptm-bm-folder__icon {\n  flex: none;\n  width: 26px;\n  height: 26px;\n  object-fit: contain;\n}\n\n.ptm-bm-folder__title {\n  flex: 1;\n  min-width: 0;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n.ptm-bm-chevron {\n  display: inline-flex;\n  transition: transform 0.2s;\n}\n\n.ptm-bm-chevron--open {\n  transform: rotate(180deg);\n}\n\n.ptm-bm-folder__divider {\n  flex: none;\n  width: 1px;\n  height: 15px;\n  background: var(--ptm-blue-border);\n}\n\n.ptm-bm-folder__body {\n  display: grid;\n  gap: 6px;\n  padding-bottom: 6px;\n}\n\n.ptm-bm-folder__empty {\n  margin: 0;\n  padding: 6px 7px 0;\n  font-size: 11px;\n  color: var(--ptm-muted);\n}\n\n.ptm-bm-save {\n  display: block;\n  padding: 0 6px;\n}\n\n/* Trades */\n\n.ptm-bm-trade {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  padding: 6px 4px 6px 7px;\n  border-bottom: 1px solid var(--ptm-blue-line);\n}\n\n.ptm-bm-trade:hover,\n.ptm-bm-trade:focus-within {\n  background: linear-gradient(to right, rgba(138, 86, 9, 0.4), transparent);\n}\n\n.ptm-bm-trade__check {\n  display: inline-flex;\n  color: var(--ptm-green-border);\n}\n\n.ptm-bm-trade__title {\n  flex: 1;\n  min-width: 0;\n  overflow: hidden;\n  font-family: var(--ptm-font-title);\n  font-size: 14px;\n  color: var(--ptm-text);\n  text-decoration: none;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n.ptm-bm-trade__title:hover {\n  color: var(--ptm-beige);\n}\n\n.ptm-bm-trade--current {\n  box-shadow: inset 3px 0 0 var(--ptm-gold-border);\n}\n\n.ptm-bm-trade--current .ptm-bm-trade__title {\n  color: var(--ptm-beige);\n}\n\n.ptm-bm-trade--completed .ptm-bm-trade__title {\n  opacity: 0.5;\n}\n\n.ptm-bm-badge {\n  flex: none;\n  padding: 1px 5px;\n  border: 1px solid var(--ptm-yellow-border);\n  background: var(--ptm-yellow);\n  font-size: 11px;\n  color: var(--ptm-text);\n  white-space: nowrap;\n}\n\n.ptm-bm-handle {\n  cursor: grab;\n  touch-action: none;\n}\n\n.ptm-bm-dragging {\n  opacity: 0.4;\n}\n\nhtml.ptm-bm-sorting,\nhtml.ptm-bm-sorting * {\n  cursor: grabbing !important;\n  user-select: none !important;\n}\n\n.ptm-bm-drop-line {\n  position: fixed;\n  z-index: 1300;\n  height: 2px;\n  background: var(--ptm-gold-border);\n  box-shadow: 0 0 4px var(--ptm-gold-border);\n  pointer-events: none;\n}\n\n/* Actions and backup (layout comes from .ptm-actions and .ptm-btn-group in core.css) */\n\n.ptm-bm-backup {\n  padding-top: 10px;\n  border-top: 1px solid var(--ptm-blue-line);\n}\n\n/* Modals */\n\n.ptm-bm-form {\n  display: grid;\n  gap: 14px;\n}\n\n.ptm-bm-preview {\n  margin: 0;\n  font-family: var(--ptm-font-title);\n  font-size: 15px;\n  color: var(--ptm-beige);\n}\n\n.ptm-bm-icons {\n  display: grid;\n  gap: 10px;\n}\n\n.ptm-bm-icons__grid {\n  display: grid;\n  gap: 6px;\n}\n\n.ptm-bm-icons__grid--currency {\n  grid-template-columns: repeat(auto-fill, 50px);\n}\n\n.ptm-bm-icons__grid--ascendancy {\n  grid-template-columns: repeat(auto-fill, 75px);\n}\n\n.ptm-bm-icons__cell {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  padding: 4px;\n  border: 1px solid transparent;\n  background: rgba(255, 255, 255, 0.04);\n  cursor: pointer;\n  transition: background-color 0.2s, border-color 0.2s;\n}\n\n.ptm-bm-icons__grid--currency .ptm-bm-icons__cell {\n  width: 50px;\n  height: 50px;\n}\n\n.ptm-bm-icons__grid--ascendancy .ptm-bm-icons__cell {\n  width: 75px;\n  height: 75px;\n}\n\n.ptm-bm-icons__cell img {\n  max-width: 100%;\n  max-height: 100%;\n  object-fit: contain;\n}\n\n.ptm-bm-icons__cell:hover {\n  background: rgba(138, 86, 9, 0.25);\n}\n\n.ptm-bm-icons__cell[aria-pressed='true'] {\n  border-color: var(--ptm-gold-border);\n  background: rgba(138, 86, 9, 0.5);\n}\n";
 
   // src/features/bookmarks/messages.ts
   var t3 = createTranslator({
@@ -1027,7 +1120,7 @@ function __ptmPageScript() {
       collapseFolders: "Ordner einklappen",
       showArchive: "Archiv anzeigen",
       hideArchive: "Zurück zu aktiven Ordnern",
-      empty: "Lege einen Ordner an und speichere darin deine Suchen. Sie funktionieren in jeder neuen League.",
+      empty: "Lege einen Ordner an und speichere darin deine Suchen. Sie funktionieren in jeder neuen League. Von Better Trading? Lade dein Backup über „Backup laden“.",
       emptyArchive: "Keine archivierten Ordner.",
       emptyFolder: "Noch keine Suchen in diesem Ordner.",
       folderMenu: "Ordner-Aktionen",
@@ -1085,7 +1178,11 @@ function __ptmPageScript() {
       backup: "Backup",
       saveBackup: "Backup speichern",
       loadBackup: "Backup laden",
-      backupLoaded: "{n} Ordner importiert, {skipped} übersprungen."
+      backupTooLarge: "Die Datei ist zu groß für ein Backup (max. 5 MB).",
+      backupFailed: "Das Backup konnte nicht gelesen werden.",
+      backupMerged: "{folders} Ordner und {trades} Suchen neu, {skipped} übersprungen. Vorhandenes bleibt, nichts wird doppelt angelegt.",
+      alreadySaved: "In diesem Ordner gespeichert",
+      alreadySavedHint: "Die aktuelle Suche liegt schon in diesem Ordner. Zum Aktualisieren im Menü der Suche „Mit aktueller Suche überschreiben“ wählen."
     },
     en: {
       label: "Bookmarks",
@@ -1093,7 +1190,7 @@ function __ptmPageScript() {
       collapseFolders: "Collapse folders",
       showArchive: "Show archive",
       hideArchive: "Back to active folders",
-      empty: "Create a folder and save your searches in it. They work in every new league.",
+      empty: 'Create a folder and save your searches in it. They work in every new league. Coming from Better Trading? Use "Load backup".',
       emptyArchive: "No archived folders.",
       emptyFolder: "No searches in this folder yet.",
       folderMenu: "Folder actions",
@@ -1151,7 +1248,11 @@ function __ptmPageScript() {
       backup: "Backup",
       saveBackup: "Save backup",
       loadBackup: "Load backup",
-      backupLoaded: "Imported {n} folders, skipped {skipped}."
+      backupTooLarge: "The file is too large for a backup (max 5 MB).",
+      backupFailed: "Could not read the backup.",
+      backupMerged: "{folders} folders and {trades} searches added, {skipped} skipped. Existing ones stay, nothing is duplicated.",
+      alreadySaved: "Saved in this folder",
+      alreadySavedHint: 'The current search is already in this folder. To update it, use "Overwrite with current search" in its menu.'
     }
   });
 
@@ -1217,34 +1318,10 @@ function __ptmPageScript() {
     return /* @__PURE__ */ u3("div", { role: "group", "aria-label": label, class: ["ptm-btn-group", block && "ptm-btn-group--block", className].filter(Boolean).join(" "), children });
   }
 
-  // src/ui/components/Logo.tsx
-  function Logo({ size = 30 }) {
-    return /* @__PURE__ */ u3("svg", { class: "ptm-logo", width: size, height: size, viewBox: "0 0 32 32", "aria-hidden": "true", children: [
-      /* @__PURE__ */ u3("circle", { cx: "16", cy: "16", r: "15", fill: "#5a3806", stroke: "#c59a50", "stroke-width": "2" }),
-      /* @__PURE__ */ u3("circle", { cx: "16", cy: "16", r: "11", fill: "none", stroke: "#8a5609", "stroke-width": "1.5" }),
-      /* @__PURE__ */ u3("text", { x: "16", y: "20.5", "text-anchor": "middle", "font-family": "FontinSmallCaps, serif", "font-size": "12", fill: "#f3d278", children: "TM" })
-    ] });
-  }
-
-  // src/ui/components/Modal.tsx
-  function Modal({ title, onClose, children, footer, width = 650 }) {
-    h2(() => {
-      const onKey = (event) => {
-        if (event.key === "Escape") onClose();
-      };
-      document.addEventListener("keydown", onKey);
-      return () => document.removeEventListener("keydown", onKey);
-    }, [onClose]);
-    return /* @__PURE__ */ u3("div", { class: "ptm-modal-overlay", onMouseDown: (event) => event.target === event.currentTarget && onClose(), children: /* @__PURE__ */ u3("div", { class: "ptm-modal", role: "dialog", "aria-modal": "true", "aria-label": title, style: { width: `min(${width}px, 92vw)` }, children: [
-      /* @__PURE__ */ u3("header", { class: "ptm-modal__header", children: [
-        /* @__PURE__ */ u3(Logo, { size: 26 }),
-        /* @__PURE__ */ u3("h2", { class: "ptm-modal__title", children: title }),
-        /* @__PURE__ */ u3("button", { type: "button", class: "ptm-icon-btn", "aria-label": "Close", onClick: onClose, children: /* @__PURE__ */ u3(IconClose, {}) })
-      ] }),
-      /* @__PURE__ */ u3("div", { class: "ptm-modal__body", children }),
-      footer && /* @__PURE__ */ u3("footer", { class: "ptm-modal__footer", children: footer })
-    ] }) });
-  }
+  // src/site/bridge/protocol.ts
+  var PAGE_TO_CONTENT = "ptm:page";
+  var CONTENT_TO_PAGE = "ptm:content";
+  var UNKNOWN_MUTATION = "unknown-mutation";
 
   // src/ui/messages.ts
   var t4 = createTranslator({
@@ -1262,7 +1339,9 @@ function __ptmPageScript() {
       version: "Version {version}",
       disclaimer: "Dieses Projekt steht in keiner Verbindung zu Grinding Gear Games und wird nicht von ihnen unterstützt.",
       noTabs: "Alle Seitenleisten-Funktionen sind ausgeschaltet. Schalte sie in den Einstellungen ein.",
-      sourceCode: "Quellcode auf GitHub"
+      sourceCode: "Quellcode auf GitHub",
+      siteChanged: "Die Trade-Seite hat sich geändert, diese Aktion klappt gerade nicht. Ein Update von Trade Monkey behebt das meist.",
+      actionFailed: "Das hat nicht geklappt. Details stehen in der Browser-Konsole."
     },
     en: {
       appName: "PoE2 Trade Monkey",
@@ -1278,9 +1357,91 @@ function __ptmPageScript() {
       version: "Version {version}",
       disclaimer: "This product isn't affiliated with or endorsed by Grinding Gear Games in any way.",
       noTabs: "All sidebar features are switched off. Turn them on in the settings.",
-      sourceCode: "Source code on GitHub"
+      sourceCode: "Source code on GitHub",
+      siteChanged: "The trade site has changed, this action does not work right now. A Trade Monkey update usually fixes it.",
+      actionFailed: "That did not work. Details are in the browser console."
     }
   });
+  function errorText(error) {
+    return String(error instanceof Error ? error.message : error).startsWith(UNKNOWN_MUTATION) ? t4("siteChanged") : t4("actionFailed");
+  }
+
+  // src/ui/components/focus.ts
+  var FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  function focusables(root) {
+    return [...root.querySelectorAll(FOCUSABLE)];
+  }
+
+  // src/ui/components/Logo.tsx
+  function Logo({ size = 30 }) {
+    return /* @__PURE__ */ u3("svg", { class: "ptm-logo", width: size, height: size, viewBox: "0 0 32 32", "aria-hidden": "true", children: [
+      /* @__PURE__ */ u3("circle", { cx: "16", cy: "16", r: "15", fill: "#5a3806", stroke: "#c59a50", "stroke-width": "2" }),
+      /* @__PURE__ */ u3("circle", { cx: "16", cy: "16", r: "11", fill: "none", stroke: "#8a5609", "stroke-width": "1.5" }),
+      /* @__PURE__ */ u3("text", { x: "16", y: "20.5", "text-anchor": "middle", "font-family": "FontinSmallCaps, serif", "font-size": "12", fill: "#f3d278", children: "TM" })
+    ] });
+  }
+
+  // src/ui/components/Modal.tsx
+  var stack = [];
+  function Modal({ title, onClose, children, footer, width = 650 }) {
+    const dialog = A2(null);
+    const token = A2({});
+    const close = A2(onClose);
+    close.current = onClose;
+    h2(() => {
+      const previous = document.activeElement;
+      const el = dialog.current;
+      const body = el.querySelector(".ptm-modal__body");
+      const foot = el.querySelector(".ptm-modal__footer");
+      const start6 = el.querySelector("[data-autofocus]") ?? (body && focusables(body)[0]) ?? (foot && focusables(foot)[0]) ?? el;
+      start6.focus();
+      stack.push(token.current);
+      const onKey = (event) => {
+        if (event.key !== "Escape" || stack[stack.length - 1] !== token.current) return;
+        event.stopPropagation();
+        close.current();
+      };
+      document.addEventListener("keydown", onKey);
+      return () => {
+        document.removeEventListener("keydown", onKey);
+        stack.splice(stack.indexOf(token.current), 1);
+        if (previous?.isConnected) previous.focus();
+      };
+    }, []);
+    const trapTab = (event) => {
+      if (event.key !== "Tab") return;
+      const items = focusables(dialog.current);
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (event.shiftKey ? document.activeElement === first || document.activeElement === dialog.current : document.activeElement === last) {
+        event.preventDefault();
+        (event.shiftKey ? last : first)?.focus();
+      }
+    };
+    return /* @__PURE__ */ u3("div", { class: "ptm-modal-overlay", onMouseDown: (event) => event.target === event.currentTarget && onClose(), children: /* @__PURE__ */ u3(
+      "div",
+      {
+        ref: dialog,
+        class: "ptm-modal",
+        role: "dialog",
+        "aria-modal": "true",
+        "aria-label": title,
+        tabIndex: -1,
+        onKeyDown: trapTab,
+        style: { width: `min(${width}px, 92vw)` },
+        children: [
+          /* @__PURE__ */ u3("header", { class: "ptm-modal__header", children: [
+            /* @__PURE__ */ u3(Logo, { size: 26 }),
+            /* @__PURE__ */ u3("h2", { class: "ptm-modal__title", children: title }),
+            /* @__PURE__ */ u3(IconButton, { label: t4("close"), onClick: onClose, children: /* @__PURE__ */ u3(IconClose, {}) })
+          ] }),
+          /* @__PURE__ */ u3("div", { class: "ptm-modal__body", children }),
+          footer && /* @__PURE__ */ u3("footer", { class: "ptm-modal__footer", children: footer })
+        ]
+      }
+    ) });
+  }
 
   // src/ui/components/ConfirmDialog.tsx
   function ConfirmDialog({ title, message, confirmLabel, onConfirm, onCancel }) {
@@ -1303,61 +1464,84 @@ function __ptmPageScript() {
   function Menu({ items, label }) {
     const [open, setOpen] = d2(false);
     const root = A2(null);
+    const trigger = A2(null);
+    const list = A2(null);
     h2(() => {
       if (!open) return;
+      list.current?.querySelector(".ptm-menu__item")?.focus();
       const close = (event) => {
-        if (event instanceof KeyboardEvent ? event.key === "Escape" : !root.current?.contains(event.target)) {
-          setOpen(false);
-        }
+        if (!root.current?.contains(event.target)) setOpen(false);
       };
       document.addEventListener("mousedown", close);
-      document.addEventListener("keydown", close);
-      return () => {
-        document.removeEventListener("mousedown", close);
-        document.removeEventListener("keydown", close);
-      };
+      return () => document.removeEventListener("mousedown", close);
     }, [open]);
-    return /* @__PURE__ */ u3("div", { class: "ptm-menu", ref: root, children: [
-      /* @__PURE__ */ u3(
-        "button",
-        {
-          type: "button",
-          class: "ptm-icon-btn",
-          title: label,
-          "aria-label": label,
-          "aria-haspopup": "menu",
-          "aria-expanded": open,
-          onClick: (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            setOpen(!open);
-          },
-          children: /* @__PURE__ */ u3(IconEllipsis, { size: 16 })
-        }
-      ),
-      open && /* @__PURE__ */ u3("ul", { class: "ptm-menu__list", role: "menu", children: items.filter((item) => !item.hidden).map((item) => /* @__PURE__ */ u3("li", { role: "none", children: /* @__PURE__ */ u3(
-        "button",
-        {
-          type: "button",
-          role: "menuitem",
-          class: item.danger ? "ptm-menu__item ptm-menu__item--danger" : "ptm-menu__item",
-          onClick: (event) => {
-            event.stopPropagation();
-            setOpen(false);
-            item.onSelect();
-          },
-          children: [
-            item.icon,
-            /* @__PURE__ */ u3("span", { children: item.label })
-          ]
-        }
-      ) }, item.label)) })
-    ] });
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        event.stopPropagation();
+        setOpen(false);
+        trigger.current?.focus();
+        return;
+      }
+      const entries = [...list.current.querySelectorAll(".ptm-menu__item")];
+      const index = entries.indexOf(document.activeElement);
+      const next = { ArrowDown: index + 1, ArrowUp: index - 1, Home: 0, End: entries.length - 1 }[event.key];
+      if (next === void 0 || !entries.length) return;
+      event.preventDefault();
+      entries[(next + entries.length) % entries.length]?.focus();
+    };
+    return /* @__PURE__ */ u3(
+      "div",
+      {
+        class: "ptm-menu",
+        ref: root,
+        onFocusOut: (event) => {
+          if (open && !root.current?.contains(event.relatedTarget)) setOpen(false);
+        },
+        children: [
+          /* @__PURE__ */ u3(
+            "button",
+            {
+              ref: trigger,
+              type: "button",
+              class: "ptm-icon-btn",
+              title: label,
+              "aria-label": label,
+              "aria-expanded": open,
+              onClick: (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                setOpen(!open);
+              },
+              children: /* @__PURE__ */ u3(IconEllipsis, { size: 16 })
+            }
+          ),
+          open && /* @__PURE__ */ u3("ul", { class: "ptm-menu__list", ref: list, onKeyDown, children: items.filter((item) => !item.hidden).map((item) => /* @__PURE__ */ u3("li", { children: /* @__PURE__ */ u3(
+            "button",
+            {
+              type: "button",
+              class: item.danger ? "ptm-menu__item ptm-menu__item--danger" : "ptm-menu__item",
+              onClick: (event) => {
+                event.stopPropagation();
+                setOpen(false);
+                item.onSelect();
+              },
+              children: [
+                item.icon,
+                /* @__PURE__ */ u3("span", { children: item.label })
+              ]
+            }
+          ) }, item.label)) })
+        ]
+      }
+    );
   }
 
   // src/site/tradeLocation.ts
   var DEFAULT_REALM = "poe2";
   var REALMS = /* @__PURE__ */ new Set(["poe2", "xbox", "sony"]);
+  function isRealm(value2) {
+    return REALMS.has(value2);
+  }
   var TYPES = /* @__PURE__ */ new Set(["search", "exchange"]);
   function parseTradeLocation(url) {
     const { pathname } = typeof url === "string" ? new URL(url, "https://www.pathofexile.com") : url;
@@ -1381,9 +1565,9 @@ function __ptmPageScript() {
     };
   }
   function buildTradePath(location2) {
-    const segments = ["trade2", location2.type, location2.realm, encodeURIComponent(location2.league)];
+    const segments = ["trade2", location2.type, encodeURIComponent(location2.realm), encodeURIComponent(location2.league)];
     if (location2.id) {
-      segments.push(location2.id);
+      segments.push(encodeURIComponent(location2.id));
       if (location2.live && location2.type === "search") segments.push("live");
     }
     return "/" + segments.join("/");
@@ -1470,6 +1654,8 @@ function __ptmPageScript() {
   var BT_ICON_PREFIX = "poe2-";
   var BT_SECTION_DELIMITER = "\n--------------------\n";
   var TYPES2 = /* @__PURE__ */ new Set(["search", "exchange"]);
+  var SEARCH_ID = /^[A-Za-z0-9_-]{1,4096}$/;
+  var MAX_BACKUP_BYTES = 5 * 1024 * 1024;
   function encodeFolderCode(folder) {
     const payload = {
       icn: folder.icon ? BT_ICON_PREFIX + folder.icon : null,
@@ -1494,7 +1680,7 @@ function __ptmPageScript() {
       if (version === 3) parts.shift();
       const [type, ...slug] = parts;
       const searchId = slug.join(":");
-      if (!type || !TYPES2.has(type) || !searchId) throw new BookmarkImportError("invalid-code");
+      if (!type || !TYPES2.has(type) || !SEARCH_ID.test(searchId)) throw new BookmarkImportError("invalid-code");
       return { title: trade.tit, type, searchId };
     });
     const siteVersion = version === 3 ? raw.ver : trades.every((trade) => isEncodedSearchId(trade.searchId)) ? "2" : "1";
@@ -1564,7 +1750,7 @@ function __ptmPageScript() {
   }
   function isTrade(value2) {
     const t20 = value2;
-    return typeof t20 === "object" && t20 !== null && isString(t20.title) && TYPES2.has(t20.type) && isString(t20.realm) && isString(t20.searchId) && t20.searchId !== "" && isString(t20.savedLeague) && (t20.payload === null || typeof t20.payload === "object" && typeof t20.payload.query === "object") && isNullableString(t20.completedAt) && isString(t20.createdAt) && isString(t20.updatedAt);
+    return typeof t20 === "object" && t20 !== null && isString(t20.title) && TYPES2.has(t20.type) && isString(t20.realm) && isRealm(t20.realm) && isString(t20.searchId) && SEARCH_ID.test(t20.searchId) && isString(t20.savedLeague) && (t20.payload === null || typeof t20.payload === "object" && typeof t20.payload.query === "object") && isNullableString(t20.completedAt) && isString(t20.createdAt) && isString(t20.updatedAt);
   }
   function toBase64(text2) {
     let binary = "";
@@ -1914,9 +2100,11 @@ function __ptmPageScript() {
     function TradeRow({ trade, folder, league, current, setDialog }) {
       const tradeLeague = leagueFor(trade, league);
       const href = tradePath(trade, tradeLeague);
-      return /* @__PURE__ */ u3("li", { class: trade.completedAt ? "ptm-bm-trade ptm-bm-trade--completed" : "ptm-bm-trade", "data-sort-kind": "trades", "data-sort-item": trade.id, children: [
+      const isCurrent = current?.location.id === trade.searchId;
+      const classes = ["ptm-bm-trade", trade.completedAt && "ptm-bm-trade--completed", isCurrent && "ptm-bm-trade--current"];
+      return /* @__PURE__ */ u3("li", { class: classes.filter(Boolean).join(" "), "data-sort-kind": "trades", "data-sort-item": trade.id, children: [
         trade.completedAt && /* @__PURE__ */ u3("span", { class: "ptm-bm-trade__check", role: "img", title: t3("completed"), "aria-label": t3("completed"), children: /* @__PURE__ */ u3(IconCheck, {}) }),
-        /* @__PURE__ */ u3("a", { class: "ptm-bm-trade__title", href, title: trade.title, children: trade.title }),
+        /* @__PURE__ */ u3("a", { class: "ptm-bm-trade__title", href, title: trade.title, "aria-current": isCurrent ? "page" : void 0, children: trade.title }),
         isFromOtherLeague(trade, tradeLeague) && /* @__PURE__ */ u3("span", { class: "ptm-bm-badge", title: t3("savedIn", { league: trade.savedLeague }), children: t3("otherLeague") }),
         /* @__PURE__ */ u3(
           Menu,
@@ -1973,6 +2161,7 @@ function __ptmPageScript() {
     }
     function FolderItem({ folder, open, visibleIds, league, current, setDialog }) {
       const archived = !!folder.archivedAt;
+      const alreadySaved = !!current && folder.trades.some((trade) => trade.searchId === current.location.id);
       return /* @__PURE__ */ u3(
         "li",
         {
@@ -2012,8 +2201,7 @@ function __ptmPageScript() {
                       label: t3("delete"),
                       icon: /* @__PURE__ */ u3(IconTrash, {}),
                       danger: true,
-                      hidden: !archived,
-                      onSelect: () => setDialog({ kind: "deleteFolder", folder })
+                      onSelect: () => folder.trades.length ? setDialog({ kind: "deleteFolder", folder }) : service.deleteFolder(folder.id)
                     }
                   ]
                 }
@@ -2041,7 +2229,17 @@ function __ptmPageScript() {
             ] }),
             open && !archived && /* @__PURE__ */ u3("div", { class: "ptm-bm-folder__body", children: [
               folder.trades.length > 0 ? /* @__PURE__ */ u3("ul", { class: "ptm-bm-trades", children: folder.trades.map((trade) => /* @__PURE__ */ u3(TradeRow, { trade, folder, league, current, setDialog }, trade.id)) }) : /* @__PURE__ */ u3("p", { class: "ptm-bm-folder__empty", children: t3("emptyFolder") }),
-              /* @__PURE__ */ u3("span", { class: "ptm-bm-save", title: current ? void 0 : t3("saveCurrentDisabled"), children: /* @__PURE__ */ u3(Button, { variant: "gold", block: true, icon: /* @__PURE__ */ u3(IconSave, {}), disabled: !current, onClick: () => setDialog({ kind: "save", folderId: folder.id }), children: t3("saveCurrent") }) })
+              /* @__PURE__ */ u3("span", { class: "ptm-bm-save", title: !current ? t3("saveCurrentDisabled") : alreadySaved ? t3("alreadySavedHint") : void 0, children: /* @__PURE__ */ u3(
+                Button,
+                {
+                  variant: "gold",
+                  block: true,
+                  icon: alreadySaved ? /* @__PURE__ */ u3(IconCheck, {}) : /* @__PURE__ */ u3(IconSave, {}),
+                  disabled: !current || alreadySaved,
+                  onClick: () => setDialog({ kind: "save", folderId: folder.id }),
+                  children: alreadySaved ? t3("alreadySaved") : t3("saveCurrent")
+                }
+              ) })
             ] })
           ]
         }
@@ -2074,12 +2272,15 @@ function __ptmPageScript() {
         setTimeout(() => URL.revokeObjectURL(url), 1e3);
       };
       const loadBackup = async (file) => {
+        if (file.size > MAX_BACKUP_BYTES) return ctx.toast(t3("backupTooLarge"), "error");
         try {
           const { folders: imported, skipped } = decodeBackupFile(await file.text());
-          const n2 = service.importFolders(imported);
-          ctx.toast(t3("backupLoaded", { n: n2, skipped }), skipped > 0 ? "warning" : "success");
+          const { folders: added, trades } = service.mergeFolders(imported);
+          ctx.toast(t3("backupMerged", { folders: added, trades, skipped }), skipped > 0 ? "warning" : "success");
         } catch (error) {
-          ctx.toast(error instanceof BookmarkImportError ? error.message : String(error), "error");
+          if (error instanceof BookmarkImportError) return ctx.toast(error.message, "error");
+          log.error("backup import failed", error);
+          ctx.toast(t3("backupFailed"), "error");
         }
       };
       return /* @__PURE__ */ u3("div", { class: "ptm-bm", children: [
@@ -2327,6 +2528,32 @@ function __ptmPageScript() {
       this.#setFolders((existing) => [...existing, ...added]);
       return added.length;
     }
+    /**
+     * Backup import that never duplicates: a folder with the same trimmed title and archive state
+     * only gains the trades whose search id it lacks, others are appended with fresh ids.
+     */
+    mergeFolders(folders) {
+      const counts = { folders: 0, trades: 0 };
+      this.#setFolders((existing) => {
+        const result = [...existing];
+        for (const folder of folders) {
+          const index = result.findIndex((f4) => f4.title.trim() === folder.title.trim() && !f4.archivedAt === !folder.archivedAt);
+          const target = result[index];
+          if (!target) {
+            result.push({ ...folder, id: newId(), trades: folder.trades.map((trade) => ({ ...trade, id: newId() })) });
+            counts.folders++;
+            counts.trades += folder.trades.length;
+            continue;
+          }
+          const known = new Set(target.trades.map((t20) => t20.searchId));
+          const added = folder.trades.filter((t20) => !known.has(t20.searchId) && known.add(t20.searchId)).map((t20) => ({ ...t20, id: newId() }));
+          if (added.length) result[index] = { ...target, trades: [...target.trades, ...added] };
+          counts.trades += added.length;
+        }
+        return result;
+      });
+      return counts;
+    }
     /** The bookmark for a search id, preferring active folders over archived ones. */
     findTradeBySearchId(searchId) {
       const matches = this.data.get().folders.flatMap(
@@ -2442,7 +2669,7 @@ function __ptmPageScript() {
       }, []);
       if (list.length === 0) return /* @__PURE__ */ u3("p", { class: "ptm-empty", children: t6("empty") });
       return /* @__PURE__ */ u3("div", { class: "ptm-history", children: [
-        /* @__PURE__ */ u3("div", { class: "ptm-toolbar", children: /* @__PURE__ */ u3(Button, { variant: "gold", size: "sm", icon: /* @__PURE__ */ u3(IconTrash, {}), onClick: () => setConfirming(true), children: t6("clear") }) }),
+        /* @__PURE__ */ u3("div", { class: "ptm-toolbar", children: /* @__PURE__ */ u3(Button, { variant: "plain", size: "sm", icon: /* @__PURE__ */ u3(IconTrash, {}), onClick: () => setConfirming(true), children: t6("clear") }) }),
         /* @__PURE__ */ u3("ul", { class: "ptm-history__list", children: list.map((entry) => {
           const href = (league) => buildTradePath({ type: entry.type, realm: entry.realm, league, id: entry.searchId, live: entry.live });
           return /* @__PURE__ */ u3("li", { class: "ptm-history__item", children: [
@@ -2586,6 +2813,9 @@ function __ptmPageScript() {
       openSearchTitle: "Öffnet die Suche, in der du das Item gepinnt hast ({league})",
       remove: "Entfernen",
       clear: "Alle entfernen",
+      clearMessage: "Alle {n} Pins entfernen?",
+      clearConfirm: "Entfernen",
+      full: "Maximal {n} Pins. Der nächste ersetzt den ältesten.",
       seller: "Verkäufer: {seller}",
       empty: "Noch nichts angepinnt. Klick bei einem Ergebnis auf „Anpinnen“, um es hier zu sammeln. Pins bleiben erhalten, auch bei neuen Suchen und nach dem Neuladen."
     },
@@ -2600,6 +2830,9 @@ function __ptmPageScript() {
       openSearchTitle: "Opens the search you pinned this item from ({league})",
       remove: "Unpin",
       clear: "Clear pins",
+      clearMessage: "Remove all {n} pins?",
+      clearConfirm: "Remove",
+      full: "Up to {n} pins. The next one replaces the oldest.",
       seller: "Seller: {seller}",
       empty: 'Nothing pinned yet. Click "Pin" on a result to collect it here. Pins stay across new searches and page reloads.'
     }
@@ -2679,15 +2912,19 @@ function __ptmPageScript() {
     function Panel() {
       const list = useStore(pins);
       useStore(rowsVersion);
+      const [confirming, setConfirming] = d2(false);
       if (list.length === 0) return /* @__PURE__ */ u3("p", { class: "ptm-empty", children: t8("empty") });
       return /* @__PURE__ */ u3("div", { class: "ptm-pins", children: [
-        /* @__PURE__ */ u3("div", { class: "ptm-toolbar", children: /* @__PURE__ */ u3(Button, { variant: "gold", size: "sm", icon: /* @__PURE__ */ u3(IconTrash, {}), onClick: () => pins.set([]), children: t8("clear") }) }),
+        /* @__PURE__ */ u3("div", { class: "ptm-toolbar", children: [
+          /* @__PURE__ */ u3(Button, { variant: "plain", size: "sm", icon: /* @__PURE__ */ u3(IconTrash, {}), onClick: () => setConfirming(true), children: t8("clear") }),
+          list.length >= MAX_PINS && /* @__PURE__ */ u3("p", { class: "ptm-meta", children: t8("full", { n: MAX_PINS }) })
+        ] }),
         list.map((pin) => /* @__PURE__ */ u3("article", { class: "ptm-pin", children: [
           /* @__PURE__ */ u3("div", { class: "ptm-pin__item", dangerouslySetInnerHTML: { __html: pin.html } }),
           /* @__PURE__ */ u3("div", { class: "ptm-pin__price", dangerouslySetInnerHTML: { __html: pin.priceHtml } }),
           /* @__PURE__ */ u3("p", { class: "ptm-meta ptm-pin__seller", children: [
             t8("seller", { seller: pin.seller }),
-            pin.indexed && ` · ${new Date(pin.indexed).toLocaleString()}`
+            pin.indexed && ` · ${new Date(pin.indexed).toLocaleString(getLocale())}`
           ] }),
           /* @__PURE__ */ u3("div", { class: "ptm-pin__actions", children: /* @__PURE__ */ u3(ButtonGroup, { block: true, children: [
             findRow(pin.id) || !pin.search ? /* @__PURE__ */ u3(Button, { size: "sm", disabled: !findRow(pin.id), onClick: () => scrollTo(pin.id), children: t8("scroll") }) : /* @__PURE__ */ u3(
@@ -2701,7 +2938,20 @@ function __ptmPageScript() {
             ),
             /* @__PURE__ */ u3(Button, { variant: "plain", size: "sm", onClick: () => pins.update((all) => all.filter((p3) => p3.id !== pin.id)), children: t8("remove") })
           ] }) })
-        ] }, pin.id))
+        ] }, pin.id)),
+        confirming && /* @__PURE__ */ u3(
+          ConfirmDialog,
+          {
+            title: t8("clear"),
+            message: t8("clearMessage", { n: list.length }),
+            confirmLabel: t8("clearConfirm"),
+            onCancel: () => setConfirming(false),
+            onConfirm: () => {
+              setConfirming(false);
+              pins.set([]);
+            }
+          }
+        )
       ] });
     }
     return {
@@ -2822,13 +3072,17 @@ function __ptmPageScript() {
     start(ctx) {
       let unregister = () => {
       };
+      let appliedKey = null;
       const clear = () => {
         unregister();
         for (const mod of ctx.doc.querySelectorAll(`.${HIGHLIGHT}`)) mod.classList.remove(HIGHLIGHT);
       };
       const apply = (search) => {
-        clear();
         const ids = activeStatIds(search);
+        const key = [...ids].sort().join(",");
+        if (key === appliedKey) return;
+        appliedKey = key;
+        clear();
         unregister = ctx.results.decorate("highlight-mods", (row) => {
           for (const stat of row.element.querySelectorAll(sel.row.modStat)) {
             const id = stat.dataset.field.slice("stat.".length);
@@ -2854,12 +3108,12 @@ function __ptmPageScript() {
   var t11 = createTranslator({
     de: {
       label: "Gleiche Angebote zusammenfassen",
-      description: "Fasst gleiche Items vom selben Verkäufer zum selben Preis zusammen.",
+      description: "Fasst identische Items (gleiche Mods) vom selben Verkäufer zum selben Preis zusammen.",
       similar: "{n} ähnliche"
     },
     en: {
       label: "Group identical listings",
-      description: "Collapses identical items from the same seller at the same price.",
+      description: "Collapses identical items (same mods) from the same seller at the same price.",
       similar: "{n} similar"
     }
   });
@@ -2874,7 +3128,8 @@ function __ptmPageScript() {
       return [seller, header, element.querySelector(sel.row.priceField)?.textContent ?? ""].join("|");
     }
     const { item, listing } = data;
-    return [seller, item.name, item.typeLine, listing.price?.amount ?? "", listing.price?.currency ?? ""].join("|");
+    const mods = [item.implicitMods, item.explicitMods, item.runeMods].map((list) => list?.map((mod) => typeof mod === "string" ? mod : mod.description).join("\n") ?? "");
+    return [seller, item.name, item.typeLine, item.ilvl ?? "", ...mods, listing.price?.amount ?? "", listing.price?.currency ?? ""].join("|");
   }
   function followers(head) {
     const key = head.getAttribute(KEY_ATTR);
@@ -2996,11 +3251,11 @@ function __ptmPageScript() {
       try {
         const rates = parseRates(await this.http(`${NINJA_URL}?league=${encodeURIComponent(league)}&type=Currency`));
         if (rates.size === 0) log.info(`poe.ninja has no currency rates for "${league}"`);
-        await this.storage.set(key, { at: Date.now(), values: Object.fromEntries(rates) });
+        else await this.storage.set(key, { at: Date.now(), values: Object.fromEntries(rates) });
         return rates;
       } catch (error) {
-        log.warn(`loading poe.ninja rates for "${league}" failed`, error);
-        return /* @__PURE__ */ new Map();
+        log.warn(`loading poe.ninja rates for "${league}" failed${cached ? ", using expired rates" : ""}`, error);
+        return cached ? new Map(Object.entries(cached.values)) : /* @__PURE__ */ new Map();
       }
     }
   };
@@ -3009,7 +3264,7 @@ function __ptmPageScript() {
       const result = GM.xmlHttpRequest({
         method: "GET",
         url,
-        timeout: 15e3,
+        timeout: 8e3,
         onload: (response) => {
           if (response.status < 200 || response.status >= 300) return reject(new Error(`${url}: ${response.status}`));
           try {
@@ -3057,10 +3312,16 @@ function __ptmPageScript() {
         };
         for (const line of ctx.doc.querySelectorAll(`.${LINE_CLASS}`)) line.remove();
       };
-      const load = async (league) => {
+      let lastKey;
+      const load = async () => {
+        const realm = ctx.location.get()?.realm ?? "poe2";
+        const league = ctx.leagues.current.get();
+        const key = `${realm}|${league}`;
+        if (key === lastKey) return;
+        lastKey = key;
         const current = ++generation;
         clear();
-        if (!league) return;
+        if (!league || realm !== "poe2") return;
         const [rates, currencies] = await Promise.all([
           source.get(league),
           ctx.data.currencies().catch(() => /* @__PURE__ */ new Map())
@@ -3068,11 +3329,13 @@ function __ptmPageScript() {
         if (current !== generation || rates.size === 0) return;
         undecorate = ctx.results.decorate("price-equivalent", (row) => render(ctx.doc, row, rates, currencies));
       };
-      void load(ctx.leagues.current.get());
-      const off = ctx.leagues.current.subscribe((league) => void load(league));
+      void load();
+      const offLeague = ctx.leagues.current.subscribe(() => void load());
+      const offLocation = ctx.location.subscribe(() => void load());
       return {
         dispose() {
-          off();
+          offLeague();
+          offLocation();
           generation++;
           clear();
         }
@@ -3109,7 +3372,7 @@ function __ptmPageScript() {
   }
 
   // src/features/mod-actions/feature.css
-  var feature_default7 = ".item-mod:has(> .ptm-mod-action) {\n  position: relative;\n}\n\n/* Sits just outside the left edge of the item card, so the site's tier labels stay readable. */\n.ptm-mod-action {\n  position: absolute;\n  top: 50%;\n  left: -41px;\n  z-index: 1;\n  width: 20px;\n  height: 20px;\n  margin-top: -10px;\n  padding: 0;\n  border: 1px solid var(--ptm-blue-border);\n  background: var(--ptm-blue);\n  color: var(--ptm-text);\n  font: 13px/18px var(--ptm-font-title);\n  text-align: center;\n  cursor: pointer;\n  opacity: 0;\n  transition: opacity 0.2s, background 0.2s;\n}\n\n.ptm-mod-action--exclude {\n  left: -22px;\n  border-color: var(--ptm-red-border);\n  background: var(--ptm-red);\n}\n\n.item-mod:hover > .ptm-mod-action,\n.ptm-mod-action:focus-visible {\n  opacity: 1;\n}\n\n.ptm-mod-action--add:hover {\n  background: var(--ptm-blue-hover);\n}\n\n.ptm-mod-action--exclude:hover {\n  background: var(--ptm-red-hover);\n}\n\n.ptm-mod-flash-ok {\n  animation: ptm-mod-flash-ok 0.9s ease;\n}\n\n.ptm-mod-flash-fail {\n  animation: ptm-mod-flash-fail 0.9s ease;\n}\n\n@keyframes ptm-mod-flash-ok {\n  0%, 60% { background: var(--ptm-green); }\n  100% { background: transparent; }\n}\n\n@keyframes ptm-mod-flash-fail {\n  0%, 60% { background: var(--ptm-red-border); }\n  100% { background: transparent; }\n}\n";
+  var feature_default7 = ".item-mod:has(> .ptm-mod-action) {\n  position: relative;\n}\n\n/* Sits just outside the left edge of the item card, so the site's tier labels stay readable. */\n.ptm-mod-action {\n  position: absolute;\n  top: 50%;\n  left: -41px;\n  z-index: 1;\n  width: 20px;\n  height: 20px;\n  margin-top: -10px;\n  padding: 0;\n  border: 1px solid var(--ptm-blue-border);\n  background: var(--ptm-blue);\n  color: var(--ptm-text);\n  font: 13px/18px var(--ptm-font-title);\n  text-align: center;\n  cursor: pointer;\n  opacity: 0;\n  transition: opacity 0.2s, background 0.2s;\n}\n\n.ptm-mod-action--exclude {\n  left: -22px;\n  border-color: var(--ptm-red-border);\n  background: var(--ptm-red);\n}\n\n.item-mod:hover > .ptm-mod-action,\n.ptm-mod-action:focus-visible {\n  opacity: 1;\n}\n\n.ptm-mod-action--add:hover {\n  background: var(--ptm-blue-hover);\n}\n\n.ptm-mod-action--exclude:hover {\n  background: var(--ptm-red-hover);\n}\n\n.ptm-mod-flash-ok {\n  animation: ptm-mod-flash-ok 0.9s ease;\n}\n\n.ptm-mod-flash-fail {\n  animation: ptm-mod-flash-fail 0.9s ease;\n}\n\n@keyframes ptm-mod-flash-ok {\n  0%, 60% { background: var(--ptm-green); }\n  100% { background: transparent; }\n}\n\n@keyframes ptm-mod-flash-fail {\n  0%, 60% { background: var(--ptm-red-border); }\n  100% { background: transparent; }\n}\n\n@media (hover: none) {\n  .ptm-mod-action {\n    opacity: 0.6;\n  }\n}\n";
 
   // src/features/mod-actions/index.ts
   var t13 = createTranslator({
@@ -3117,21 +3380,21 @@ function __ptmPageScript() {
       label: "Mods als Filter übernehmen",
       description: "Plus und Minus an jeder Mod im Ergebnis fügen sie als Filter hinzu oder schließen sie aus.",
       addTitle: "Als Filter hinzufügen",
+      addHint: "Als Filter hinzufügen (Shift: ohne Mindestwert)",
       excludeTitle: "Ausschließen",
       added: "Filter hinzugefügt: {text}",
       excluded: "Ausgeschlossen: {text}",
-      duplicate: "Schon im Filter: {text}",
-      failed: "Filter konnte nicht gesetzt werden: {error}"
+      duplicate: "Schon im Filter: {text}"
     },
     en: {
       label: "Mod filter buttons",
       description: "Plus and minus on each result mod add it as a filter or exclude it.",
       addTitle: "Add as filter",
+      addHint: "Add as filter (Shift: without minimum)",
       excludeTitle: "Exclude",
       added: "Filter added: {text}",
       excluded: "Excluded: {text}",
-      duplicate: "Already in filter: {text}",
-      failed: "Could not set the filter: {error}"
+      duplicate: "Already in filter: {text}"
     }
   });
   var ACTION = "ptm-mod-action";
@@ -3166,7 +3429,8 @@ function __ptmPageScript() {
       ctx.toast(t13(action.kind === "add" ? "added" : "excluded", { text: action.text }));
       return true;
     } catch (error) {
-      ctx.toast(t13("failed", { error: error instanceof Error ? error.message : String(error) }), "error");
+      log.error("mod-actions: commit failed", error);
+      ctx.toast(errorText(error), "error");
       return false;
     }
   }
@@ -3195,8 +3459,8 @@ function __ptmPageScript() {
         el.type = "button";
         el.className = `${ACTION} ${ACTION}--${kind}`;
         el.textContent = kind === "add" ? "+" : "−";
-        el.title = t13(kind === "add" ? "addTitle" : "excludeTitle");
-        el.setAttribute("aria-label", el.title);
+        el.title = t13(kind === "add" ? "addHint" : "excludeTitle");
+        el.setAttribute("aria-label", `${t13(kind === "add" ? "addTitle" : "excludeTitle")}: ${(stat.textContent ?? "").trim()}`);
         el.addEventListener("click", (event) => {
           event.preventDefault();
           event.stopPropagation();
@@ -3230,20 +3494,30 @@ function __ptmPageScript() {
 
   // src/features/auto-load-more/index.ts
   var t14 = createTranslator({
-    de: { label: "Automatisch nachladen", description: "Lädt beim Scrollen ans Ende weitere Ergebnisse." },
-    en: { label: "Auto load more", description: "Loads more results when you scroll to the end." }
+    de: {
+      label: "Automatisch nachladen",
+      description: "Lädt beim Scrollen ans Ende weitere Ergebnisse.",
+      paused: "Die Trade-Seite bremst gerade. Automatisches Nachladen pausiert {s} s."
+    },
+    en: {
+      label: "Auto load more",
+      description: "Loads more results when you scroll to the end.",
+      paused: "The trade site is rate limiting. Auto load paused for {s} s."
+    }
   });
   var THROTTLE_MS2 = 750;
-  function autoLoadMore({ doc }, Observer = IntersectionObserver) {
+  function autoLoadMore(ctx, Observer = IntersectionObserver) {
     let watched = null;
     let inView = false;
     let lastClick = -Infinity;
     let retry;
+    let pausedUntil = 0;
+    const { doc } = ctx;
     const tryLoad = () => {
       clearTimeout(retry);
       const button = watched;
       if (!inView || !button?.isConnected || button.disabled) return;
-      const wait = lastClick + THROTTLE_MS2 - Date.now();
+      const wait = Math.max(lastClick + THROTTLE_MS2, pausedUntil) - Date.now();
       if (wait > 0) {
         retry = setTimeout(tryLoad, wait);
         return;
@@ -3267,8 +3541,18 @@ function __ptmPageScript() {
       );
       if (button) io.observe(button);
     };
+    const offRateLimited = ctx.bridge.events.on("rateLimited", (retryAfterMs) => {
+      const until = Date.now() + retryAfterMs;
+      if (Date.now() >= pausedUntil) ctx.toast(t14("paused", { s: Math.ceil(retryAfterMs / 1e3) }), "warning");
+      pausedUntil = Math.max(pausedUntil, until);
+      tryLoad();
+    });
+    let layoutClass = null;
     const attach = () => {
       const button = doc.querySelector(sel.loadMoreButton);
+      const htmlClass = doc.documentElement.className;
+      if (button === watched && io && htmlClass === layoutClass) return;
+      layoutClass = htmlClass;
       const nextRoot = button ? scrollParent(button) : null;
       if (button === watched && nextRoot === root && io) return;
       watched = button;
@@ -3282,6 +3566,7 @@ function __ptmPageScript() {
     return {
       dispose() {
         clearTimeout(retry);
+        offRateLimited();
         mutations.disconnect();
         io?.disconnect();
       }
@@ -3364,6 +3649,7 @@ function __ptmPageScript() {
     description: () => t15("description"),
     toggleable: true,
     defaultEnabled: true,
+    early: true,
     css: feature_default8,
     start: (ctx) => layout(ctx)
   };
@@ -3402,7 +3688,7 @@ function __ptmPageScript() {
 /* "No": red border and a red diagonal strike. */
 .ptm-qf__btn--no {
   border-color: var(--ptm-red-border);
-  color: var(--ptm-muted);
+  color: var(--ptm-beige);
 }
 
 .ptm-qf__btn--no::after {
@@ -3690,8 +3976,8 @@ function __ptmPageScript() {
             class: `ptm-btn ptm-btn--blue ptm-btn--sm ptm-qf__btn ptm-qf__btn--${tri}${tri === "yes" ? " ptm-btn--active" : ""}`,
             "data-filter": id,
             "data-state": tri,
-            "aria-pressed": tri !== "any",
             title: t16("triTitle", { name: t16(id), state: t16(tri) }),
+            "aria-label": t16("triTitle", { name: t16(id), state: t16(tri) }),
             onClick: () => run(toggleCommits(filters, id, nextTri(tri))),
             children: /* @__PURE__ */ u3("span", { children: t16(id) })
           },
@@ -3745,12 +4031,11 @@ function __ptmPageScript() {
                 ]
               }
             ),
-            open === "rarity" && /* @__PURE__ */ u3("div", { class: "ptm-qf__pop ptm-qf__pop--list", role: "menu", children: options.map((option) => /* @__PURE__ */ u3(
+            open === "rarity" && /* @__PURE__ */ u3("div", { class: "ptm-qf__pop ptm-qf__pop--list", children: options.map((option) => /* @__PURE__ */ u3(
               "button",
               {
                 type: "button",
-                role: "menuitemradio",
-                "aria-checked": option.id === view.rarity,
+                "aria-pressed": option.id === view.rarity,
                 class: "ptm-qf__option",
                 "data-rarity": option.id ?? void 0,
                 onClick: () => run(rarityCommits(filters, option.id)),
@@ -3795,6 +4080,7 @@ function __ptmPageScript() {
         for (const commit of commits) await bridge2.commit(commit.mutation, commit.payload);
       } catch (error) {
         log.error("quick filters: commit failed", error);
+        ctx.toast(errorText(error), "error");
       }
       await refresh();
     };
@@ -3840,7 +4126,7 @@ function __ptmPageScript() {
   };
 
   // src/features/stat-favorites/feature.css
-  var feature_default10 = "/* Favorites float to the top via `order`; vue-multiselect sets display: inline-block inline. */\n.ptm-stat-fav-list {\n  display: flex !important;\n  flex-direction: column;\n}\n\n.ptm-stat-fav-list > li.ptm-stat-fav {\n  order: -1;\n}\n\n.ptm-stat-fav-list.ptm-stat-has-fav::before {\n  content: attr(data-ptm-fav-label);\n  order: -2;\n  padding: 4px 12px;\n  font: 13px var(--ptm-font-title);\n  color: var(--ptm-muted);\n}\n\n/* Separator after the favorites block, before the first group header. */\n.ptm-stat-fav-list.ptm-stat-has-fav::after {\n  content: '';\n  order: -1;\n  border-bottom: 1px solid var(--ptm-gold-border);\n}\n\n.multiselect__option:has(> .ptm-stat-star) {\n  position: relative;\n  padding-right: 32px;\n}\n\n.ptm-stat-star {\n  position: absolute;\n  top: 50%;\n  right: 4px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 24px;\n  height: 24px;\n  margin-top: -12px;\n  padding: 0;\n  border: 0;\n  background: none;\n  color: var(--ptm-muted);\n  cursor: pointer;\n  opacity: 0.45;\n  transition: opacity 0.2s, color 0.2s;\n}\n\n.multiselect__option:hover > .ptm-stat-star,\n.ptm-stat-star[aria-pressed='true'] {\n  opacity: 1;\n}\n\n.ptm-stat-star:hover {\n  color: var(--ptm-beige);\n}\n\n.ptm-stat-star[aria-pressed='true'] {\n  color: var(--ptm-gold-border);\n  filter: brightness(1.6);\n}\n\n.ptm-stat-star[aria-pressed='true'] svg {\n  fill: currentColor;\n}\n";
+  var feature_default10 = "/* Favorites float to the top via `order`; vue-multiselect sets display: inline-block inline. */\n.ptm-stat-fav-list {\n  display: flex !important;\n  flex-direction: column;\n}\n\n.ptm-stat-fav-list > li.ptm-stat-fav {\n  order: -1;\n}\n\n.ptm-stat-fav-list.ptm-stat-has-fav::before {\n  content: attr(data-ptm-fav-label);\n  order: -2;\n  padding: 4px 12px;\n  font: 13px var(--ptm-font-title);\n  color: var(--ptm-muted);\n}\n\n/* Separator after the favorites block, before the first group header. */\n.ptm-stat-fav-list.ptm-stat-has-fav::after {\n  content: '';\n  order: -1;\n  border-bottom: 1px solid var(--ptm-gold-border);\n}\n\n.multiselect__option:has(> .ptm-stat-star) {\n  position: relative;\n  padding-right: 32px;\n}\n\n.ptm-stat-star {\n  position: absolute;\n  top: 50%;\n  right: 4px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 24px;\n  height: 24px;\n  margin-top: -12px;\n  padding: 0;\n  border: 0;\n  background: none;\n  color: var(--ptm-muted);\n  cursor: pointer;\n  opacity: 0.45;\n  transition: opacity 0.2s, color 0.2s;\n}\n\n.multiselect__option:hover > .ptm-stat-star,\n.ptm-stat-star[aria-pressed='true'] {\n  opacity: 1;\n}\n\n.ptm-stat-star:hover {\n  color: var(--ptm-beige);\n}\n\n.ptm-stat-star[aria-pressed='true'] {\n  color: var(--ptm-gold-border);\n  filter: brightness(1.6);\n}\n\n.ptm-stat-star[aria-pressed='true'] svg {\n  fill: currentColor;\n}\n\n@media (hover: none) {\n  .ptm-stat-star {\n    opacity: 0.6;\n  }\n}\n";
 
   // src/features/stat-favorites/index.ts
   var t17 = createTranslator({
@@ -3967,7 +4253,7 @@ function __ptmPageScript() {
   };
 
   // src/features/search-clear/feature.css
-  var feature_default11 = ".search-left:has(> .ptm-search-clear) {\n  position: relative;\n}\n\n.search-left:has(> .ptm-search-clear:not([hidden])) .multiselect__tags {\n  padding-right: 68px;\n}\n\n/* Left of the multiselect caret (40px wide). */\n.ptm-search-clear {\n  position: absolute;\n  top: 50%;\n  right: 40px;\n  z-index: 51;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 24px;\n  height: 24px;\n  margin-top: -12px;\n  padding: 0;\n  border: 0;\n  background: none;\n  color: var(--ptm-muted);\n  cursor: pointer;\n  transition: color 0.2s;\n}\n\n.ptm-search-clear[hidden] {\n  display: none;\n}\n\n.ptm-search-clear:hover,\n.ptm-search-clear:focus-visible {\n  color: var(--ptm-beige);\n}\n\n.ptm-search-clear:focus-visible {\n  outline: 1px solid var(--ptm-gold-border);\n}\n";
+  var feature_default11 = ".search-left:has(> .ptm-search-clear) {\n  position: relative;\n}\n\n.search-left:has(> .ptm-search-clear:not([hidden])) .multiselect__tags {\n  padding-right: 68px;\n}\n\n/* Left of the multiselect caret (40px wide). */\n.ptm-search-clear {\n  position: absolute;\n  top: 50%;\n  right: 40px;\n  z-index: 51;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 24px;\n  height: 24px;\n  margin-top: -12px;\n  padding: 0;\n  border: 0;\n  background: none;\n  color: var(--ptm-muted);\n  cursor: pointer;\n  transition: color 0.2s;\n}\n\n.ptm-search-clear[hidden] {\n  display: none;\n}\n\n.ptm-search-clear:hover,\n.ptm-search-clear:focus-visible {\n  color: var(--ptm-beige);\n}\n";
 
   // src/features/search-clear/index.ts
   var t18 = createTranslator({
@@ -4003,7 +4289,10 @@ function __ptmPageScript() {
       }
     };
     button.addEventListener("click", () => {
-      bridge2.commit("setItem", {}).catch((error) => log.error("search-clear: setItem failed", error));
+      bridge2.commit("setItem", {}).catch((error) => {
+        log.error("search-clear: setItem failed", error);
+        ctx.toast(errorText(error), "error");
+      });
       const field = input();
       if (field) {
         field.value = "";
@@ -4129,22 +4418,28 @@ function __ptmPageScript() {
     }
   };
 
-  // src/site/bridge/protocol.ts
-  var PAGE_TO_CONTENT = "ptm:page";
-  var CONTENT_TO_PAGE = "ptm:content";
-
   // src/site/bridge/client.ts
   var PageBridge = class {
     constructor(win = window) {
       this.win = win;
       win.addEventListener(PAGE_TO_CONTENT, (event) => {
         const detail = event.detail;
-        if (typeof detail === "string") this.#receive(JSON.parse(detail));
+        if (typeof detail !== "string") return;
+        let message;
+        try {
+          message = JSON.parse(detail);
+        } catch {
+          return;
+        }
+        if (message && typeof message === "object" && typeof message.kind === "string") {
+          this.#receive(message);
+        }
       });
     }
     win;
     events = new EventBus();
-    #nextRequestId = 1;
+    // Random start so two script instances (two userscript managers) do not take each other's replies.
+    #nextRequestId = Math.floor(Math.random() * 1e9);
     #ready = false;
     #pending = /* @__PURE__ */ new Map();
     get isReady() {
@@ -4163,7 +4458,7 @@ function __ptmPageScript() {
     getState() {
       return this.send({ kind: "getState" });
     }
-    /** Commits a Vuex mutation, e.g. `commit('persistent/setStatFilter', { group: 0, value })`. */
+    /** Commits a Vuex mutation, e.g. `commit('setStatFilter', { group: 0, value })`. */
     commit(mutation, payload) {
       return this.send({ kind: "commit", mutation, payload });
     }
@@ -4203,6 +4498,9 @@ function __ptmPageScript() {
           break;
         case "mutation":
           this.events.emit("mutation", message.type);
+          break;
+        case "rateLimited":
+          this.events.emit("rateLimited", message.retryAfterMs);
           break;
         case "reply": {
           const pending = this.#pending.get(message.requestId);
@@ -4375,7 +4673,7 @@ function __ptmPageScript() {
 
   // src/site/tradeData.ts
   var TradeData = class {
-    constructor(fetchJson = defaultFetchJson2, imageOrigin = "https://web.poecdn.com") {
+    constructor(fetchJson = defaultFetchJson, imageOrigin = "https://web.poecdn.com") {
       this.fetchJson = fetchJson;
       this.imageOrigin = imageOrigin;
     }
@@ -4392,6 +4690,9 @@ function __ptmPageScript() {
           for (const entry of group.entries) map.set(entry.id, entry);
         }
         return map;
+      }).catch((error) => {
+        this.#stats = void 0;
+        throw error;
       });
       return this.#stats;
     }
@@ -4409,6 +4710,9 @@ function __ptmPageScript() {
           }
         }
         return map;
+      }).catch((error) => {
+        this.#currencies = void 0;
+        throw error;
       });
       return this.#currencies;
     }
@@ -4422,11 +4726,14 @@ function __ptmPageScript() {
           }
         }
         return map;
+      }).catch((error) => {
+        this.#filterOptions = void 0;
+        throw error;
       });
       return this.#filterOptions;
     }
   };
-  async function defaultFetchJson2(path) {
+  async function defaultFetchJson(path) {
     const response = await fetch(path, { credentials: "same-origin" });
     if (!response.ok) throw new Error(`${path}: ${response.status}`);
     return response.json();
@@ -4474,7 +4781,7 @@ function __ptmPageScript() {
         feature.id
       )) }),
       /* @__PURE__ */ u3("p", { class: "ptm-meta", children: [
-        t4("version", { version: "0.2.3" }),
+        t4("version", { version: "0.3.0" }),
         " ·",
         " ",
         /* @__PURE__ */ u3("a", { href: "https://github.com/maluramichael/poe2-trade-monkey", target: "_blank", rel: "noreferrer", children: t4("sourceCode") })
@@ -4491,14 +4798,36 @@ function __ptmPageScript() {
     const [settingsOpen, setSettingsOpen] = d2(false);
     const tabs = running.filter((entry) => entry.feature.sidebarTab && entry.Panel).sort((a3, b2) => a3.feature.sidebarTab.order - b2.feature.sidebarTab.order);
     const active = tabs.find((entry) => entry.feature.id === activeTab) ?? tabs[0];
-    const setCollapsed = (collapsed) => settings.update((value2) => ({ ...value2, sidebarCollapsed: collapsed }));
+    const expandRef = A2(null);
+    const headerRef = A2(null);
+    const tablistRef = A2(null);
+    const focusAfterToggle = A2(false);
+    const setCollapsed = (collapsed) => {
+      focusAfterToggle.current = true;
+      settings.update((value2) => ({ ...value2, sidebarCollapsed: collapsed }));
+    };
+    h2(() => {
+      if (!focusAfterToggle.current) return;
+      focusAfterToggle.current = false;
+      (sidebarCollapsed ? expandRef.current : headerRef.current?.querySelector("button"))?.focus();
+    }, [sidebarCollapsed]);
+    const selectTab = (id) => settings.update((value2) => ({ ...value2, activeTab: id }));
+    const onTabKeyDown = (event, index) => {
+      const last = tabs.length - 1;
+      const next = { ArrowRight: index === last ? 0 : index + 1, ArrowLeft: index === 0 ? last : index - 1, Home: 0, End: last }[event.key];
+      if (next === void 0) return;
+      event.preventDefault();
+      const id = tabs[next].feature.id;
+      selectTab(id);
+      tablistRef.current?.querySelector(`#ptm-tab-${id}`)?.focus();
+    };
     return /* @__PURE__ */ u3(S, { children: [
-      sidebarCollapsed && /* @__PURE__ */ u3("button", { type: "button", class: "ptm-expand-tab", title: t4("expand"), "aria-label": t4("expand"), onClick: () => setCollapsed(false), children: [
+      sidebarCollapsed && /* @__PURE__ */ u3("button", { ref: expandRef, type: "button", class: "ptm-expand-tab", title: t4("expand"), "aria-label": t4("expand"), onClick: () => setCollapsed(false), children: [
         /* @__PURE__ */ u3(IconChevronLeft, { size: 16 }),
         /* @__PURE__ */ u3(Logo, { size: 24 })
       ] }),
-      /* @__PURE__ */ u3("aside", { class: "ptm-sidebar", "aria-label": t4("appName"), "aria-hidden": sidebarCollapsed, children: [
-        /* @__PURE__ */ u3("header", { class: "ptm-sidebar__header", children: [
+      /* @__PURE__ */ u3("aside", { class: "ptm-sidebar", "aria-label": t4("appName"), ...sidebarCollapsed ? { inert: true } : {}, children: [
+        /* @__PURE__ */ u3("header", { ref: headerRef, class: "ptm-sidebar__header", children: [
           /* @__PURE__ */ u3(IconButton, { label: t4("collapse"), onClick: () => setCollapsed(true), children: /* @__PURE__ */ u3(IconChevronRight, { size: 18 }) }),
           /* @__PURE__ */ u3("div", { class: "ptm-sidebar__brand", children: [
             /* @__PURE__ */ u3(Logo, {}),
@@ -4507,7 +4836,7 @@ function __ptmPageScript() {
           /* @__PURE__ */ u3(IconButton, { label: t4("settings"), onClick: () => setSettingsOpen(true), children: /* @__PURE__ */ u3(IconSettings, { size: 18 }) })
         ] }),
         tabs.length > 0 ? /* @__PURE__ */ u3(S, { children: [
-          /* @__PURE__ */ u3("nav", { class: "ptm-tabs", role: "tablist", children: tabs.map(({ feature }) => {
+          /* @__PURE__ */ u3("div", { ref: tablistRef, role: "tablist", class: "ptm-tabs", "aria-label": t4("appName"), children: tabs.map(({ feature }, index) => {
             const TabIcon = feature.sidebarTab.icon;
             const selected = feature.id === active?.feature.id;
             return /* @__PURE__ */ u3(
@@ -4515,9 +4844,13 @@ function __ptmPageScript() {
               {
                 type: "button",
                 role: "tab",
+                id: `ptm-tab-${feature.id}`,
+                "aria-controls": "ptm-tabpanel",
                 "aria-selected": selected,
+                tabIndex: selected ? 0 : -1,
                 class: selected ? "ptm-tab ptm-tab--active" : "ptm-tab",
-                onClick: () => settings.update((value2) => ({ ...value2, activeTab: feature.id })),
+                onClick: () => selectTab(feature.id),
+                onKeyDown: (event) => onTabKeyDown(event, index),
                 children: [
                   /* @__PURE__ */ u3(TabIcon, {}),
                   /* @__PURE__ */ u3("span", { children: feature.sidebarTab.label() })
@@ -4526,7 +4859,7 @@ function __ptmPageScript() {
               feature.id
             );
           }) }),
-          /* @__PURE__ */ u3("div", { class: "ptm-sidebar__panel", role: "tabpanel", children: active?.Panel && /* @__PURE__ */ u3(active.Panel, {}) })
+          /* @__PURE__ */ u3("div", { class: "ptm-sidebar__panel", role: "tabpanel", id: "ptm-tabpanel", "aria-labelledby": active && `ptm-tab-${active.feature.id}`, children: active?.Panel && /* @__PURE__ */ u3(active.Panel, {}) })
         ] }) : /* @__PURE__ */ u3("p", { class: "ptm-empty", children: t4("noTabs") })
       ] }),
       settingsOpen && /* @__PURE__ */ u3(SettingsModal, { features: host.features, onClose: () => setSettingsOpen(false) })
@@ -4537,7 +4870,21 @@ function __ptmPageScript() {
   function Toasts() {
     const { toast } = useApp();
     const toasts = useStore(toast.toasts);
-    return /* @__PURE__ */ u3("div", { class: "ptm-toasts", role: "status", "aria-live": "polite", children: toasts.map((entry) => /* @__PURE__ */ u3("button", { type: "button", class: `ptm-toast ptm-toast--${entry.kind}`, onClick: () => toast.dismiss(entry.id), children: entry.message }, entry.id)) });
+    const list = (entries) => entries.map((entry) => /* @__PURE__ */ u3(
+      "button",
+      {
+        type: "button",
+        class: `ptm-toast ptm-toast--${entry.kind}`,
+        title: t4("close"),
+        onClick: () => toast.dismiss(entry.id),
+        children: entry.message
+      },
+      entry.id
+    ));
+    return /* @__PURE__ */ u3("div", { class: "ptm-toasts", children: [
+      /* @__PURE__ */ u3("div", { role: "status", "aria-live": "polite", children: list(toasts.filter((entry) => entry.kind !== "error")) }),
+      /* @__PURE__ */ u3("div", { role: "alert", children: list(toasts.filter((entry) => entry.kind === "error")) })
+    ] });
   }
 
   // src/ui/App.tsx
@@ -4549,23 +4896,21 @@ function __ptmPageScript() {
   }
 
   // src/ui/core.css
-  var core_default = "/* Shared UI shell. Tokens and components follow DESIGN.md. Components are scoped to #ptm-root. */\n\n/* Tokens live on :root so feature styles inside the trade page can use them too. */\n:root {\n  --ptm-sidebar-width: 400px;\n  --ptm-bg: rgba(10, 10, 10, 0.88);\n  --ptm-surface: #161616;\n  --ptm-input: #1e2124;\n  --ptm-blue: #0f304d;\n  --ptm-blue-hover: #133d62;\n  --ptm-blue-border: #4c4c7d;\n  --ptm-blue-line: rgba(76, 76, 125, 0.4);\n  --ptm-gold: #5a3806;\n  --ptm-gold-hover: #724708;\n  --ptm-gold-border: #8a5609;\n  --ptm-red: #5a0a09;\n  --ptm-red-hover: #710d0b;\n  --ptm-red-border: #6d2725;\n  --ptm-green: #4b7e42;\n  --ptm-green-border: #5e9954;\n  --ptm-yellow: #666521;\n  --ptm-yellow-border: #7a7921;\n  --ptm-text: #ffffff;\n  --ptm-beige: #fff8e1;\n  --ptm-muted: #a38d6d;\n  --ptm-menu: #373737;\n  --ptm-menu-border: #7a7a7a;\n  --ptm-font-title: FontinSmallCaps, FontinSmallcaps, Verdana, Arial, sans-serif;\n  --ptm-font-body: Verdana, Arial, Helvetica, sans-serif;\n}\n\n#ptm-root {\n  font-family: var(--ptm-font-body);\n  font-size: 13px;\n  color: var(--ptm-text);\n  line-height: 1.35;\n}\n\n#ptm-root *,\n#ptm-root *::before,\n#ptm-root *::after {\n  box-sizing: border-box;\n}\n\n#ptm-root button {\n  font: inherit;\n  color: inherit;\n}\n\n/* Page gets pushed left instead of being covered (Better Trading overlays it since PoE2 0.5). */\nhtml.ptm-sidebar-open body {\n  padding-right: var(--ptm-sidebar-width, 400px);\n  transition: padding-right 0.2s;\n}\n\n.ptm-icon {\n  flex: none;\n  vertical-align: middle;\n}\n\n/* Sidebar */\n\n.ptm-sidebar {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  width: var(--ptm-sidebar-width);\n  z-index: 1000;\n  display: flex;\n  flex-direction: column;\n  padding: 5px 10px;\n  background: var(--ptm-bg);\n  border-left: 1px solid #000;\n  transition: right 0.2s;\n}\n\nhtml:not(.ptm-sidebar-open) .ptm-sidebar {\n  right: calc(-1 * var(--ptm-sidebar-width) - 2px);\n}\n\n.ptm-sidebar__header {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  padding: 4px 0 8px;\n}\n\n.ptm-sidebar__brand {\n  flex: 1;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  gap: 8px;\n  font-family: var(--ptm-font-title);\n  font-size: 20px;\n  color: var(--ptm-beige);\n  white-space: nowrap;\n}\n\n.ptm-sidebar__brand .ptm-logo {\n  transition: transform 0.2s;\n}\n\n.ptm-sidebar__brand:hover .ptm-logo {\n  transform: rotate(5deg);\n}\n\n.ptm-sidebar__panel {\n  flex: 1;\n  overflow-x: hidden;\n  overflow-y: auto;\n  padding: 8px 0;\n  scrollbar-width: thin;\n}\n\n.ptm-expand-tab {\n  position: fixed;\n  top: 50px;\n  right: 0;\n  z-index: 1000;\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  padding: 6px 8px 6px 10px;\n  border: 1px solid var(--ptm-blue-border);\n  border-right: 0;\n  background: var(--ptm-blue);\n  cursor: pointer;\n  transition: padding-left 0.2s, background-color 0.2s;\n}\n\n.ptm-expand-tab:hover {\n  padding-left: 15px;\n  background: var(--ptm-blue-hover);\n}\n\n/* Tabs */\n\n.ptm-tabs {\n  display: flex;\n}\n\n.ptm-tab {\n  flex: 1;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  gap: 5px;\n  padding: 6px 0;\n  border: 0;\n  border-bottom: 2px solid transparent;\n  background: none;\n  font-family: var(--ptm-font-title) !important;\n  font-size: 14px;\n  cursor: pointer;\n}\n\n.ptm-tab:hover {\n  background: rgba(90, 56, 6, 0.2);\n}\n\n.ptm-tab--active {\n  border-bottom-color: var(--ptm-gold-border);\n}\n\n/* Buttons: one height, one font, no wrapping. Variants only change colours. */\n\n.ptm-btn {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  gap: 6px;\n  height: 30px;\n  min-width: 0;\n  padding: 0 12px;\n  border: 1px solid;\n  border-radius: 0;\n  font-family: var(--ptm-font-title) !important;\n  font-size: 13px;\n  line-height: 1;\n  letter-spacing: 0.3px;\n  white-space: nowrap;\n  color: var(--ptm-text);\n  cursor: pointer;\n  transition: background-color 0.15s, border-color 0.15s, color 0.15s;\n  user-select: none;\n}\n\na.ptm-btn,\na.ptm-btn:hover {\n  text-decoration: none;\n}\n\n.ptm-btn > span {\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n\n.ptm-btn:focus-visible {\n  outline: 1px solid var(--ptm-beige);\n  outline-offset: 1px;\n  position: relative;\n  z-index: 1;\n}\n\n.ptm-btn:disabled {\n  opacity: 0.45;\n  cursor: default;\n}\n\n.ptm-btn--sm {\n  height: 26px;\n  padding: 0 9px;\n  font-size: 12px;\n  gap: 4px;\n}\n\n.ptm-btn--block {\n  display: flex;\n  width: 100%;\n}\n\n.ptm-btn--blue { background: var(--ptm-blue); border-color: var(--ptm-blue-border); }\n.ptm-btn--blue:hover:not(:disabled) { background: var(--ptm-blue-hover); }\n.ptm-btn--gold { background: var(--ptm-gold); border-color: var(--ptm-gold-border); }\n.ptm-btn--gold:hover:not(:disabled) { background: var(--ptm-gold-hover); }\n.ptm-btn--red { background: var(--ptm-red); border-color: var(--ptm-red-border); }\n.ptm-btn--red:hover:not(:disabled) { background: var(--ptm-red-hover); }\n.ptm-btn--plain { background: rgba(255, 255, 255, 0.03); border-color: #3a3a3a; color: var(--ptm-beige); }\n.ptm-btn--plain:hover:not(:disabled) { background: rgba(255, 255, 255, 0.08); border-color: var(--ptm-menu-border); }\n\n/* Pressed toggles look the same in every variant. */\n.ptm-btn.ptm-btn--active {\n  background: var(--ptm-gold);\n  border-color: #c59a50;\n  color: #f3d278;\n}\n\n/* Groups: buttons share borders, no gaps, outer group decides the width. */\n.ptm-btn-group {\n  display: inline-flex;\n  max-width: 100%;\n}\n\n.ptm-btn-group > * + * {\n  margin-left: -1px;\n}\n\n.ptm-btn-group > .ptm-btn:hover:not(:disabled) {\n  position: relative;\n  z-index: 1;\n}\n\n.ptm-btn-group--block {\n  display: flex;\n  width: 100%;\n}\n\n.ptm-btn-group--block > * {\n  flex: 1 1 0;\n  min-width: 0;\n}\n\n/* Stack of groups, e.g. a panel footer. */\n.ptm-actions {\n  display: grid;\n  gap: 6px;\n  margin-top: 10px;\n}\n\n/* The site's CSS shows hidden file inputs; keep [hidden] meaning hidden inside our UI. */\n#ptm-root [hidden] {\n  display: none !important;\n}\n\n.ptm-icon-btn {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  min-width: 24px;\n  height: 24px;\n  padding: 0 3px;\n  border: 0;\n  background: none;\n  color: rgba(255, 255, 255, 0.8);\n  cursor: pointer;\n}\n\n.ptm-icon-btn:hover {\n  color: #fff;\n}\n\n.ptm-toolbar {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: flex-end;\n  gap: 5px;\n  margin-bottom: 8px;\n}\n\n\n/* Menu */\n\n.ptm-menu {\n  position: relative;\n}\n\n.ptm-menu__list {\n  position: absolute;\n  top: 100%;\n  right: 0;\n  z-index: 10;\n  width: 200px;\n  margin: 2px 0 0;\n  padding: 0;\n  list-style: none;\n  background: var(--ptm-menu);\n  border: 1px solid var(--ptm-menu-border);\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);\n}\n\n.ptm-menu__item {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  width: 100%;\n  padding: 5px 8px;\n  border: 0;\n  background: none;\n  font-family: var(--ptm-font-body) !important;\n  font-size: 13px;\n  text-align: left;\n  cursor: pointer;\n}\n\n.ptm-menu__item:hover {\n  background: linear-gradient(90deg, var(--ptm-menu-border), transparent);\n}\n\n.ptm-menu__item--danger {\n  color: #ef7d7d !important;\n}\n\n/* Modal */\n\n.ptm-modal-overlay {\n  position: fixed;\n  inset: 0;\n  z-index: 1100;\n  display: flex;\n  align-items: flex-start;\n  justify-content: center;\n  padding-top: 8vh;\n  background: rgba(0, 0, 0, 0.6);\n  animation: ptm-fade-in 0.2s;\n}\n\n.ptm-modal {\n  max-height: 84vh;\n  display: flex;\n  flex-direction: column;\n  background: rgba(20, 20, 20, 0.95);\n  border: 1px solid var(--ptm-gold-border);\n  backdrop-filter: blur(2px);\n  animation: ptm-slide-in 0.2s;\n}\n\n.ptm-modal__header {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  padding: 10px 12px;\n  border-bottom: 1px solid var(--ptm-gold-border);\n}\n\n.ptm-modal__title {\n  flex: 1;\n  margin: 0;\n  font-family: var(--ptm-font-title);\n  font-size: 15px;\n  font-weight: normal;\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n  color: var(--ptm-beige);\n}\n\n.ptm-modal__body {\n  overflow-y: auto;\n  padding: 14px;\n  display: grid;\n  gap: 14px;\n}\n\n.ptm-modal__footer {\n  display: flex;\n  justify-content: flex-end;\n  gap: 5px;\n  padding: 10px 14px;\n  border-top: 1px solid rgba(138, 86, 9, 0.5);\n}\n\n/* Forms */\n\n.ptm-field {\n  display: grid;\n  gap: 6px;\n}\n\n.ptm-field__label {\n  font-family: var(--ptm-font-title);\n  font-size: 15px;\n  letter-spacing: 0.5px;\n  color: var(--ptm-beige);\n}\n\n.ptm-field__hint {\n  font-size: 11px;\n  color: rgba(255, 248, 225, 0.7);\n}\n\n.ptm-input {\n  width: 100%;\n  height: 30px;\n  padding: 0 8px;\n  border: 1px solid transparent;\n  background: var(--ptm-input);\n  color: var(--ptm-text);\n  font-family: var(--ptm-font-body);\n  font-size: 13px;\n}\n\n.ptm-input:focus {\n  outline: none;\n  border-color: var(--ptm-gold-border);\n}\n\n.ptm-textarea {\n  height: 120px;\n  padding: 6px 8px;\n  resize: vertical;\n  font-family: Consolas, monospace;\n  font-size: 12px;\n}\n\n.ptm-checkbox {\n  display: flex;\n  align-items: flex-start;\n  gap: 8px;\n  cursor: pointer;\n}\n\n.ptm-checkbox input {\n  position: absolute;\n  opacity: 0;\n  pointer-events: none;\n}\n\n.ptm-checkbox__box {\n  flex: none;\n  position: relative;\n  width: 15px;\n  height: 15px;\n  margin-top: 1px;\n  border: 2px solid #634928;\n}\n\n.ptm-checkbox__box::after {\n  content: '';\n  position: absolute;\n  inset: 2px;\n  background: #fff;\n  transform: scale(0);\n  transition: transform 0.15s;\n}\n\n.ptm-checkbox input:checked + .ptm-checkbox__box::after {\n  transform: scale(1);\n}\n\n.ptm-checkbox input:focus-visible + .ptm-checkbox__box {\n  outline: 1px solid var(--ptm-gold-border);\n}\n\n.ptm-checkbox__text {\n  display: grid;\n  gap: 2px;\n}\n\n.ptm-checkbox__label {\n  font-family: var(--ptm-font-title);\n  font-size: 14px;\n  color: var(--ptm-beige);\n}\n\n.ptm-checkbox__description {\n  font-size: 11px;\n  color: var(--ptm-muted);\n}\n\n.ptm-settings-grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));\n  gap: 12px 18px;\n}\n\n.ptm-section-title {\n  margin: 4px 0 0;\n  font-family: var(--ptm-font-title);\n  font-size: 15px;\n  font-weight: normal;\n  color: var(--ptm-beige);\n  border-bottom: 1px solid rgba(138, 86, 9, 0.5);\n  padding-bottom: 4px;\n}\n\n/* Text, alerts, toasts */\n\n.ptm-text {\n  margin: 0;\n}\n\n.ptm-meta {\n  margin: 0;\n  font-size: 11px;\n  color: var(--ptm-muted);\n}\n\n.ptm-meta a {\n  color: var(--ptm-beige);\n}\n\n.ptm-empty {\n  margin: 12px 0;\n  padding: 8px;\n  color: var(--ptm-muted);\n  text-align: center;\n}\n\n.ptm-alert {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  padding: 8px;\n  border: 1px solid;\n}\n\n.ptm-alert--warning { background: var(--ptm-yellow); border-color: var(--ptm-yellow-border); }\n.ptm-alert--error { background: var(--ptm-red); border-color: var(--ptm-red-border); }\n.ptm-alert--success { background: var(--ptm-green); border-color: var(--ptm-green-border); }\n\n.ptm-toasts {\n  position: fixed;\n  right: 30px;\n  bottom: 20px;\n  z-index: 1200;\n  display: grid;\n  gap: 6px;\n  justify-items: end;\n}\n\nhtml.ptm-sidebar-open .ptm-toasts {\n  right: calc(var(--ptm-sidebar-width) + 20px);\n}\n\n.ptm-toast {\n  max-width: 340px;\n  padding: 8px 12px;\n  border: 1px solid;\n  text-align: left;\n  cursor: pointer;\n  animation: ptm-slide-in 0.2s;\n}\n\n.ptm-toast--success { background: var(--ptm-green); border-color: var(--ptm-green-border); }\n.ptm-toast--warning { background: var(--ptm-yellow); border-color: var(--ptm-yellow-border); }\n.ptm-toast--error { background: var(--ptm-red); border-color: var(--ptm-red-border); }\n\n@keyframes ptm-fade-in {\n  from { opacity: 0; }\n}\n\n@keyframes ptm-slide-in {\n  from { opacity: 0; transform: translateY(10px); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  #ptm-root *,\n  .ptm-modal-overlay,\n  .ptm-modal,\n  .ptm-toast {\n    animation: none !important;\n    transition: none !important;\n  }\n}\n";
+  var core_default = "/* Shared UI shell. Tokens and components follow DESIGN.md. Components are scoped to #ptm-root. */\n\n/* Tokens live on :root so feature styles inside the trade page can use them too. */\n:root {\n  --ptm-sidebar-width: 400px;\n  --ptm-focus: #c59a50;\n  --ptm-bg: rgba(10, 10, 10, 0.88);\n  --ptm-surface: #161616;\n  --ptm-input: #1e2124;\n  --ptm-blue: #0f304d;\n  --ptm-blue-hover: #133d62;\n  --ptm-blue-border: #4c4c7d;\n  --ptm-blue-line: rgba(76, 76, 125, 0.4);\n  --ptm-gold: #5a3806;\n  --ptm-gold-hover: #724708;\n  --ptm-gold-border: #8a5609;\n  --ptm-red: #5a0a09;\n  --ptm-red-hover: #710d0b;\n  --ptm-red-border: #6d2725;\n  --ptm-green: #4b7e42;\n  --ptm-green-border: #5e9954;\n  --ptm-yellow: #666521;\n  --ptm-yellow-border: #7a7921;\n  --ptm-text: #ffffff;\n  --ptm-beige: #fff8e1;\n  --ptm-muted: #a38d6d;\n  --ptm-menu: #373737;\n  --ptm-menu-border: #7a7a7a;\n  --ptm-font-title: FontinSmallCaps, FontinSmallcaps, Verdana, Arial, sans-serif;\n  --ptm-font-body: Verdana, Arial, Helvetica, sans-serif;\n}\n\n#ptm-root {\n  font-family: var(--ptm-font-body);\n  font-size: 13px;\n  color: var(--ptm-text);\n  line-height: 1.35;\n}\n\n#ptm-root *,\n#ptm-root *::before,\n#ptm-root *::after {\n  box-sizing: border-box;\n}\n\n#ptm-root button {\n  font: inherit;\n  color: inherit;\n}\n\n/* Page gets pushed left instead of being covered (Better Trading overlays it since PoE2 0.5). */\nhtml.ptm-sidebar-open body {\n  padding-right: var(--ptm-sidebar-width, 400px);\n}\n\n/* Animate only after boot, so the first paint does not slide. */\nhtml.ptm-ready body {\n  transition: padding-right 0.2s;\n}\n\n/* Small windows: the sidebar covers the page instead of squeezing it. */\n@media (max-width: 999px) {\n  html.ptm-sidebar-open body {\n    padding-right: 0;\n  }\n\n  /* Covering the page, so the page must not show through. */\n  html .ptm-sidebar {\n    background: #0a0a0a;\n  }\n}\n\n.ptm-icon {\n  flex: none;\n  vertical-align: middle;\n}\n\n/* Sidebar */\n\n.ptm-sidebar {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  width: min(var(--ptm-sidebar-width), 100vw);\n  z-index: 1000;\n  display: flex;\n  flex-direction: column;\n  padding: 5px 10px;\n  background: var(--ptm-bg);\n  border-left: 1px solid #000;\n  transition: right 0.2s;\n}\n\nhtml:not(.ptm-sidebar-open) .ptm-sidebar {\n  right: calc(-1 * var(--ptm-sidebar-width) - 2px);\n}\n\n.ptm-sidebar__header {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  padding: 4px 0 8px;\n}\n\n.ptm-sidebar__brand {\n  flex: 1;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  gap: 8px;\n  font-family: var(--ptm-font-title);\n  font-size: 20px;\n  color: var(--ptm-beige);\n  white-space: nowrap;\n}\n\n.ptm-sidebar__brand .ptm-logo {\n  transition: transform 0.2s;\n}\n\n.ptm-sidebar__brand:hover .ptm-logo {\n  transform: rotate(5deg);\n}\n\n.ptm-sidebar__panel {\n  flex: 1;\n  overflow-x: hidden;\n  overflow-y: auto;\n  padding: 8px 0;\n  scrollbar-width: thin;\n}\n\n.ptm-expand-tab {\n  position: fixed;\n  top: 50px;\n  right: 0;\n  z-index: 1000;\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  padding: 6px 8px 6px 10px;\n  border: 1px solid var(--ptm-blue-border);\n  border-right: 0;\n  background: var(--ptm-blue);\n  cursor: pointer;\n  transition: padding-left 0.2s, background-color 0.2s;\n}\n\n.ptm-expand-tab:hover {\n  padding-left: 15px;\n  background: var(--ptm-blue-hover);\n}\n\n/* Tabs */\n\n.ptm-tabs {\n  display: flex;\n}\n\n.ptm-tab {\n  flex: 1;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  gap: 5px;\n  padding: 6px 0;\n  border: 0;\n  border-bottom: 2px solid transparent;\n  background: none;\n  font-family: var(--ptm-font-title) !important;\n  font-size: 14px;\n  cursor: pointer;\n}\n\n.ptm-tab:hover {\n  background: rgba(90, 56, 6, 0.2);\n}\n\n.ptm-tab--active {\n  border-bottom-color: var(--ptm-gold-border);\n}\n\n/* Buttons: one height, one font, no wrapping. Variants only change colours. */\n\n.ptm-btn {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  gap: 6px;\n  height: 30px;\n  min-width: 0;\n  padding: 0 12px;\n  border: 1px solid;\n  border-radius: 0;\n  font-family: var(--ptm-font-title) !important;\n  font-size: 13px;\n  line-height: 1;\n  letter-spacing: 0.3px;\n  white-space: nowrap;\n  color: var(--ptm-text);\n  cursor: pointer;\n  transition: background-color 0.15s, border-color 0.15s, color 0.15s;\n  user-select: none;\n}\n\na.ptm-btn,\na.ptm-btn:hover {\n  text-decoration: none;\n}\n\n.ptm-btn > span {\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n\n:is(#ptm-root, .ptm-qf) :is(a, button, input, select, textarea, [tabindex]):focus-visible,\n:is(.ptm-mod-action, .ptm-stat-star, .ptm-search-clear, .ptm-pin-btn, .ptm-regroup-btn):focus-visible {\n  outline: 2px solid var(--ptm-focus, #c59a50);\n  outline-offset: 1px;\n}\n\n/* Joined buttons overlap their borders: lift the focused one so its ring stays visible. */\n.ptm-btn:focus-visible {\n  position: relative;\n  z-index: 1;\n}\n\n.ptm-btn:disabled {\n  opacity: 0.45;\n  cursor: default;\n}\n\n.ptm-btn--sm {\n  height: 26px;\n  padding: 0 9px;\n  font-size: 12px;\n  gap: 4px;\n}\n\n.ptm-btn--block {\n  display: flex;\n  width: 100%;\n}\n\n.ptm-btn--blue { background: var(--ptm-blue); border-color: var(--ptm-blue-border); }\n.ptm-btn--blue:hover:not(:disabled) { background: var(--ptm-blue-hover); }\n.ptm-btn--gold { background: var(--ptm-gold); border-color: var(--ptm-gold-border); }\n.ptm-btn--gold:hover:not(:disabled) { background: var(--ptm-gold-hover); }\n.ptm-btn--red { background: var(--ptm-red); border-color: var(--ptm-red-border); }\n.ptm-btn--red:hover:not(:disabled) { background: var(--ptm-red-hover); }\n.ptm-btn--plain { background: rgba(255, 255, 255, 0.03); border-color: #3a3a3a; color: var(--ptm-beige); }\n.ptm-btn--plain:hover:not(:disabled) { background: rgba(255, 255, 255, 0.08); border-color: var(--ptm-menu-border); }\n\n/* Pressed toggles look the same in every variant. */\n.ptm-btn.ptm-btn--active {\n  background: var(--ptm-gold);\n  border-color: #c59a50;\n  color: #f3d278;\n}\n\n/* Groups: buttons share borders, no gaps, outer group decides the width. */\n.ptm-btn-group {\n  display: inline-flex;\n  max-width: 100%;\n}\n\n.ptm-btn-group > * + * {\n  margin-left: -1px;\n}\n\n.ptm-btn-group > .ptm-btn:hover:not(:disabled) {\n  position: relative;\n  z-index: 1;\n}\n\n.ptm-btn-group--block {\n  display: flex;\n  width: 100%;\n}\n\n.ptm-btn-group--block > * {\n  flex: 1 1 0;\n  min-width: 0;\n}\n\n/* Stack of groups, e.g. a panel footer. */\n.ptm-actions {\n  display: grid;\n  gap: 6px;\n  margin-top: 10px;\n}\n\n/* The site's CSS shows hidden file inputs; keep [hidden] meaning hidden inside our UI. */\n#ptm-root [hidden] {\n  display: none !important;\n}\n\n.ptm-icon-btn {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  min-width: 24px;\n  height: 24px;\n  padding: 0 3px;\n  border: 0;\n  background: none;\n  color: rgba(255, 255, 255, 0.8);\n  cursor: pointer;\n}\n\n.ptm-icon-btn:hover {\n  color: #fff;\n}\n\n.ptm-toolbar {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: flex-end;\n  gap: 5px;\n  margin-bottom: 8px;\n}\n\n\n/* Menu */\n\n.ptm-menu {\n  position: relative;\n}\n\n.ptm-menu__list {\n  position: absolute;\n  top: 100%;\n  right: 0;\n  z-index: 10;\n  width: 200px;\n  margin: 2px 0 0;\n  padding: 0;\n  list-style: none;\n  background: var(--ptm-menu);\n  border: 1px solid var(--ptm-menu-border);\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);\n}\n\n.ptm-menu__item {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  width: 100%;\n  padding: 5px 8px;\n  border: 0;\n  background: none;\n  font-family: var(--ptm-font-body) !important;\n  font-size: 13px;\n  text-align: left;\n  cursor: pointer;\n}\n\n.ptm-menu__item:hover {\n  background: linear-gradient(90deg, var(--ptm-menu-border), transparent);\n}\n\n.ptm-menu__item--danger {\n  color: #ef7d7d !important;\n}\n\n/* Modal */\n\n.ptm-modal-overlay {\n  position: fixed;\n  inset: 0;\n  z-index: 1100;\n  display: flex;\n  align-items: flex-start;\n  justify-content: center;\n  padding-top: 8vh;\n  background: rgba(0, 0, 0, 0.6);\n  animation: ptm-fade-in 0.2s;\n}\n\n.ptm-modal {\n  max-height: 84vh;\n  display: flex;\n  flex-direction: column;\n  background: rgba(20, 20, 20, 0.95);\n  border: 1px solid var(--ptm-gold-border);\n  backdrop-filter: blur(2px);\n  animation: ptm-slide-in 0.2s;\n}\n\n.ptm-modal__header {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  padding: 10px 12px;\n  border-bottom: 1px solid var(--ptm-gold-border);\n}\n\n.ptm-modal__title {\n  flex: 1;\n  margin: 0;\n  font-family: var(--ptm-font-title);\n  font-size: 15px;\n  font-weight: normal;\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n  color: var(--ptm-beige);\n}\n\n.ptm-modal__body {\n  overflow-y: auto;\n  padding: 14px;\n  display: grid;\n  gap: 14px;\n}\n\n.ptm-modal__footer {\n  display: flex;\n  justify-content: flex-end;\n  gap: 5px;\n  padding: 10px 14px;\n  border-top: 1px solid rgba(138, 86, 9, 0.5);\n}\n\n/* Forms */\n\n.ptm-field {\n  display: grid;\n  gap: 6px;\n}\n\n.ptm-field__label {\n  font-family: var(--ptm-font-title);\n  font-size: 15px;\n  letter-spacing: 0.5px;\n  color: var(--ptm-beige);\n}\n\n.ptm-field__hint {\n  font-size: 11px;\n  color: rgba(255, 248, 225, 0.7);\n}\n\n.ptm-input {\n  width: 100%;\n  height: 30px;\n  padding: 0 8px;\n  border: 1px solid transparent;\n  background: var(--ptm-input);\n  color: var(--ptm-text);\n  font-family: var(--ptm-font-body);\n  font-size: 13px;\n}\n\n.ptm-input:focus {\n  outline: 2px solid var(--ptm-focus);\n  outline-offset: 0;\n  border-color: var(--ptm-gold-border);\n}\n\n.ptm-textarea {\n  height: 120px;\n  padding: 6px 8px;\n  resize: vertical;\n  font-family: Consolas, monospace;\n  font-size: 12px;\n}\n\n.ptm-checkbox {\n  display: flex;\n  align-items: flex-start;\n  gap: 8px;\n  cursor: pointer;\n}\n\n.ptm-checkbox input {\n  position: absolute;\n  opacity: 0;\n  pointer-events: none;\n}\n\n.ptm-checkbox__box {\n  flex: none;\n  position: relative;\n  width: 15px;\n  height: 15px;\n  margin-top: 1px;\n  border: 2px solid #8a6a3a;\n}\n\n.ptm-checkbox__box::after {\n  content: '';\n  position: absolute;\n  inset: 2px;\n  background: #fff;\n  transform: scale(0);\n  transition: transform 0.15s;\n}\n\n.ptm-checkbox input:checked + .ptm-checkbox__box::after {\n  transform: scale(1);\n}\n\n.ptm-checkbox input:focus-visible + .ptm-checkbox__box {\n  outline: 1px solid var(--ptm-gold-border);\n}\n\n.ptm-checkbox__text {\n  display: grid;\n  gap: 2px;\n}\n\n.ptm-checkbox__label {\n  font-family: var(--ptm-font-title);\n  font-size: 14px;\n  color: var(--ptm-beige);\n}\n\n.ptm-checkbox__description {\n  font-size: 11px;\n  color: var(--ptm-muted);\n}\n\n.ptm-settings-grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));\n  gap: 12px 18px;\n}\n\n.ptm-section-title {\n  margin: 4px 0 0;\n  font-family: var(--ptm-font-title);\n  font-size: 15px;\n  font-weight: normal;\n  color: var(--ptm-beige);\n  border-bottom: 1px solid rgba(138, 86, 9, 0.5);\n  padding-bottom: 4px;\n}\n\n/* Text, alerts, toasts */\n\n.ptm-text {\n  margin: 0;\n}\n\n.ptm-meta {\n  margin: 0;\n  font-size: 11px;\n  color: var(--ptm-muted);\n}\n\n.ptm-meta a {\n  color: var(--ptm-beige);\n}\n\n.ptm-empty {\n  margin: 12px 0;\n  padding: 8px;\n  color: var(--ptm-muted);\n  text-align: center;\n}\n\n.ptm-alert {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  padding: 8px;\n  border: 1px solid;\n}\n\n.ptm-alert--warning { background: var(--ptm-yellow); border-color: var(--ptm-yellow-border); }\n.ptm-alert--error { background: var(--ptm-red); border-color: var(--ptm-red-border); }\n.ptm-alert--success { background: var(--ptm-green); border-color: var(--ptm-green-border); }\n\n.ptm-toasts {\n  position: fixed;\n  right: 30px;\n  bottom: 20px;\n  z-index: 1200;\n  display: grid;\n  gap: 6px;\n  justify-items: end;\n}\n\n.ptm-toasts > div {\n  display: grid;\n  gap: 6px;\n  justify-items: end;\n}\n\nhtml.ptm-sidebar-open .ptm-toasts {\n  right: calc(var(--ptm-sidebar-width) + 20px);\n}\n\n.ptm-toast {\n  max-width: 340px;\n  padding: 8px 12px;\n  border: 1px solid;\n  text-align: left;\n  cursor: pointer;\n  animation: ptm-slide-in 0.2s;\n}\n\n.ptm-toast--success { background: var(--ptm-green); border-color: var(--ptm-green-border); }\n.ptm-toast--warning { background: var(--ptm-yellow); border-color: var(--ptm-yellow-border); }\n.ptm-toast--error { background: var(--ptm-red); border-color: var(--ptm-red-border); }\n\n@keyframes ptm-fade-in {\n  from { opacity: 0; }\n}\n\n@keyframes ptm-slide-in {\n  from { opacity: 0; transform: translateY(10px); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  #ptm-root *,\n  .ptm-modal-overlay,\n  .ptm-modal,\n  .ptm-toast,\n  .ptm-pin-glow,\n  .ptm-mod-flash-ok,\n  .ptm-mod-flash-fail,\n  .ptm-mod-action,\n  .ptm-stat-star,\n  html.ptm-ready body {\n    animation: none !important;\n    transition: none !important;\n  }\n}\n";
 
   // src/main.tsx
   var bridge = new PageBridge(window);
-  if (!window.__ptmLoaded) injectPageScript(`(${__ptmPageScript.toString()})();`);
+  var firstCopy = claimPage();
+  if (firstCopy) injectPageScript(`(${__ptmPageScript.toString()})();`);
   async function boot() {
     await domReady();
-    const appReady = await Promise.race([bridge.whenReady().then(() => true), delay(3e4).then(() => false)]);
-    if (!appReady) {
-      log.info("trade app not found on this page, staying inactive");
-      return;
-    }
+    if (!document.querySelector(sel.tradeRoot) && !await waitForApp()) return inactive();
     const storage = new GmStorage();
     const settings = await loadSettings(storage);
     const { location: location2 } = trackLocation(window);
-    const leagues = new LeagueService(storage, location2);
-    void leagues.load();
+    applyLanguage(settings.get());
+    applySidebarState(settings.get());
+    const coreStyle = addStyle(core_default, "core");
     const ctx = {
       win: window,
       doc: document,
@@ -4574,24 +4919,32 @@ function __ptmPageScript() {
       settings,
       location: location2,
       currentSearch: trackCurrentSearch(location2, bridge),
-      leagues,
+      leagues: new LeagueService(location2),
       searchNames: new Store({}),
       results: new ResultsObserver(bridge, document),
       data: new TradeData(),
       toast: createToaster()
     };
-    applyLanguage(settings.get());
-    applySidebarState(settings.get());
-    settings.subscribe((next, previous) => {
-      applySidebarState(next);
-      if (next.language !== previous.language) applyLanguage(next);
-    });
-    addStyle(core_default, "core");
-    ctx.results.start();
     const host = new FeatureHost(features, ctx);
-    host.start();
+    host.startEarly();
+    if (!await waitForApp()) {
+      host.stop();
+      document.documentElement.classList.remove("ptm-sidebar-open");
+      coreStyle.remove();
+      return inactive();
+    }
     const root = document.createElement("div");
     root.id = "ptm-root";
+    root.lang = getLocale();
+    settings.subscribe((next, previous) => {
+      applySidebarState(next);
+      if (next.language !== previous.language) {
+        applyLanguage(next);
+        root.lang = getLocale();
+      }
+    });
+    ctx.results.start();
+    host.start();
     document.body.append(root);
     const renderApp = () => R(/* @__PURE__ */ u3(App, { ctx, host }), root);
     renderApp();
@@ -4600,7 +4953,25 @@ function __ptmPageScript() {
       renderApp();
       void host.restart();
     });
-    log.info(`v${"0.2.3"} ready with ${features.length} features`);
+    document.documentElement.classList.add("ptm-ready");
+    log.info(`v${"0.3.0"} ready with ${features.length} features`);
+  }
+  function waitForApp() {
+    return Promise.race([bridge.whenReady().then(() => true), delay(3e4).then(() => false)]);
+  }
+  function inactive() {
+    log.info("trade app not found on this page, staying inactive");
+  }
+  function claimPage() {
+    const html = document.documentElement;
+    if (!html) {
+      if (window.__ptmLoaded) return false;
+      window.__ptmLoaded = true;
+      return true;
+    }
+    if (html.dataset.ptmLoaded) return false;
+    html.dataset.ptmLoaded = "true";
+    return true;
   }
   function applyLanguage(settings) {
     setLocale(settings.language === "auto" ? detectLocale(location.hostname) : settings.language);
@@ -4613,6 +4984,7 @@ function __ptmPageScript() {
     style.dataset.ptm = name;
     style.textContent = css;
     document.head.append(style);
+    return style;
   }
   function domReady() {
     if (document.readyState !== "loading") return Promise.resolve();
@@ -4621,8 +4993,5 @@ function __ptmPageScript() {
   function delay(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
-  if (!window.__ptmLoaded) {
-    window.__ptmLoaded = true;
-    boot().catch((error) => log.error("startup failed", error));
-  }
+  if (firstCopy) boot().catch((error) => log.error("startup failed", error));
 })();

@@ -137,4 +137,43 @@ describe('BookmarksService trades', () => {
     service.importFolders([copy]);
     expect(folders()[2]!.archivedAt).toBeNull();
   });
+
+  describe('mergeFolders', () => {
+    const imported = (title: string, ids: string[], archivedAt: string | null = null) => ({
+      title, icon: null, archivedAt,
+      trades: ids.map((searchId) => ({
+        title: searchId, type: 'search' as const, realm: 'poe2', searchId, savedLeague: '', payload: null,
+        completedAt: null, createdAt: '', updatedAt: '',
+      })),
+    });
+
+    it('appends unknown folders with fresh ids', () => {
+      expect(service.mergeFolders([imported('New', ['H4sIa', 'H4sIb'])])).toEqual({ folders: 1, trades: 2 });
+      expect(folders().map((f) => f.title)).toEqual(['F', 'New']);
+      expect(trades(folders()[1]!.id).every((t) => typeof t.id === 'string' && t.id)).toBe(true);
+    });
+
+    it('merges into a folder with the same trimmed title, adding only new search ids', () => {
+      service.addTrade(folder, 'a', search('H4sIa'));
+      expect(service.mergeFolders([imported(' F ', ['H4sIa', 'H4sIc'])])).toEqual({ folders: 0, trades: 1 });
+      expect(folders()).toHaveLength(1);
+      expect(trades(folder).map((t) => t.searchId)).toEqual(['H4sIa', 'H4sIc']);
+      expect(service.mergeFolders([imported('f', [])])).toEqual({ folders: 1, trades: 0 });
+    });
+
+    it('is idempotent and writes once', () => {
+      const backup = [imported('X', ['H4sIa']), imported('Y', ['H4sIb'], '2026-01-01T00:00:00.000Z')];
+      const writes = vi.fn();
+      service.data.subscribe(writes);
+      expect(service.mergeFolders(backup)).toEqual({ folders: 2, trades: 2 });
+      expect(writes).toHaveBeenCalledTimes(1);
+      expect(service.mergeFolders(backup)).toEqual({ folders: 0, trades: 0 });
+      expect(folders()).toHaveLength(3);
+    });
+
+    it('creates a new folder when the archive state differs', () => {
+      expect(service.mergeFolders([imported('F', ['H4sIa'], '2026-01-01T00:00:00.000Z')])).toEqual({ folders: 1, trades: 1 });
+      expect(folders()[1]!.archivedAt).not.toBeNull();
+    });
+  });
 });

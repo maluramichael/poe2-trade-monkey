@@ -6,13 +6,14 @@ import { LeagueService } from './app/leagues';
 import { loadSettings, type Settings } from './app/settings';
 import { createToaster } from './app/toaster';
 import { Store } from './core/store';
-import { detectLocale, setLocale } from './core/i18n';
+import { detectLocale, getLocale, setLocale } from './core/i18n';
 import { log } from './core/log';
 import { GmStorage } from './core/storage';
 import { features } from './features';
 import { injectPageScript, PageBridge } from './site/bridge/client';
 import { trackLocation } from './site/location';
 import { ResultsObserver } from './site/results';
+import { sel } from './site/selectors';
 import { TradeData } from './site/tradeData';
 import { App } from './ui/App';
 import coreCss from './ui/core.css';
@@ -26,21 +27,23 @@ declare global {
 // The bridge listens before the page script exists, and the page script is injected at
 // document-start so it hooks the site's XHR/fetch before the site's own code runs.
 const bridge = new PageBridge(window);
-if (!window.__ptmLoaded) injectPageScript(`(${__ptmPageScript.toString()})();`);
+const firstCopy = claimPage();
+if (firstCopy) injectPageScript(`(${__ptmPageScript.toString()})();`);
 
 async function boot(): Promise<void> {
   await domReady();
-  const appReady = await Promise.race([bridge.whenReady().then(() => true), delay(30_000).then(() => false)]);
-  if (!appReady) {
-    log.info('trade app not found on this page, staying inactive');
-    return;
-  }
+  // No trade form (e.g. a Cloudflare check page): apply nothing until the app shows up.
+  if (!document.querySelector(sel.tradeRoot) && !(await waitForApp())) return inactive();
 
+  // Apply settings, sidebar padding and early features before the first paint after
+  // DOMContentLoaded, so the page does not jump once the Vue app is ready.
   const storage = new GmStorage();
   const settings = await loadSettings(storage);
   const { location } = trackLocation(window);
-  const leagues = new LeagueService(storage, location);
-  void leagues.load();
+
+  applyLanguage(settings.get());
+  applySidebarState(settings.get());
+  const coreStyle = addStyle(coreCss, 'core');
 
   const ctx: AppContext = {
     win: window,
@@ -50,27 +53,36 @@ async function boot(): Promise<void> {
     settings,
     location,
     currentSearch: trackCurrentSearch(location, bridge),
-    leagues,
+    leagues: new LeagueService(location),
     searchNames: new Store<Record<string, string>>({}),
     results: new ResultsObserver(bridge, document),
     data: new TradeData(),
     toast: createToaster(),
   };
-
-  applyLanguage(settings.get());
-  applySidebarState(settings.get());
-  settings.subscribe((next, previous) => {
-    applySidebarState(next);
-    if (next.language !== previous.language) applyLanguage(next);
-  });
-
-  addStyle(coreCss, 'core');
-  ctx.results.start();
   const host = new FeatureHost(features, ctx);
-  host.start();
+  host.startEarly();
+
+  if (!(await waitForApp())) {
+    host.stop();
+    document.documentElement.classList.remove('ptm-sidebar-open');
+    coreStyle.remove();
+    return inactive();
+  }
 
   const root = document.createElement('div');
   root.id = 'ptm-root';
+  root.lang = getLocale();
+  settings.subscribe((next, previous) => {
+    applySidebarState(next);
+    if (next.language !== previous.language) {
+      applyLanguage(next);
+      root.lang = getLocale();
+    }
+  });
+
+  ctx.results.start();
+  host.start();
+
   document.body.append(root);
   const renderApp = () => render(<App ctx={ctx} host={host} />, root);
   renderApp();
@@ -81,8 +93,33 @@ async function boot(): Promise<void> {
     renderApp();
     void host.restart();
   });
+  document.documentElement.classList.add('ptm-ready');
 
   log.info(`v${__VERSION__} ready with ${features.length} features`);
+}
+
+function waitForApp(): Promise<boolean> {
+  return Promise.race([bridge.whenReady().then(() => true), delay(30_000).then(() => false)]);
+}
+
+function inactive(): void {
+  log.info('trade app not found on this page, staying inactive');
+}
+
+/**
+ * Guard against running twice (two installed copies, dev loader plus manager). The flag lives in
+ * the DOM because each userscript manager has its own sandboxed window.
+ */
+function claimPage(): boolean {
+  const html = document.documentElement;
+  if (!html) {
+    if (window.__ptmLoaded) return false;
+    window.__ptmLoaded = true;
+    return true;
+  }
+  if (html.dataset.ptmLoaded) return false;
+  html.dataset.ptmLoaded = 'true';
+  return true;
 }
 
 function applyLanguage(settings: Settings): void {
@@ -93,11 +130,12 @@ function applySidebarState(settings: Settings): void {
   document.documentElement.classList.toggle('ptm-sidebar-open', !settings.sidebarCollapsed);
 }
 
-function addStyle(css: string, name: string): void {
+function addStyle(css: string, name: string): HTMLStyleElement {
   const style = document.createElement('style');
   style.dataset.ptm = name;
   style.textContent = css;
   document.head.append(style);
+  return style;
 }
 
 function domReady(): Promise<void> {
@@ -109,8 +147,4 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// Guard against running twice (two installed copies, dev loader plus manager).
-if (!window.__ptmLoaded) {
-  window.__ptmLoaded = true;
-  boot().catch((error) => log.error('startup failed', error));
-}
+if (firstCopy) boot().catch((error) => log.error('startup failed', error));

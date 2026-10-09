@@ -7,12 +7,12 @@ import css from './feature.css';
 const t = createTranslator({
   de: {
     label: 'Gleiche Angebote zusammenfassen',
-    description: 'Fasst gleiche Items vom selben Verkäufer zum selben Preis zusammen.',
+    description: 'Fasst identische Items (gleiche Mods) vom selben Verkäufer zum selben Preis zusammen.',
     similar: '{n} ähnliche',
   },
   en: {
     label: 'Group identical listings',
-    description: 'Collapses identical items from the same seller at the same price.',
+    description: 'Collapses identical items (same mods) from the same seller at the same price.',
     similar: '{n} similar',
   },
 });
@@ -22,7 +22,7 @@ const HIDDEN = 'ptm-regroup-hidden';
 const SHOWN = 'ptm-regroup-shown';
 const BUTTON = 'ptm-regroup-btn';
 
-/** Seller + item + price. Falls back to the rendered text if the listing data was not captured. */
+/** Seller + item (incl. mods and ilvl) + price. Falls back to the rendered text if the listing data was not captured. */
 export function groupKey({ element, data }: ResultRow): string {
   const seller = data?.listing.account.name ?? element.querySelector(sel.row.sellerLink)?.getAttribute('href') ?? '';
   if (!data) {
@@ -30,7 +30,8 @@ export function groupKey({ element, data }: ResultRow): string {
     return [seller, header, element.querySelector(sel.row.priceField)?.textContent ?? ''].join('|');
   }
   const { item, listing } = data;
-  return [seller, item.name, item.typeLine, listing.price?.amount ?? '', listing.price?.currency ?? ''].join('|');
+  const mods = [item.implicitMods, item.explicitMods, item.runeMods].map((list) => list?.map((mod) => (typeof mod === 'string' ? mod : mod.description)).join('\n') ?? '');
+  return [seller, item.name, item.typeLine, item.ilvl ?? '', ...mods, listing.price?.amount ?? '', listing.price?.currency ?? ''].join('|');
 }
 
 /** Rows of the same group that follow `head`, in order. */

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import type { AppContext } from '../../app/context';
 import type { CurrentSearch } from '../../app/currentSearch';
 import { resolveSearchTitle } from '../../app/searchName';
+import { log } from '../../core/log';
 import { type Store, useStore } from '../../core/store';
 import { decodeSearchId } from '../../site/searchId';
 import type { SearchPayload } from '../../site/tradeTypes';
@@ -13,7 +14,7 @@ import {
   IconArchive, IconBolt, IconCheck, IconChevronDown, IconCompress, IconDownload, IconEdit, IconFolderPlus,
   IconGrip, IconLink, IconPlus, IconSave, IconTrash, IconUndo, IconUpload, IconWarning,
 } from '../../ui/icons';
-import { BookmarkImportError, decodeBackupFile, encodeBackup, encodeFolderCode } from './codec';
+import { BookmarkImportError, decodeBackupFile, encodeBackup, encodeFolderCode, MAX_BACKUP_BYTES } from './codec';
 import { folderIconUrl } from './icons';
 import { t } from './messages';
 import { FolderModal, ImportModal, ShareModal, TitleModal } from './modals';
@@ -107,14 +108,16 @@ export function bookmarksPanel(ctx: AppContext, service: BookmarksService, expan
   }) {
     const tradeLeague = leagueFor(trade, league);
     const href = tradePath(trade, tradeLeague);
+    const isCurrent = current?.location.id === trade.searchId;
+    const classes = ['ptm-bm-trade', trade.completedAt && 'ptm-bm-trade--completed', isCurrent && 'ptm-bm-trade--current'];
     return (
-      <li class={trade.completedAt ? 'ptm-bm-trade ptm-bm-trade--completed' : 'ptm-bm-trade'} data-sort-kind="trades" data-sort-item={trade.id}>
+      <li class={classes.filter(Boolean).join(' ')} data-sort-kind="trades" data-sort-item={trade.id}>
         {trade.completedAt && (
           <span class="ptm-bm-trade__check" role="img" title={t('completed')} aria-label={t('completed')}>
             <IconCheck />
           </span>
         )}
-        <a class="ptm-bm-trade__title" href={href} title={trade.title}>
+        <a class="ptm-bm-trade__title" href={href} title={trade.title} aria-current={isCurrent ? 'page' : undefined}>
           {trade.title}
         </a>
         {isFromOtherLeague(trade, tradeLeague) && (
@@ -185,6 +188,7 @@ export function bookmarksPanel(ctx: AppContext, service: BookmarksService, expan
     setDialog: (dialog: Dialog) => void;
   }) {
     const archived = !!folder.archivedAt;
+    const alreadySaved = !!current && folder.trades.some((trade) => trade.searchId === current.location.id);
     return (
       <li
         class="ptm-bm-folder"
@@ -223,8 +227,7 @@ export function bookmarksPanel(ctx: AppContext, service: BookmarksService, expan
                 label: t('delete'),
                 icon: <IconTrash />,
                 danger: true,
-                hidden: !archived,
-                onSelect: () => setDialog({ kind: 'deleteFolder', folder }),
+                onSelect: () => (folder.trades.length ? setDialog({ kind: 'deleteFolder', folder }) : service.deleteFolder(folder.id)),
               },
             ]}
           />
@@ -260,9 +263,15 @@ export function bookmarksPanel(ctx: AppContext, service: BookmarksService, expan
             ) : (
               <p class="ptm-bm-folder__empty">{t('emptyFolder')}</p>
             )}
-            <span class="ptm-bm-save" title={current ? undefined : t('saveCurrentDisabled')}>
-              <Button variant="gold" block icon={<IconSave />} disabled={!current} onClick={() => setDialog({ kind: 'save', folderId: folder.id })}>
-                {t('saveCurrent')}
+            <span class="ptm-bm-save" title={!current ? t('saveCurrentDisabled') : alreadySaved ? t('alreadySavedHint') : undefined}>
+              <Button
+                variant="gold"
+                block
+                icon={alreadySaved ? <IconCheck /> : <IconSave />}
+                disabled={!current || alreadySaved}
+                onClick={() => setDialog({ kind: 'save', folderId: folder.id })}
+              >
+                {alreadySaved ? t('alreadySaved') : t('saveCurrent')}
               </Button>
             </span>
           </div>
@@ -302,12 +311,15 @@ export function bookmarksPanel(ctx: AppContext, service: BookmarksService, expan
     };
 
     const loadBackup = async (file: File) => {
+      if (file.size > MAX_BACKUP_BYTES) return ctx.toast(t('backupTooLarge'), 'error');
       try {
         const { folders: imported, skipped } = decodeBackupFile(await file.text());
-        const n = service.importFolders(imported);
-        ctx.toast(t('backupLoaded', { n, skipped }), skipped > 0 ? 'warning' : 'success');
+        const { folders: added, trades } = service.mergeFolders(imported);
+        ctx.toast(t('backupMerged', { folders: added, trades, skipped }), skipped > 0 ? 'warning' : 'success');
       } catch (error) {
-        ctx.toast(error instanceof BookmarkImportError ? error.message : String(error), 'error');
+        if (error instanceof BookmarkImportError) return ctx.toast(error.message, 'error');
+        log.error('backup import failed', error);
+        ctx.toast(t('backupFailed'), 'error');
       }
     };
 

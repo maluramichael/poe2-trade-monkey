@@ -3,6 +3,7 @@
 /* Tokens live on :root so feature styles inside the trade page can use them too. */
 :root {
   --ptm-sidebar-width: 400px;
+  --ptm-focus: #c59a50;
   --ptm-bg: rgba(10, 10, 10, 0.88);
   --ptm-surface: #161616;
   --ptm-input: #1e2124;
@@ -50,7 +51,23 @@
 /* Page gets pushed left instead of being covered (Better Trading overlays it since PoE2 0.5). */
 html.ptm-sidebar-open body {
   padding-right: var(--ptm-sidebar-width, 400px);
+}
+
+/* Animate only after boot, so the first paint does not slide. */
+html.ptm-ready body {
   transition: padding-right 0.2s;
+}
+
+/* Small windows: the sidebar covers the page instead of squeezing it. */
+@media (max-width: 999px) {
+  html.ptm-sidebar-open body {
+    padding-right: 0;
+  }
+
+  /* Covering the page, so the page must not show through. */
+  html .ptm-sidebar {
+    background: #0a0a0a;
+  }
 }
 
 .ptm-icon {
@@ -65,7 +82,7 @@ html.ptm-sidebar-open body {
   top: 0;
   right: 0;
   bottom: 0;
-  width: var(--ptm-sidebar-width);
+  width: min(var(--ptm-sidebar-width), 100vw);
   z-index: 1000;
   display: flex;
   flex-direction: column;
@@ -197,9 +214,14 @@ a.ptm-btn:hover {
   text-overflow: ellipsis;
 }
 
-.ptm-btn:focus-visible {
-  outline: 1px solid var(--ptm-beige);
+:is(#ptm-root, .ptm-qf) :is(a, button, input, select, textarea, [tabindex]):focus-visible,
+:is(.ptm-mod-action, .ptm-stat-star, .ptm-search-clear, .ptm-pin-btn, .ptm-regroup-btn):focus-visible {
+  outline: 2px solid var(--ptm-focus, #c59a50);
   outline-offset: 1px;
+}
+
+/* Joined buttons overlap their borders: lift the focused one so its ring stays visible. */
+.ptm-btn:focus-visible {
   position: relative;
   z-index: 1;
 }
@@ -431,7 +453,8 @@ a.ptm-btn:hover {
 }
 
 .ptm-input:focus {
-  outline: none;
+  outline: 2px solid var(--ptm-focus);
+  outline-offset: 0;
   border-color: var(--ptm-gold-border);
 }
 
@@ -462,7 +485,7 @@ a.ptm-btn:hover {
   width: 15px;
   height: 15px;
   margin-top: 1px;
-  border: 2px solid #634928;
+  border: 2px solid #8a6a3a;
 }
 
 .ptm-checkbox__box::after {
@@ -559,6 +582,12 @@ a.ptm-btn:hover {
   justify-items: end;
 }
 
+.ptm-toasts > div {
+  display: grid;
+  gap: 6px;
+  justify-items: end;
+}
+
 html.ptm-sidebar-open .ptm-toasts {
   right: calc(var(--ptm-sidebar-width) + 20px);
 }
@@ -588,7 +617,13 @@ html.ptm-sidebar-open .ptm-toasts {
   #ptm-root *,
   .ptm-modal-overlay,
   .ptm-modal,
-  .ptm-toast {
+  .ptm-toast,
+  .ptm-pin-glow,
+  .ptm-mod-flash-ok,
+  .ptm-mod-flash-fail,
+  .ptm-mod-action,
+  .ptm-stat-star,
+  html.ptm-ready body {
     animation: none !important;
     transition: none !important;
   }

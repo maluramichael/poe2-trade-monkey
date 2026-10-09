@@ -1,4 +1,4 @@
-import { buildQueryPath, buildTradePath, parseTradeLocation, withLeague } from './tradeLocation';
+import { buildQueryPath, buildTradePath, isRealm, parseTradeLocation, withLeague } from './tradeLocation';
 
 const ID = 'H4sIAAAAAAAAE6tWKi5JLCktVrKqVsovKMnMz1OyUkrMq1Sq1QHLFCtZRVcrlVQWpILFU5R0lNIyc0pSi0ASsbWxtQADy6BQQQAAAA';
 
@@ -46,6 +46,25 @@ describe('buildTradePath', () => {
   it('never adds /live to exchange urls', () => {
     expect(buildTradePath({ type: 'exchange', realm: 'poe2', league: 'Standard', id: 'x', live: true })).toBe(
       '/trade2/exchange/poe2/Standard/x',
+    );
+  });
+});
+
+describe('isRealm', () => {
+  it('knows the trade realms', () => {
+    expect(['poe2', 'xbox', 'sony'].every(isRealm)).toBe(true);
+    expect(isRealm('pc')).toBe(false);
+    expect(isRealm('')).toBe(false);
+  });
+});
+
+describe('buildTradePath encoding', () => {
+  it('encodes realm and id so stored values cannot leave their segment', () => {
+    expect(buildTradePath({ type: 'search', realm: 'a/b', league: 'Standard', id: '../x?y', live: false })).toBe(
+      '/trade2/search/a%2Fb/Standard/..%2Fx%3Fy',
+    );
+    expect(buildTradePath({ type: 'search', realm: 'poe2', league: 'Standard', id: 'H4sI_a-b', live: false })).toBe(
+      '/trade2/search/poe2/Standard/H4sI_a-b',
     );
   });
 });

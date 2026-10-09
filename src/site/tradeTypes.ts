@@ -57,6 +57,9 @@ export interface Listing {
   whisper?: string;
 }
 
+/** Older responses send plain strings, current ones (seen live 2026-10-09) send objects with `description` and `hash`. */
+export type ItemMod = string | { description: string; hash?: string; [key: string]: unknown };
+
 export interface Item {
   name: string;
   typeLine: string;
@@ -65,9 +68,9 @@ export interface Item {
   ilvl?: number;
   icon?: string;
   corrupted?: boolean;
-  implicitMods?: string[];
-  explicitMods?: string[];
-  runeMods?: string[];
+  implicitMods?: ItemMod[];
+  explicitMods?: ItemMod[];
+  runeMods?: ItemMod[];
   [key: string]: unknown;
 }
 

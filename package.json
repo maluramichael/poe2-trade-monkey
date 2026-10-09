@@ -1,11 +1,14 @@
 {
   "name": "poe2-trade-monkey",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "private": true,
   "description": "Userscript that enhances the Path of Exile 2 trade site: bookmarks, history, pins, layout and result tools.",
   "license": "MIT",
   "author": "Michael Malura <michael@malura.de>",
   "type": "module",
+  "engines": {
+    "node": ">=22.12"
+  },
   "scripts": {
     "build": "node build.mjs",
     "dev": "node build.mjs --watch",
@@ -13,7 +16,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "check": "npm run typecheck && npm test && npm run build"
+    "check": "npm run typecheck && npm test && npm run build",
+    "setup": "git config core.hooksPath .githooks && npx playwright install firefox chromium"
   },
   "dependencies": {
     "preact": "10.29.8"

@@ -30,13 +30,17 @@ export const highlightModsFeature: Feature = {
   css,
   start(ctx) {
     let unregister = () => {};
+    let appliedKey: string | null = null;
     const clear = () => {
       unregister();
       for (const mod of ctx.doc.querySelectorAll(`.${HIGHLIGHT}`)) mod.classList.remove(HIGHLIGHT);
     };
     const apply = (search: CurrentSearch | null) => {
-      clear();
       const ids = activeStatIds(search);
+      const key = [...ids].sort().join(',');
+      if (key === appliedKey) return;
+      appliedKey = key;
+      clear();
       unregister = ctx.results.decorate('highlight-mods', (row) => {
         for (const stat of row.element.querySelectorAll<HTMLElement>(sel.row.modStat)) {
           const id = stat.dataset.field!.slice('stat.'.length);

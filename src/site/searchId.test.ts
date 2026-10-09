@@ -1,3 +1,4 @@
+import { gzipSync } from 'node:zlib';
 import { decodeSearchId, isEncodedSearchId } from './searchId';
 
 describe('decodeSearchId', () => {
@@ -10,5 +11,14 @@ describe('decodeSearchId', () => {
     expect(isEncodedSearchId('zyZy300s4')).toBe(false);
     expect(await decodeSearchId('zyZy300s4')).toBeNull();
     expect(await decodeSearchId('H4sI!!!')).toBeNull();
+  });
+
+  // Valid JSON, so only the size limit can reject it.
+  it('rejects ids that decompress to more than the limit', async () => {
+    const bomb = gzipSync(JSON.stringify('0'.repeat(300 * 1024))).toString('base64url');
+    expect(bomb.startsWith('H4sI')).toBe(true);
+    expect(await decodeSearchId(bomb)).toBeNull();
+    const query = { query: { status: { option: 'online' } } };
+    expect(await decodeSearchId(gzipSync(JSON.stringify(query)).toString('base64url'))).toEqual(query);
   });
 });

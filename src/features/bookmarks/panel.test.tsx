@@ -66,7 +66,7 @@ const byText = (selector: string, text: string, root: ParentNode = document) => 
 async function menu(root: Element, item: string) {
   $('.ptm-menu > button', root).click();
   await flush();
-  byText('[role="menuitem"]', item, root).click();
+  byText('.ptm-menu__item', item, root).click();
   await flush();
 }
 
@@ -194,7 +194,7 @@ describe('folders and trades', () => {
     // Overwrite only shows with a search on screen.
     $('.ptm-menu > button', tradeEl('1')).click();
     await flush();
-    expect($$('[role="menuitem"]').map((el) => el.textContent)).not.toContain('Overwrite with current search');
+    expect($$('.ptm-menu__item').map((el) => el.textContent)).not.toContain('Overwrite with current search');
     document.dispatchEvent(new MouseEvent('mousedown'));
     await flush();
     ctx.currentSearch.set(search('H4sIother', 'Standard'));
@@ -224,9 +224,9 @@ describe('folders and trades', () => {
   });
 
   it('archives, restores and deletes archived folders', async () => {
-    const { ctx } = await setup({ folders: [folder('a', [trade('1')]), folder('b')], expanded: ['a'] });
+    const { ctx } = await setup({ folders: [folder('a', [trade('1')]), folder('b', [trade('2')])], expanded: ['a'] });
     expect($$('button').map((b) => b.textContent)).not.toContain('Show archive');
-    expect($$('[role="menuitem"]')).toHaveLength(0);
+    expect($$('.ptm-menu__item')).toHaveLength(0);
 
     await menu(folderEl('a'), 'Archive');
     expect($$('.ptm-bm-folder__title').map((el) => el.textContent)).toEqual(['Folder b']);
@@ -246,9 +246,9 @@ describe('folders and trades', () => {
     await flush();
     $('.ptm-menu > button', folderEl('b')).click();
     await flush();
-    byText('[role="menuitem"]', 'Delete').click();
+    byText('.ptm-menu__item', 'Delete').click();
     await flush();
-    expect($('.ptm-modal').textContent).toContain('Delete folder "Folder b" with 0 searches for good?');
+    expect($('.ptm-modal').textContent).toContain('Delete folder "Folder b" with 1 searches for good?');
     byText('.ptm-modal__footer button', 'Delete').click();
     await flush();
     expect(stored(ctx).folders.map((f) => f.id)).toEqual(['a']);
@@ -293,11 +293,69 @@ describe('folders and trades', () => {
     input.dispatchEvent(new Event('change', { bubbles: true }));
     await vi.waitFor(() => expect(stored(ctx).folders).toHaveLength(3));
     expect(stored(ctx).folders.map((f) => [f.title, f.archivedAt])).toEqual([['Folder a', null], ['Folder x', null], ['Folder y', AT]]);
-    expect(ctx.toast.toasts.get().at(-1)).toMatchObject({ kind: 'success', message: 'Imported 2 folders, skipped 0.' });
+    expect(ctx.toast.toasts.get().at(-1)).toMatchObject({
+      kind: 'success', message: '2 folders and 1 searches added, 0 skipped. Existing ones stay, nothing is duplicated.',
+    });
+
+    // Loading the same backup again adds nothing.
+    Object.defineProperty(input, 'files', { configurable: true, value: [new File([backup], 'backup.json')] });
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    await vi.waitFor(() => expect(ctx.toast.toasts.get().at(-1)?.message).toContain('0 folders and 0 searches added'));
+    expect(stored(ctx).folders).toHaveLength(3);
 
     Object.defineProperty(input, 'files', { configurable: true, value: [new File(['{"nope":1}'], 'bad.json')] });
     input.dispatchEvent(new Event('change', { bubbles: true }));
     await vi.waitFor(() => expect(ctx.toast.toasts.get().at(-1)).toMatchObject({ kind: 'error', message: 'The backup file has an unknown format.' }));
+  });
+
+  it('rejects oversized backups and hides unexpected errors', async () => {
+    const { ctx } = await setup();
+    const input = $<HTMLInputElement>('input[type="file"]');
+    const big = new File(['x'], 'big.json');
+    Object.defineProperty(big, 'size', { value: 5 * 1024 * 1024 + 1 });
+    big.text = () => Promise.reject(new Error('should not be read'));
+    Object.defineProperty(input, 'files', { configurable: true, value: [big] });
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    await vi.waitFor(() =>
+      expect(ctx.toast.toasts.get().at(-1)).toMatchObject({ kind: 'error', message: 'The file is too large for a backup (max 5 MB).' }),
+    );
+
+    const broken = new File(['x'], 'broken.json');
+    broken.text = () => Promise.reject(new Error('disk on fire'));
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    Object.defineProperty(input, 'files', { configurable: true, value: [broken] });
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    await vi.waitFor(() => expect(ctx.toast.toasts.get().at(-1)).toMatchObject({ kind: 'error', message: 'Could not read the backup.' }));
+    expect(error).toHaveBeenCalled();
+    error.mockRestore();
+  });
+
+  it('marks the open search and blocks saving it twice in the same folder', async () => {
+    const { ctx } = await setup({ folders: [folder('a', [trade('1'), trade('2')]), folder('b')], expanded: ['a', 'b'] });
+    ctx.currentSearch.set(search(`${ID}1`));
+    await flush();
+    expect(tradeEl('1').classList.contains('ptm-bm-trade--current')).toBe(true);
+    expect($('a', tradeEl('1')).getAttribute('aria-current')).toBe('page');
+    expect(tradeEl('2').classList.contains('ptm-bm-trade--current')).toBe(false);
+    expect($('a', tradeEl('2')).hasAttribute('aria-current')).toBe(false);
+
+    const saved = byText('button', 'Saved in this folder', folderEl('a')) as HTMLButtonElement;
+    expect(saved.disabled).toBe(true);
+    expect(saved.parentElement!.title).toContain('already in this folder');
+    expect((byText('button', 'Save current search', folderEl('b')) as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  it('deletes active folders, empty ones without asking', async () => {
+    const { ctx } = await setup({ folders: [folder('a', [trade('1')]), folder('b')] });
+    await menu(folderEl('b'), 'Delete');
+    expect($('.ptm-modal')).toBeNull();
+    expect(stored(ctx).folders.map((f) => f.id)).toEqual(['a']);
+
+    await menu(folderEl('a'), 'Delete');
+    expect($('.ptm-modal').textContent).toContain('Delete folder "Folder a" with 1 searches for good?');
+    byText('.ptm-modal__footer button', 'Delete').click();
+    await flush();
+    expect(stored(ctx).folders).toEqual([]);
   });
 
   it('names the backup file by date', () => {

@@ -39,4 +39,15 @@ describe('highlight-mods', () => {
     instance.dispose();
     expect(highlighted()).toEqual([]);
   });
+
+  it('does not re-decorate when the active stat ids did not change', () => {
+    const ctx = createTestContext();
+    const decorate = vi.spyOn(ctx.results, 'decorate');
+    const same = () => search([{ type: 'and', filters: [{ id: 'explicit.stat_3299347043' }] }]);
+    ctx.currentSearch.set(same());
+    const instance = highlightModsFeature.start(ctx) as { dispose(): void };
+    ctx.currentSearch.set(same());
+    expect(decorate).toHaveBeenCalledTimes(1);
+    instance.dispose();
+  });
 });

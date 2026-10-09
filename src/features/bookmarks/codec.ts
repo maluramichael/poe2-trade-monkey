@@ -1,6 +1,6 @@
 import { createTranslator } from '../../core/i18n';
 import { isEncodedSearchId } from '../../site/searchId';
-import { DEFAULT_REALM, type TradeType } from '../../site/tradeLocation';
+import { DEFAULT_REALM, isRealm, type TradeType } from '../../site/tradeLocation';
 import { isFolderIcon } from './icons';
 import type { BookmarkFolder, BookmarksData, NewFolder, NewTrade } from './model';
 
@@ -36,6 +36,10 @@ export interface ImportResult {
 const BT_ICON_PREFIX = 'poe2-';
 const BT_SECTION_DELIMITER = '\n--------------------\n';
 const TYPES = new Set<string>(['search', 'exchange']);
+/** Search ids end up in links, so only url-safe base64 characters get in. */
+const SEARCH_ID = /^[A-Za-z0-9_-]{1,4096}$/;
+/** Larger files are not read at all. */
+export const MAX_BACKUP_BYTES = 5 * 1024 * 1024;
 
 interface BtFolder {
   icn: string | null;
@@ -75,7 +79,7 @@ export function decodeFolderCode(code: string, now = new Date().toISOString()): 
     if (version === 3) parts.shift();
     const [type, ...slug] = parts;
     const searchId = slug.join(':');
-    if (!type || !TYPES.has(type) || !searchId) throw new BookmarkImportError('invalid-code');
+    if (!type || !TYPES.has(type) || !SEARCH_ID.test(searchId)) throw new BookmarkImportError('invalid-code');
     return { title: trade.tit, type: type as TradeType, searchId };
   });
 
@@ -171,7 +175,7 @@ function isTrade(value: unknown): boolean {
   const t = value as NewTrade | null;
   return (
     typeof t === 'object' && t !== null && isString(t.title) && TYPES.has(t.type) && isString(t.realm) &&
-    isString(t.searchId) && t.searchId !== '' && isString(t.savedLeague) &&
+    isRealm(t.realm) && isString(t.searchId) && SEARCH_ID.test(t.searchId) && isString(t.savedLeague) &&
     (t.payload === null || (typeof t.payload === 'object' && typeof t.payload.query === 'object')) &&
     isNullableString(t.completedAt) && isString(t.createdAt) && isString(t.updatedAt)
   );

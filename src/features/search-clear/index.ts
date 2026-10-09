@@ -4,6 +4,7 @@ import { createTranslator } from '../../core/i18n';
 import { log } from '../../core/log';
 import { sel } from '../../site/selectors';
 import { IconClose } from '../../ui/icons';
+import { errorText } from '../../ui/messages';
 import type { Feature } from '../types';
 import css from './feature.css';
 
@@ -47,7 +48,10 @@ async function start(ctx: AppContext) {
   };
 
   button.addEventListener('click', () => {
-    bridge.commit('setItem', {}).catch((error) => log.error('search-clear: setItem failed', error));
+    bridge.commit('setItem', {}).catch((error) => {
+      log.error('search-clear: setItem failed', error);
+      ctx.toast(errorText(error), 'error');
+    });
     const field = input();
     if (field) {
       field.value = '';

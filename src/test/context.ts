@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath, URL as NodeURL } from 'node:url';
 import type { AppContext } from '../app/context';
 import type { CurrentSearch } from '../app/currentSearch';
 import { LeagueService } from '../app/leagues';
@@ -11,6 +13,14 @@ import { ResultsObserver } from '../site/results';
 import { TradeData } from '../site/tradeData';
 import type { TradeLocation } from '../site/tradeLocation';
 import type { FetchResult } from '../site/tradeTypes';
+
+/** Mutation names the real site knows, e.g. "setItem" from "## persistent/setItem". */
+const KNOWN_MUTATIONS = new Set(
+  // node:url's URL, the global one is happy-dom's and drops the file: base.
+  [...readFileSync(fileURLToPath(new NodeURL('../../docs/dom/vuex-mutations.txt', import.meta.url)), 'utf8').matchAll(/^## (\S+)/gm)].map(
+    (match) => match[1]!.split('/').pop()!,
+  ),
+);
 
 export interface TestContext extends AppContext {
   storage: MemoryStorage;
@@ -39,6 +49,8 @@ export function createTestContext(options: {
 
   bridge.send = (async (command: { kind: string; mutation?: string; payload?: unknown }) => {
     if (command.kind === 'commit') {
+      // Like the page bridge: unknown names are rejected and never reach the store.
+      if (!KNOWN_MUTATIONS.has(command.mutation!)) throw new Error('unknown-mutation: ' + command.mutation);
       commits.push({ mutation: command.mutation!, payload: command.payload });
       return null;
     }
@@ -63,7 +75,7 @@ export function createTestContext(options: {
     settings: new Store<Settings>({ ...DEFAULT_SETTINGS, ...options.settings }),
     location,
     currentSearch: new Store<CurrentSearch | null>(null),
-    leagues: new LeagueService(storage, location, fetchJson),
+    leagues: new LeagueService(location),
     searchNames: new Store<Record<string, string>>({}),
     results: new ResultsObserver(bridge, document, 0),
     data: new TradeData(fetchJson),

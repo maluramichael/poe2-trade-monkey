@@ -67,7 +67,7 @@ export function historyPanel(entries: Store<HistoryEntry[]>, ctx: Pick<AppContex
     return (
       <div class="ptm-history">
         <div class="ptm-toolbar">
-          <Button variant="gold" size="sm" icon={<IconTrash />} onClick={() => setConfirming(true)}>
+          <Button variant="plain" size="sm" icon={<IconTrash />} onClick={() => setConfirming(true)}>
             {t('clear')}
           </Button>
         </div>

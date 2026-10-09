@@ -6,6 +6,7 @@ Steckbrief und Scope: `PROJEKT.md`. Design-Vorgaben: `DESIGN.md`.
 ## Befehle
 
 ```bash
+npm run setup        # einmal pro Klon: Git-Hooks und Playwright-Browser
 npm run check        # typecheck + unit tests + build (vor jedem Commit)
 npm test             # Vitest + happy-dom
 npm run build        # dist/poe2-trade-monkey.user.js + .meta.js
@@ -15,8 +16,9 @@ npm run test:e2e     # Playwright gegen Fixtures (offline)
 
 ## Architektur
 
-- `src/main.tsx` bootet: Page-Bridge injizieren (document-start), auf die Vue-App warten,
-  Settings laden, Features über den `FeatureHost` starten, Sidebar rendern.
+- `src/main.tsx` bootet: Page-Bridge injizieren (document-start), nach DOMContentLoaded Settings,
+  Seitenleisten-Padding und Features mit `early: true` (Layout) anwenden, damit die Seite nicht
+  springt, dann auf die Vue-App warten, übrige Features über den `FeatureHost` starten, Sidebar rendern.
 - `src/site/page/` läuft **im Seitenkontext** (eigenes esbuild-Bundle, als String eingebettet).
   Hookt XHR (Suche) und fetch (Listings) der Seite und führt Vuex-Commits aus. Kein GM-API dort.
 - `src/site/bridge/` Protokoll und Client. Nachrichten sind JSON-Strings in `CustomEvent.detail`
@@ -38,6 +40,8 @@ npm run test:e2e     # Playwright gegen Fixtures (offline)
   (leerer `value` löscht), `commit('setFilterGroupDisabled', {type: 'filters', group, disable})`,
   `commit('setItem', {name, type, disc, term})`. Live verifiziert, das Formular zieht sofort nach.
   Quelltext (Pfadpräfix dort ist nur das Modul, nicht Teil des Namens): `docs/dom/vuex-mutations.txt`.
+  Die Bridge lehnt unbekannte Namen ab (`unknown-mutation`, Prüfung gegen `$store._mutations`), der
+  Unit-Test-Kontext prüft gegen diese Datei. Nach einer Umbenennung durch GGG dort nachziehen.
 - Suche = XHR `POST /api/trade2/search/poe2/{league}`, Listings = fetch `GET /api/trade2/fetch/...`.
 - Such-IDs sind gzip+base64url der Query (`H4sI...`) und league-unabhängig. `?q=<json>` lässt die
   Seite eine Query selbst ausführen.
@@ -47,13 +51,14 @@ npm run test:e2e     # Playwright gegen Fixtures (offline)
 ## Offline testen (Standard)
 
 ```bash
-npm run build && npm run test:e2e                         # 7 Flows gegen die nachgebaute Seite
+npm run build && npm run test:e2e                         # Flows gegen die nachgebaute Seite, CLS-Budget in Chromium
 npm run build && PTM_SCREENS=1 npx playwright test e2e/screens.spec.ts
 ```
 
 `e2e/fake-site.ts` baut die trade2-Seite aus den Fixtures nach (Fake-Vuex, echte API-Antworten).
 Die Screenshot-Spec lädt zusätzlich das echte Seiten-CSS vom CDN (web.poecdn.com, ohne Login und
-ohne Cloudflare) und legt Bilder unter `~/.claude/screenshots/pathofexile2trademonkey/offline/` ab.
+ohne Cloudflare; die Dateinamen in `SITE_CSS` ändern sich mit jedem Deploy der Seite und müssen
+beim nächsten Live-Test erneuert werden) und legt Bilder unter `~/.claude/screenshots/pathofexile2trademonkey/offline/` ab.
 Design und Abläufe zuerst hier prüfen.
 
 ## Live testen (sparsam)

@@ -81,4 +81,19 @@ describe('RateSource', () => {
     expect(console.warn).toHaveBeenCalledTimes(1);
     expect(storage.data.size).toBe(0);
   });
+
+  it('keeps using expired rates when poe.ninja fails', async () => {
+    await storage.set('price-equivalent:rates:Standard', { at: Date.now() - 2 * 60 * 60 * 1000, values: { exalted: 0.002 } });
+    http.mockRejectedValue(new Error('offline'));
+    const rates = await new RateSource(storage, http).get('Standard');
+    expect(rates.get('exalted')).toBe(0.002);
+    expect(console.warn).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not cache empty rates', async () => {
+    http.mockResolvedValue({ lines: [] });
+    const rates = await new RateSource(storage, http).get('Standard');
+    expect(rates.size).toBe(0);
+    expect(storage.data.size).toBe(0);
+  });
 });

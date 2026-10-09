@@ -1,5 +1,5 @@
 import { homedir } from 'node:os';
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { PAGE_URL, setupFakeSite } from './fake-site';
 
 /**
@@ -14,15 +14,27 @@ test.use({ viewport: { width: 1920, height: 1080 } });
 /** The site's real stylesheets (public CDN, no login, no Cloudflare check) for realistic shots. */
 const SITE_CSS = [
   'trade.CWybe7yKFwAA', 'chunk.cPtk7Gt2b9yC', 'chunk.CVUyA65b6iKx', 'chunk.Bu2FJzTrkyQu', 'chunk.sOL4Z4VkxCxP',
-  'chunk.BcENQw-3r0o4', 'chunk.DQ7TqNqiKhKT', 'chunk.CLAD-CyBV90u', 'chunk.FsMMKz2Rmvhd', 'chunk.CANKkviOHVgg',
+  'chunk.DlXZ1iK5b7tj', 'chunk.DQ7TqNqiKhKT', 'chunk.CLAD-CyBV90u', 'chunk.D4nVfHo5F5z6', 'chunk.CANKkviOHVgg',
 ].map((name) => `https://web.poecdn.com/dist/css/${name}.css`);
+
+/** Hashed names change with site deploys; a stylesheet the CDN dropped is skipped, not fatal. */
+async function addSiteCss(page: Page): Promise<number> {
+  let missing = 0;
+  for (const url of SITE_CSS) {
+    await page.addStyleTag({ url }).catch(() => {
+      missing++;
+      console.warn(`site CSS missing: ${url}`);
+    });
+  }
+  return missing;
+}
 
 test('bookmarks, pins and settings', async ({ context, page }) => {
   await setupFakeSite(context);
   // Registered last, so it wins over the catch-all route of the fake site.
   await context.route('https://web.poecdn.com/**', (route) => route.continue());
   await page.goto(PAGE_URL);
-  for (const url of SITE_CSS) await page.addStyleTag({ url });
+  await addSiteCss(page);
   const sidebar = page.locator('.ptm-sidebar');
   await expect(sidebar).toBeVisible();
   await page.evaluate(() => (window as unknown as { __fakeSite: { search(): Promise<unknown> } }).__fakeSite.search());
@@ -49,7 +61,7 @@ test('german interface', async ({ context, page }) => {
   await setupFakeSite(context);
   await context.route('https://web.poecdn.com/**', (route) => route.continue());
   await page.goto(PAGE_URL);
-  for (const url of SITE_CSS) await page.addStyleTag({ url });
+  await addSiteCss(page);
   const sidebar = page.locator('.ptm-sidebar');
   await expect(sidebar).toBeVisible();
   await page.evaluate(() => (window as unknown as { __fakeSite: { search(): Promise<unknown> } }).__fakeSite.search());
@@ -71,7 +83,7 @@ test('two columns at medium width: item card and price do not overlap', async ({
   await setupFakeSite(context);
   await context.route('https://web.poecdn.com/**', (route) => route.continue());
   await page.goto(PAGE_URL);
-  for (const url of SITE_CSS) await page.addStyleTag({ url });
+  test.skip((await addSiteCss(page)) > 0, 'the CDN dropped a site stylesheet, update SITE_CSS from the live page');
   // The fake page's stand-in row CSS is for offline smoke tests; the real CSS decides here.
   await page.evaluate(() => document.querySelector('head > style')?.remove());
   await expect(page.locator('html.ptm-layout-split')).toBeAttached();
@@ -79,4 +91,18 @@ test('two columns at medium width: item card and price do not overlap', async ({
   const [card, price] = await Promise.all([row.locator('.item-popup').boundingBox(), row.locator('.right').boundingBox()]);
   expect(card!.x + card!.width).toBeLessThanOrEqual(price!.x + 1);
   await page.screenshot({ path: `${DIR}/06-split-1720.png` });
+});
+
+test('narrow window: the sidebar covers the page instead of squeezing it', async ({ context, page }) => {
+  await page.setViewportSize({ width: 820, height: 1000 });
+  await setupFakeSite(context);
+  await context.route('https://web.poecdn.com/**', (route) => route.continue());
+  await page.goto(PAGE_URL);
+  await addSiteCss(page);
+  await expect(page.locator('.ptm-sidebar')).toBeVisible();
+  expect(await page.evaluate(() => getComputedStyle(document.body).paddingRight)).toBe('0px');
+  await page.screenshot({ path: `${DIR}/08-narrow-820.png` });
+  await page.locator('.ptm-sidebar').getByRole('button', { name: 'Collapse sidebar' }).click();
+  await expect(page.locator('.ptm-expand-tab')).toBeFocused();
+  await page.screenshot({ path: `${DIR}/09-narrow-collapsed.png` });
 });

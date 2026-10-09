@@ -116,6 +116,10 @@ describe('pins', () => {
     expect(panel.querySelectorAll('.ptm-pin').length).toBe(1);
     expect(rows()[0]!.classList.contains('ptm-pinned')).toBe(false);
     act(() => panelButtons('Clear pins')[0]!.click());
+    expect(panel.querySelector('[role="dialog"]')?.textContent).toContain('Remove all 1 pins?');
+    expect(panel.querySelectorAll('.ptm-pin').length).toBe(1);
+    act(() => [...panel.querySelectorAll<HTMLButtonElement>('[role="dialog"] button')].find((b) => b.textContent === 'Remove')!.click());
+    expect(panel.querySelector('[role="dialog"]')).toBeNull();
     expect(panel.querySelector('.ptm-pin')).toBeNull();
     expect(rows()[1]!.classList.contains('ptm-pinned')).toBe(false);
   });

@@ -1,7 +1,9 @@
 import type { AppContext } from '../../app/context';
 import { createTranslator } from '../../core/i18n';
+import { log } from '../../core/log';
 import { sel } from '../../site/selectors';
 import type { StatFilter } from '../../site/tradeTypes';
+import { errorText } from '../../ui/messages';
 import type { Feature } from '../types';
 import css from './feature.css';
 
@@ -10,21 +12,21 @@ const t = createTranslator({
     label: 'Mods als Filter übernehmen',
     description: 'Plus und Minus an jeder Mod im Ergebnis fügen sie als Filter hinzu oder schließen sie aus.',
     addTitle: 'Als Filter hinzufügen',
+    addHint: 'Als Filter hinzufügen (Shift: ohne Mindestwert)',
     excludeTitle: 'Ausschließen',
     added: 'Filter hinzugefügt: {text}',
     excluded: 'Ausgeschlossen: {text}',
     duplicate: 'Schon im Filter: {text}',
-    failed: 'Filter konnte nicht gesetzt werden: {error}',
   },
   en: {
     label: 'Mod filter buttons',
     description: 'Plus and minus on each result mod add it as a filter or exclude it.',
     addTitle: 'Add as filter',
+    addHint: 'Add as filter (Shift: without minimum)',
     excludeTitle: 'Exclude',
     added: 'Filter added: {text}',
     excluded: 'Excluded: {text}',
     duplicate: 'Already in filter: {text}',
-    failed: 'Could not set the filter: {error}',
   },
 });
 
@@ -74,7 +76,8 @@ export async function applyModAction(ctx: AppContext, action: ModAction): Promis
     ctx.toast(t(action.kind === 'add' ? 'added' : 'excluded', { text: action.text }));
     return true;
   } catch (error) {
-    ctx.toast(t('failed', { error: error instanceof Error ? error.message : String(error) }), 'error');
+    log.error('mod-actions: commit failed', error);
+    ctx.toast(errorText(error), 'error');
     return false;
   }
 }
@@ -107,8 +110,8 @@ export const modActionsFeature: Feature = {
       el.type = 'button';
       el.className = `${ACTION} ${ACTION}--${kind}`;
       el.textContent = kind === 'add' ? '+' : '−';
-      el.title = t(kind === 'add' ? 'addTitle' : 'excludeTitle');
-      el.setAttribute('aria-label', el.title);
+      el.title = t(kind === 'add' ? 'addHint' : 'excludeTitle');
+      el.setAttribute('aria-label', `${t(kind === 'add' ? 'addTitle' : 'excludeTitle')}: ${(stat.textContent ?? '').trim()}`);
       el.addEventListener('click', (event) => {
         event.preventDefault();
         event.stopPropagation();

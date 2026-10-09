@@ -51,6 +51,8 @@ const pageScript = `(() => {
   const subscribers = [];
   const $store = {
     state,
+    // Like Vuex, so the bridge's existence check applies.
+    _mutations: mutations,
     commit(type, payload) {
       const mutation = mutations[type];
       if (!mutation) return console.error('[vuex] unknown mutation type: ' + type);

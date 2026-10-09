@@ -31,4 +31,17 @@ describe('PageBridge', () => {
     expect(bridge.isReady).toBe(true);
     expect(searches).toEqual([{ type: 'search', league: 'Standard' }]);
   });
+
+  it('ignores broken JSON from the page', () => {
+    new PageBridge(window);
+    expect(() => window.dispatchEvent(new CustomEvent(PAGE_TO_CONTENT, { detail: '{nope' }))).not.toThrow();
+  });
+
+  it('emits rateLimited with the wait time', () => {
+    const bridge = new PageBridge(window);
+    const waits: number[] = [];
+    bridge.events.on('rateLimited', (ms) => waits.push(ms));
+    window.dispatchEvent(new CustomEvent(PAGE_TO_CONTENT, { detail: JSON.stringify({ kind: 'rateLimited', retryAfterMs: 3000 }) }));
+    expect(waits).toEqual([3000]);
+  });
 });

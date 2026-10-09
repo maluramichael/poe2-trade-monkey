@@ -22,6 +22,14 @@ export function isFetchUrl(url: string): boolean {
 export interface NetworkCallbacks {
   onSearch(captured: CapturedSearch): void;
   onListings(results: FetchResult[]): void;
+  onRateLimited(retryAfterMs: number): void;
+}
+
+/** Retry-After seconds as ms, 60s when missing or unreadable, clamped to 1s..10min. */
+export function retryAfterMs(header: string | null): number {
+  const seconds = header === null || header.trim() === '' ? NaN : Number(header);
+  if (!Number.isFinite(seconds)) return 60000;
+  return Math.min(600000, Math.max(1000, seconds * 1000));
 }
 
 /**
@@ -63,6 +71,11 @@ function hookXhr(win: Window & typeof globalThis, callbacks: NetworkCallbacks): 
 
   proto.send = function (this: XMLHttpRequest, body?: Document | XMLHttpRequestBodyInit | null) {
     const url = urls.get(this) ?? '';
+    if (parseSearchUrl(url) || isFetchUrl(url)) {
+      this.addEventListener('load', () => {
+        if (this.status === 429) callbacks.onRateLimited(retryAfterMs(this.getResponseHeader('Retry-After')));
+      });
+    }
     if (parseSearchUrl(url)) {
       this.addEventListener('load', () => {
         if (this.status === 200) handleSearch(url, body, this.responseText, callbacks);
@@ -84,15 +97,26 @@ function hookXhr(win: Window & typeof globalThis, callbacks: NetworkCallbacks): 
 function hookFetch(win: Window & typeof globalThis, callbacks: NetworkCallbacks): void {
   const originalFetch = win.fetch;
   win.fetch = async function (input: RequestInfo | URL, init?: RequestInit) {
-    const response = await originalFetch.call(win, input, init);
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+    // Clone before sending, the original Request body is consumed by the call. A body that is
+    // already used makes clone() throw; then we only lose the capture, never the site's request.
+    let requestBody: Promise<unknown> = Promise.resolve(init?.body);
+    if (init?.body === undefined && typeof input === 'object' && 'clone' in input && parseSearchUrl(url)) {
+      try {
+        requestBody = input.clone().text().catch(() => undefined);
+      } catch {
+        requestBody = Promise.resolve(undefined);
+      }
+    }
+    const response = await originalFetch.call(win, input, init);
+    if (response.status === 429 && (isFetchUrl(url) || parseSearchUrl(url))) {
+      callbacks.onRateLimited(retryAfterMs(response.headers.get('Retry-After')));
+    }
     if (response.ok && (isFetchUrl(url) || parseSearchUrl(url))) {
-      response
-        .clone()
-        .text()
-        .then((text) => {
+      Promise.all([response.clone().text(), requestBody])
+        .then(([text, body]) => {
           if (isFetchUrl(url)) handleListings(JSON.parse(text), callbacks);
-          else handleSearch(url, init?.body, text, callbacks);
+          else handleSearch(url, body, text, callbacks);
         })
         .catch(() => {});
     }

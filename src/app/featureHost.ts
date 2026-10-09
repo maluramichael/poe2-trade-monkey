@@ -18,16 +18,26 @@ export class FeatureHost {
   readonly running = new Store<RunningFeature[]>([]);
   readonly #instances = new Map<string, { instance: FeatureInstance | void; style?: HTMLStyleElement }>();
   readonly #starting = new Set<string>();
+  #stopped = false;
 
   constructor(
     readonly features: readonly Feature[],
     private readonly ctx: AppContext,
   ) {}
 
+  /** Starts the enabled `early` features before the page's Vue app is ready. No settings subscription. */
+  startEarly(): void {
+    for (const feature of this.features) {
+      if (feature.early && this.#wanted(feature) && !this.#instances.has(feature.id) && !this.#starting.has(feature.id)) {
+        void this.#startFeature(feature);
+      }
+    }
+  }
+
   start(): () => void {
     const sync = () => {
       for (const feature of this.features) {
-        const enabled = !feature.toggleable || isFeatureEnabled(this.ctx.settings.get(), feature.id, feature.defaultEnabled);
+        const enabled = this.#wanted(feature);
         const running = this.#instances.has(feature.id) || this.#starting.has(feature.id);
         if (enabled && !running) void this.#startFeature(feature);
         if (!enabled && running) this.#stopFeature(feature);
@@ -39,6 +49,12 @@ export class FeatureHost {
       off();
       for (const feature of this.features) this.#stopFeature(feature);
     };
+  }
+
+  /** Stops every feature for good, e.g. when the trade app never becomes ready. */
+  stop(): void {
+    this.#stopped = true;
+    for (const feature of this.features) this.#stopFeature(feature);
   }
 
   /**
@@ -62,6 +78,15 @@ export class FeatureHost {
         this.ctx.doc.head.append(style);
       }
       const instance = await feature.start(this.ctx);
+      // Switched off (or host stopped) while start() was pending.
+      if (this.#stopped || !this.#wanted(feature)) {
+        try {
+          instance?.dispose?.();
+        } finally {
+          style?.remove();
+        }
+        return;
+      }
       this.#instances.set(feature.id, { instance, style });
       this.#publish();
     } catch (error) {
@@ -70,6 +95,10 @@ export class FeatureHost {
     } finally {
       this.#starting.delete(feature.id);
     }
+  }
+
+  #wanted(feature: Feature): boolean {
+    return !feature.toggleable || isFeatureEnabled(this.ctx.settings.get(), feature.id, feature.defaultEnabled);
   }
 
   #stopFeature(feature: Feature): void {

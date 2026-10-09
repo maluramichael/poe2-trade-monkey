@@ -64,3 +64,9 @@
 .ptm-stat-star[aria-pressed='true'] svg {
   fill: currentColor;
 }
+
+@media (hover: none) {
+  .ptm-stat-star {
+    opacity: 0.6;
+  }
+}

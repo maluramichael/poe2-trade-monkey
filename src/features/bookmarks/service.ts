@@ -119,6 +119,33 @@ export class BookmarksService {
     return added.length;
   }
 
+  /**
+   * Backup import that never duplicates: a folder with the same trimmed title and archive state
+   * only gains the trades whose search id it lacks, others are appended with fresh ids.
+   */
+  mergeFolders(folders: NewFolder[]): { folders: number; trades: number } {
+    const counts = { folders: 0, trades: 0 };
+    this.#setFolders((existing) => {
+      const result = [...existing];
+      for (const folder of folders) {
+        const index = result.findIndex((f) => f.title.trim() === folder.title.trim() && !f.archivedAt === !folder.archivedAt);
+        const target = result[index];
+        if (!target) {
+          result.push({ ...folder, id: newId(), trades: folder.trades.map((trade) => ({ ...trade, id: newId() })) });
+          counts.folders++;
+          counts.trades += folder.trades.length;
+          continue;
+        }
+        const known = new Set(target.trades.map((t) => t.searchId));
+        const added = folder.trades.filter((t) => !known.has(t.searchId) && known.add(t.searchId)).map((t) => ({ ...t, id: newId() }));
+        if (added.length) result[index] = { ...target, trades: [...target.trades, ...added] };
+        counts.trades += added.length;
+      }
+      return result;
+    });
+    return counts;
+  }
+
   /** The bookmark for a search id, preferring active folders over archived ones. */
   findTradeBySearchId(searchId: string): { folder: BookmarkFolder; trade: BookmarkTrade } | null {
     const matches = this.data.get().folders.flatMap((folder) =>

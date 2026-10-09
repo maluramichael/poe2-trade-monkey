@@ -2,10 +2,13 @@
 import { readFileSync } from 'node:fs';
 import type { StatGroup } from '../../site/tradeTypes';
 import { createTestContext } from '../../test/context';
+import { t as ui } from '../../ui/messages';
 import { applyModAction, modActionsFeature, parseModValue } from './index';
 
 const rowsHtml = readFileSync('src/test/fixtures/result-rows.html', 'utf8');
 const LIFE = 'explicit.stat_3299347043';
+const siteChanged = ui('siteChanged');
+const actionFailed = ui('actionFailed');
 
 const contextWith = (stats: StatGroup[]) => createTestContext({ pageState: { stats } });
 const lastToast = (ctx: ReturnType<typeof createTestContext>) => ctx.toast.toasts.get().at(-1);
@@ -82,6 +85,15 @@ describe('applyModAction', () => {
     }) as typeof ctx.bridge.send;
     expect(await applyModAction(ctx, { id: LIFE, text: 'x', kind: 'add', withValue: true })).toBe(false);
     expect(lastToast(ctx)?.kind).toBe('error');
+    expect(lastToast(ctx)?.message).toBe(actionFailed);
+  });
+
+  it('explains a changed trade site instead of the raw error', async () => {
+    const ctx = contextWith([{ type: 'and', filters: [] }]);
+    vi.spyOn(ctx.bridge, 'commit').mockRejectedValue(new Error('unknown-mutation: setStatFilter'));
+    expect(await applyModAction(ctx, { id: LIFE, text: '+89 to maximum Life', kind: 'add', withValue: true })).toBe(false);
+    expect(lastToast(ctx)).toMatchObject({ kind: 'error', message: siteChanged });
+    expect(lastToast(ctx)?.message).not.toContain('unknown-mutation');
   });
 });
 
@@ -101,7 +113,10 @@ describe('mod-actions decorator', () => {
 
     const line = document.querySelector(`[data-field="stat.${LIFE}"]`)!.closest('.item-mod')!;
     const plus = line.querySelector<HTMLButtonElement>('.ptm-mod-action--add')!;
-    expect(plus.title).toBe('Add as filter');
+    expect(plus.title).toBe('Add as filter (Shift: without minimum)');
+    const modText = line.querySelector(`[data-field="stat.${LIFE}"]`)!.textContent!.trim();
+    expect(plus.getAttribute('aria-label')).toBe(`Add as filter: ${modText}`);
+    expect(line.querySelector('.ptm-mod-action--exclude')!.getAttribute('aria-label')).toBe(`Exclude: ${modText}`);
     plus.click();
     await vi.waitFor(() => expect(ctx.commits).toHaveLength(1));
     expect(ctx.commits[0]).toEqual({ mutation: 'setStatFilter', payload: { group: 0, value: { id: LIFE, value: { min: expect.any(Number) } } } });

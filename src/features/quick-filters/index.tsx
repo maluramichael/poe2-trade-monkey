@@ -8,6 +8,7 @@ import { sel } from '../../site/selectors';
 import type { FilterOption } from '../../site/tradeData';
 import type { PersistentState } from '../../site/tradeTypes';
 import { ButtonGroup } from '../../ui/components/Button';
+import { errorText } from '../../ui/messages';
 import { IconChevronDown, IconClose } from '../../ui/icons';
 import type { Feature } from '../types';
 import css from './feature.css';
@@ -172,8 +173,8 @@ function Strip({ state, rarities, apply }: { state: Store<PersistentState | null
               class={`ptm-btn ptm-btn--blue ptm-btn--sm ptm-qf__btn ptm-qf__btn--${tri}${tri === 'yes' ? ' ptm-btn--active' : ''}`}
               data-filter={id}
               data-state={tri}
-              aria-pressed={tri !== 'any'}
               title={t('triTitle', { name: t(id), state: t(tri) })}
+              aria-label={t('triTitle', { name: t(id), state: t(tri) })}
               onClick={() => run(toggleCommits(filters, id, nextTri(tri)))}
             >
               <span>{t(id)}</span>
@@ -222,13 +223,12 @@ function Strip({ state, rarities, apply }: { state: Store<PersistentState | null
               <IconChevronDown size={11} />
             </button>
             {open === 'rarity' && (
-              <div class="ptm-qf__pop ptm-qf__pop--list" role="menu">
+              <div class="ptm-qf__pop ptm-qf__pop--list">
                 {options.map((option) => (
                   <button
                     key={option.id ?? 'any'}
                     type="button"
-                    role="menuitemradio"
-                    aria-checked={option.id === view.rarity}
+                    aria-pressed={option.id === view.rarity}
                     class="ptm-qf__option"
                     data-rarity={option.id ?? undefined}
                     onClick={() => run(rarityCommits(filters, option.id))}
@@ -278,6 +278,7 @@ function start(ctx: AppContext) {
       for (const commit of commits) await bridge.commit(commit.mutation, commit.payload);
     } catch (error) {
       log.error('quick filters: commit failed', error);
+      ctx.toast(errorText(error), 'error');
     }
     await refresh();
   };

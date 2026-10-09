@@ -31,7 +31,7 @@
 /* "No": red border and a red diagonal strike. */
 .ptm-qf__btn--no {
   border-color: var(--ptm-red-border);
-  color: var(--ptm-muted);
+  color: var(--ptm-beige);
 }
 
 .ptm-qf__btn--no::after {

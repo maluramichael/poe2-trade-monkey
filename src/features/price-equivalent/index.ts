@@ -40,10 +40,17 @@ export const priceEquivalentFeature: Feature = {
       for (const line of ctx.doc.querySelectorAll(`.${LINE_CLASS}`)) line.remove();
     };
 
-    const load = async (league: string | null) => {
+    let lastKey: string | undefined;
+    const load = async () => {
+      // poe.ninja only has PC rates (realm "poe2").
+      const realm = ctx.location.get()?.realm ?? 'poe2';
+      const league = ctx.leagues.current.get();
+      const key = `${realm}|${league}`;
+      if (key === lastKey) return;
+      lastKey = key;
       const current = ++generation;
       clear();
-      if (!league) return;
+      if (!league || realm !== 'poe2') return;
       const [rates, currencies] = await Promise.all([
         source.get(league),
         ctx.data.currencies().catch(() => new Map<string, CurrencyEntry>()),
@@ -52,11 +59,13 @@ export const priceEquivalentFeature: Feature = {
       undecorate = ctx.results.decorate('price-equivalent', (row) => render(ctx.doc, row, rates, currencies));
     };
 
-    void load(ctx.leagues.current.get());
-    const off = ctx.leagues.current.subscribe((league) => void load(league));
+    void load();
+    const offLeague = ctx.leagues.current.subscribe(() => void load());
+    const offLocation = ctx.location.subscribe(() => void load());
     return {
       dispose() {
-        off();
+        offLeague();
+        offLocation();
         generation++;
         clear();
       },

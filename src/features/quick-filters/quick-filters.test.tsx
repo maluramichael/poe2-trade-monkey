@@ -2,6 +2,7 @@ import { act } from 'preact/test-utils';
 import { sel } from '../../site/selectors';
 import { createTestContext, type TestContext } from '../../test/context';
 import type { FeatureInstance } from '../types';
+import { t as ui } from '../../ui/messages';
 import { quickFiltersFeature } from './index';
 import { NUMBERS, clearCommits, numberCommits, toView, toggleCommits, type Filters } from './model';
 
@@ -118,12 +119,21 @@ describe('quick filters strip', () => {
     await wait(150);
     expect(button('corrupted').dataset.state).toBe('no');
     expect(button('corrupted').classList.contains('ptm-qf__btn--no')).toBe(true);
+    expect(button('corrupted').getAttribute('aria-label')).toBe('Corrupted: no. Click cycles any, yes and no.');
+    expect(button('corrupted').hasAttribute('aria-pressed')).toBe(false);
 
     from = ctx.commits.length;
     await click(button('corrupted'));
     expect(lastCommits(from)).toEqual([
       { mutation: 'setPropertyFilter', payload: { group: 'misc_filters', index: 'corrupted', value: {} } },
     ]);
+  });
+
+  it('shows an error toast when a commit fails', async () => {
+    vi.spyOn(ctx.bridge, 'commit').mockRejectedValue(new Error('unknown-mutation: setPropertyFilter'));
+    await click(button('corrupted'));
+    await wait();
+    expect(ctx.toast.toasts.get().at(-1)).toMatchObject({ kind: 'error', message: ui('siteChanged') });
   });
 
   it('syncs changes from the native form, debounced', async () => {

@@ -4,7 +4,13 @@
 # Enable once per clone: git config core.hooksPath .githooks
 set -e
 
-npm run check >/dev/null || { echo "pre-push: npm run check failed" >&2; exit 1; }
+# The checks below build into the working tree, so it has to match the pushed commit.
+if ! git diff --quiet HEAD || [ -n "$(git status --porcelain -- dist)" ]; then
+  echo "pre-push: working tree has uncommitted changes. Commit or stash them first." >&2
+  exit 1
+fi
+
+out=$(npm run check 2>&1) || { echo "$out" >&2; echo 'pre-push: npm run check failed' >&2; exit 1; }
 
 if ! git diff --quiet -- dist; then
   echo "pre-push: dist/ differs from a fresh build. Commit the build, then push again." >&2
@@ -15,6 +21,7 @@ version() { git show "$1:package.json" 2>/dev/null | sed -n 's/^  "version": "\(
 
 # stdin: <local ref> <local sha> <remote ref> <remote sha>, one line per pushed ref
 while read -r _ local_sha _ remote_sha; do
+  case "$local_sha" in *[!0]*) ;; *) continue ;; esac # ref is being deleted
   git cat-file -e "$remote_sha" 2>/dev/null || continue # new branch or unknown remote state
   git diff --quiet "$remote_sha" "$local_sha" -- dist/poe2-trade-monkey.user.js && continue
   if [ "$(version "$remote_sha")" = "$(version "$local_sha")" ]; then

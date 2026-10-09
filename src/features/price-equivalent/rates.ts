@@ -26,7 +26,7 @@ export function parseRates(json: unknown): Rates {
   return rates;
 }
 
-/** poe.ninja rates per league, cached in storage for an hour. Failures yield empty rates. */
+/** poe.ninja rates per league, cached in storage for an hour. Failures fall back to expired rates, else empty rates. */
 export class RateSource {
   readonly #inFlight = new Map<string, Promise<Rates>>();
 
@@ -51,11 +51,11 @@ export class RateSource {
     try {
       const rates = parseRates(await this.http(`${NINJA_URL}?league=${encodeURIComponent(league)}&type=Currency`));
       if (rates.size === 0) log.info(`poe.ninja has no currency rates for "${league}"`);
-      await this.storage.set(key, { at: Date.now(), values: Object.fromEntries(rates) });
+      else await this.storage.set(key, { at: Date.now(), values: Object.fromEntries(rates) });
       return rates;
     } catch (error) {
-      log.warn(`loading poe.ninja rates for "${league}" failed`, error);
-      return new Map();
+      log.warn(`loading poe.ninja rates for "${league}" failed${cached ? ', using expired rates' : ''}`, error);
+      return cached ? new Map(Object.entries(cached.values)) : new Map();
     }
   }
 }
@@ -66,7 +66,7 @@ export function gmGetJson(url: string): Promise<unknown> {
     const result = GM.xmlHttpRequest({
       method: 'GET',
       url,
-      timeout: 15000,
+      timeout: 8000,
       onload: (response) => {
         if (response.status < 200 || response.status >= 300) return reject(new Error(`${url}: ${response.status}`));
         try {

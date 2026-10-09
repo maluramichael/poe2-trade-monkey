@@ -1,12 +1,12 @@
-import type { FetchResult } from '../../site/tradeTypes';
+import type { FetchResult, ItemMod } from '../../site/tradeTypes';
 import { createTestContext } from '../../test/context';
 import { regroupSimilarFeature } from './index';
 
-function listing(id: string, seller: string, amount: number): FetchResult {
+function listing(id: string, seller: string, amount: number, explicitMods?: ItemMod[]): FetchResult {
   return {
     id,
     listing: { indexed: '', account: { name: seller }, price: { type: '~price', amount, currency: 'exalted' } },
-    item: { name: 'Bramble Locket', typeLine: 'Gold Amulet', baseType: 'Gold Amulet' },
+    item: { name: 'Bramble Locket', typeLine: 'Gold Amulet', baseType: 'Gold Amulet', explicitMods },
   };
 }
 
@@ -48,5 +48,29 @@ describe('regroup-similar', () => {
     instance.dispose();
     expect(hidden()).toEqual([]);
     expect(document.querySelector('.ptm-regroup-btn, .ptm-regroup-shown, [data-ptm-group]')).toBeNull();
+  });
+
+  it('only groups listings with the same mods', () => {
+    const ctx = createTestContext();
+    ctx.emitListings([listing('a', 'S1', 1, ['+10 to Strength']), listing('b', 'S1', 1, ['+20 to Strength']), listing('c', 'S1', 1, ['+20 to Strength'])]);
+    render(['a', 'b', 'c']);
+    const instance = regroupSimilarFeature.start(ctx) as { dispose(): void };
+    ctx.results.flush();
+    expect(button('a')).toBeNull();
+    expect(button('b')?.textContent).toBe('1 similar');
+    expect(hidden()).toEqual(['c']);
+    instance.dispose();
+  });
+
+  it('compares object-shaped mods (current API) by their description', () => {
+    const mod = (description: string) => ({ description, hash: 'stat.explicit.stat_1' });
+    const ctx = createTestContext();
+    ctx.emitListings([listing('a', 'S1', 1, [mod('+10 to Strength')]), listing('b', 'S1', 1, [mod('+20 to Strength')]), listing('c', 'S1', 1, [mod('+20 to Strength')])]);
+    render(['a', 'b', 'c']);
+    const instance = regroupSimilarFeature.start(ctx) as { dispose(): void };
+    ctx.results.flush();
+    expect(button('a')).toBeNull();
+    expect(hidden()).toEqual(['c']);
+    instance.dispose();
   });
 });

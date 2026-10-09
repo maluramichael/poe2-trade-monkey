@@ -3,6 +3,8 @@ export interface VuexStore {
   state: { persistent: unknown; transient: unknown };
   commit(type: string, payload?: unknown): void;
   subscribe(handler: (mutation: { type: string; payload: unknown }) => void): () => void;
+  /** Vuex internals (mutation name -> handlers), only used to check that a mutation exists. */
+  _mutations?: Record<string, unknown>;
 }
 
 export interface TradeApp {

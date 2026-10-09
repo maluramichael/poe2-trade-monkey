@@ -58,3 +58,9 @@
   0%, 60% { background: var(--ptm-red-border); }
   100% { background: transparent; }
 }
+
+@media (hover: none) {
+  .ptm-mod-action {
+    opacity: 0.6;
+  }
+}

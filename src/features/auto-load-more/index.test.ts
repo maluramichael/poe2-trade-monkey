@@ -82,4 +82,44 @@ describe('auto-load-more', () => {
     document.documentElement.classList.remove('ptm-layout-split');
     instance.dispose!();
   });
+  it('pauses after a rate limit until the wait is over, with one warning', () => {
+    let clicks = 0;
+    const button = render();
+    button.addEventListener('click', () => clicks++);
+    const ctx = createTestContext();
+    const instance = autoLoadMore(ctx, FakeObserver as unknown as typeof IntersectionObserver);
+    const io = FakeObserver.last;
+
+    ctx.fromPage({ kind: 'rateLimited', retryAfterMs: 5000 });
+    ctx.fromPage({ kind: 'rateLimited', retryAfterMs: 5000 });
+    io.fire(true);
+    expect(clicks).toBe(0);
+    const toasts = ctx.toast.toasts.get();
+    expect(toasts).toHaveLength(1);
+    expect(toasts[0]!.kind).toBe('warning');
+
+    vi.advanceTimersByTime(4999);
+    expect(clicks).toBe(0);
+    vi.advanceTimersByTime(1);
+    expect(clicks).toBe(1);
+
+    instance.dispose!();
+  });
+
+  it('does not recompute styles on mutations that change neither button nor layout', async () => {
+    render();
+    const instance = autoLoadMore(createTestContext(), FakeObserver as unknown as typeof IntersectionObserver);
+    const spy = vi.spyOn(window, 'getComputedStyle');
+    const seen = vi.fn();
+    const probe = new MutationObserver(seen);
+    probe.observe(document.body, { childList: true, subtree: true });
+
+    document.querySelector('.resultset')!.append(document.createElement('div'));
+    await vi.waitFor(() => expect(seen).toHaveBeenCalled());
+    expect(spy).not.toHaveBeenCalled();
+
+    probe.disconnect();
+    spy.mockRestore();
+    instance.dispose!();
+  });
 });

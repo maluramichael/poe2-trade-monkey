@@ -11,7 +11,7 @@ const overview = read('./ninja-overview.fixture.json');
 const staticData = JSON.parse(read('../../test/fixtures/static.json'));
 const listings = (JSON.parse(read('../../test/fixtures/fetch.json')) as { result: FetchResult[] }).result;
 
-const location = (league: string) => ({ type: 'search' as const, realm: 'poe2', league, id: null, live: false });
+const location = (league: string, realm = 'poe2') => ({ type: 'search' as const, realm, league, id: null, live: false });
 
 describe('price-equivalent feature', () => {
   let ctx: TestContext;
@@ -82,5 +82,15 @@ describe('price-equivalent feature', () => {
     instance = undefined;
     ctx.results.flush();
     expect(lines()).toHaveLength(0);
+  });
+
+  it('does nothing on console realms', async () => {
+    ctx = createTestContext({ location: location('Standard', 'xbox'), data: { static: staticData } });
+    ctx.emitListings(listings);
+    instance = await priceEquivalentFeature.start(ctx);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    ctx.results.flush();
+    expect(lines()).toHaveLength(0);
+    expect(requests).toHaveLength(0);
   });
 });

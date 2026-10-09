@@ -82,6 +82,7 @@ export const layoutFeature: Feature = {
   description: () => t('description'),
   toggleable: true,
   defaultEnabled: true,
+  early: true,
   css,
   start: (ctx) => layout(ctx),
 };

@@ -7,7 +7,7 @@ test.beforeEach(async ({ context, page }) => {
   await setupFakeSite(context);
   ptmErrors = [];
   page.on('console', (msg) => {
-    if (msg.type() === 'error' && msg.text().includes('[ptm]')) ptmErrors.push(msg.text());
+    if (msg.type() === 'error' && (msg.text().includes('[ptm]') || msg.text().includes('[vuex]'))) ptmErrors.push(msg.text());
   });
   page.on('pageerror', (error) => ptmErrors.push(String(error)));
 });

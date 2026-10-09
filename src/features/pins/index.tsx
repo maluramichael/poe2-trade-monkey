@@ -1,11 +1,13 @@
 import { persistedStore } from '../../core/storage';
 import { Store, useStore } from '../../core/store';
-import { createTranslator } from '../../core/i18n';
+import { useState } from 'preact/hooks';
+import { createTranslator, getLocale } from '../../core/i18n';
 import type { AppContext } from '../../app/context';
 import type { ResultRow } from '../../site/results';
 import { sel } from '../../site/selectors';
 import { buildTradePath, type TradeLocation } from '../../site/tradeLocation';
 import { Button, ButtonGroup } from '../../ui/components/Button';
+import { ConfirmDialog } from '../../ui/components/ConfirmDialog';
 import { IconPin, IconTrash } from '../../ui/icons';
 import type { Feature } from '../types';
 import css from './feature.css';
@@ -22,6 +24,9 @@ const t = createTranslator({
     openSearchTitle: 'Öffnet die Suche, in der du das Item gepinnt hast ({league})',
     remove: 'Entfernen',
     clear: 'Alle entfernen',
+    clearMessage: 'Alle {n} Pins entfernen?',
+    clearConfirm: 'Entfernen',
+    full: 'Maximal {n} Pins. Der nächste ersetzt den ältesten.',
     seller: 'Verkäufer: {seller}',
     empty: 'Noch nichts angepinnt. Klick bei einem Ergebnis auf „Anpinnen“, um es hier zu sammeln. Pins bleiben erhalten, auch bei neuen Suchen und nach dem Neuladen.',
   },
@@ -36,6 +41,9 @@ const t = createTranslator({
     openSearchTitle: 'Opens the search you pinned this item from ({league})',
     remove: 'Unpin',
     clear: 'Clear pins',
+    clearMessage: 'Remove all {n} pins?',
+    clearConfirm: 'Remove',
+    full: 'Up to {n} pins. The next one replaces the oldest.',
     seller: 'Seller: {seller}',
     empty: 'Nothing pinned yet. Click "Pin" on a result to collect it here. Pins stay across new searches and page reloads.',
   },
@@ -140,13 +148,15 @@ async function start(ctx: AppContext) {
   function Panel() {
     const list = useStore(pins);
     useStore(rowsVersion);
+    const [confirming, setConfirming] = useState(false);
     if (list.length === 0) return <p class="ptm-empty">{t('empty')}</p>;
     return (
       <div class="ptm-pins">
         <div class="ptm-toolbar">
-          <Button variant="gold" size="sm" icon={<IconTrash />} onClick={() => pins.set([])}>
+          <Button variant="plain" size="sm" icon={<IconTrash />} onClick={() => setConfirming(true)}>
             {t('clear')}
           </Button>
+          {list.length >= MAX_PINS && <p class="ptm-meta">{t('full', { n: MAX_PINS })}</p>}
         </div>
         {list.map((pin) => (
           <article key={pin.id} class="ptm-pin">
@@ -154,7 +164,7 @@ async function start(ctx: AppContext) {
             <div class="ptm-pin__price" dangerouslySetInnerHTML={{ __html: pin.priceHtml }} />
             <p class="ptm-meta ptm-pin__seller">
               {t('seller', { seller: pin.seller })}
-              {pin.indexed && ` · ${new Date(pin.indexed).toLocaleString()}`}
+              {pin.indexed && ` · ${new Date(pin.indexed).toLocaleString(getLocale())}`}
             </p>
             <div class="ptm-pin__actions">
               <ButtonGroup block>
@@ -178,6 +188,18 @@ async function start(ctx: AppContext) {
             </div>
           </article>
         ))}
+        {confirming && (
+          <ConfirmDialog
+            title={t('clear')}
+            message={t('clearMessage', { n: list.length })}
+            confirmLabel={t('clearConfirm')}
+            onCancel={() => setConfirming(false)}
+            onConfirm={() => {
+              setConfirming(false);
+              pins.set([]);
+            }}
+          />
+        )}
       </div>
     );
   }

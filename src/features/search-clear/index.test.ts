@@ -1,6 +1,7 @@
 import { sel } from '../../site/selectors';
 import { createTestContext, type TestContext } from '../../test/context';
 import type { FeatureInstance } from '../types';
+import { t as ui } from '../../ui/messages';
 import { searchClearFeature } from './index';
 
 import panelHtml from '../../test/fixtures/search-panel.html?raw';
@@ -51,6 +52,13 @@ describe('search clear', () => {
     expect(input().value).toBe('');
     expect(typed).toHaveBeenCalled();
     expect(button()!.hidden).toBe(true);
+  });
+
+  it('reports a failed clear as a toast', async () => {
+    await startWith({ name: 'Headhunter' });
+    vi.spyOn(ctx.bridge, 'commit').mockRejectedValue(new Error('page bridge: timed out'));
+    button()!.click();
+    await vi.waitFor(() => expect(ctx.toast.toasts.get().at(-1)).toMatchObject({ kind: 'error', message: ui('actionFailed') }));
   });
 
   it('shows while the input has text', async () => {

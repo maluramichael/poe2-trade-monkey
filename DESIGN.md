@@ -32,6 +32,7 @@ Pfade), keine Icon-Fonts.
 | `--ptm-beige` | `#fff8e1` | Labels |
 | `--ptm-muted` | `#a38d6d` | Meta-Text (Seitenfarbe für Fließtext) |
 | `--ptm-menu` / `--ptm-menu-border` | `#373737` / `#7a7a7a` | Kontextmenü |
+| `--ptm-focus` | `#c59a50` | Fokus-Rahmen (2 px, alle interaktiven Elemente) |
 
 Seltenheiten: normal `#c8c8c8`, magic `#8888ff`, rare `#ffff77`, unique `#af6025`.
 
@@ -41,7 +42,8 @@ Seltenheiten: normal `#c8c8c8`, magic `#8888ff`, rare `#ffff77`, unique `#af6025
   weiße Schrift, Hover hellt um ca. 5 % auf (`--*-hover`), Übergang 0,2 s. Varianten blau, gold,
   rot. Keine Verläufe auf Buttons.
 - **Seitenleiste:** fest rechts, 400 px breit, `z-index: 1000`, Padding `5px 10px`. Die Seite
-  bekommt `padding-right: 400px`, eingeklappt 0. Ausklapp-Lasche oben rechts in Blau mit Logo.
+  bekommt `padding-right: 400px`, eingeklappt 0. Ausklapp-Lasche oben rechts in Blau mit Logo. Unter 1000 px
+  Fensterbreite liegt sie über der Seite statt sie zu schieben.
 - **Kopf:** Einklapp-Knopf, Logo und „PoE2 Trade Monkey“ in Fontin 20 px, rechts Einstellungen.
 - **Tabs:** Lesezeichen, Verlauf, Pins. Je gleich breit, 2 px Unterstrich, aktiv in
   `--ptm-gold-border`, Hover-Hintergrund Gold mit 20 % Alpha.
@@ -52,10 +54,11 @@ Seltenheiten: normal `#c8c8c8`, magic `#8888ff`, rare `#ffff77`, unique `#af6025
 - **Kontextmenü:** 200 px, `--ptm-menu`, Rahmen `--ptm-menu-border`, Verdana 13 px,
   Einträge `4px 8px`.
 - **Modal:** 650 px, `rgba(20,20,20,.9)`, Overlay `rgba(0,0,0,.6)`, Kopf mit Logo und Titel in
-  Fontin 15 px Großbuchstaben, schließt mit Esc und Klick aufs Overlay.
+  Fontin 15 px Großbuchstaben, schließt mit Esc und Klick aufs Overlay. Startfokus im Dialog, Fokus kehrt beim
+  Schließen zurück.
 - **Toast:** unten rechts, 4,5 s, Klick schließt, Varianten Erfolg, Warnung, Fehler.
 - **Formulare:** Label Fontin 15 px beige, Input 30 px hoch `--ptm-input` ohne Rahmen,
-  Checkbox 15 px Quadrat mit 2 px Rahmen `#634928`.
+  Checkbox 15 px Quadrat mit 2 px Rahmen `#8a6a3a`.
 
 ## Ergebnis-Markierungen
 
