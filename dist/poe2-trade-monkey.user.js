@@ -2,7 +2,7 @@
 // @name            PoE2 Trade Monkey
 // @name:de         PoE2 Trade Monkey
 // @namespace       https://github.com/maluramichael/poe2-trade-monkey
-// @version         0.3.0
+// @version         0.3.1
 // @description     Userscript that enhances the Path of Exile 2 trade site: bookmarks, history, pins, layout and result tools.
 // @description:de  Erweitert die Trade-Seite von Path of Exile 2: Lesezeichen für jede Liga, Verlauf, Pins, Schnellfilter, Zwei-Spalten-Layout und Werkzeuge für die Ergebnisse.
 // @author          Michael Malura
@@ -5042,7 +5042,7 @@ html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name 
         feature.id
       )) }),
       /* @__PURE__ */ u3("p", { class: "ptm-meta", children: [
-        t4("version", { version: "0.3.0" }),
+        t4("version", { version: "0.3.1" }),
         " ·",
         " ",
         /* @__PURE__ */ u3("a", { href: "https://github.com/maluramichael/poe2-trade-monkey", target: "_blank", rel: "noreferrer", children: t4("sourceCode") })
@@ -5215,7 +5215,7 @@ html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name 
       void host.restart();
     });
     document.documentElement.classList.add("ptm-ready");
-    log.info(`v${"0.3.0"} ready with ${features.length} features`);
+    log.info(`v${"0.3.1"} ready with ${features.length} features`);
   }
   function waitForApp() {
     return Promise.race([bridge.whenReady().then(() => true), delay(3e4).then(() => false)]);
