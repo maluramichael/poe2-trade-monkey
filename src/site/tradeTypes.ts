@@ -57,7 +57,7 @@ export interface Listing {
   whisper?: string;
 }
 
-/** Older responses send plain strings, current ones (seen live 2026-10-09) send objects with `description` and `hash`. */
+/** Mods come as objects with `description` and `hash` (fixtures and live since at least 2026-10-05); plain strings are accepted for older responses. */
 export type ItemMod = string | { description: string; hash?: string; [key: string]: unknown };
 
 export interface Item {

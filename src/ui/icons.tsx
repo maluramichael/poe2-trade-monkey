@@ -1,10 +1,10 @@
-import type { JSX } from 'preact';
+import type { JSX, SVGAttributes } from 'preact';
 
 /**
  * Inline SVG icons (24x24, stroke based, shapes after Lucide, ISC licence). Add new ones here so
  * every feature uses the same set.
  */
-type IconProps = JSX.SVGAttributes<SVGSVGElement> & { size?: number };
+type IconProps = SVGAttributes<SVGSVGElement> & { size?: number };
 
 function icon(paths: JSX.Element) {
   return ({ size = 14, ...props }: IconProps) => (

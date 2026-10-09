@@ -54,9 +54,9 @@
   height: 25px;
 }
 
+/* Keep the currency name: without it a missing image leaves only the trade id ("exalted"). */
 .ptm-pin__price br,
-.ptm-pin__price .price-label,
-.ptm-pin__price .currency-text span {
+.ptm-pin__price .price-label {
   display: none;
 }
 

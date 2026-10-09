@@ -1,4 +1,4 @@
-import type { JSX } from 'preact';
+import type { TargetedKeyboardEvent } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { useApp } from '../app/context';
 import type { FeatureHost } from '../app/featureHost';
@@ -36,7 +36,7 @@ export function Sidebar({ host }: { host: FeatureHost }) {
   }, [sidebarCollapsed]);
 
   const selectTab = (id: string) => settings.update((value) => ({ ...value, activeTab: id }));
-  const onTabKeyDown = (event: JSX.TargetedKeyboardEvent<HTMLButtonElement>, index: number) => {
+  const onTabKeyDown = (event: TargetedKeyboardEvent<HTMLButtonElement>, index: number) => {
     const last = tabs.length - 1;
     const next = { ArrowRight: index === last ? 0 : index + 1, ArrowLeft: index === 0 ? last : index - 1, Home: 0, End: last }[event.key];
     if (next === undefined) return;

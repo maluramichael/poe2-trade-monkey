@@ -1,4 +1,4 @@
-import type { ComponentChildren, JSX } from 'preact';
+import type { ComponentChildren, InputHTMLAttributes, TextareaHTMLAttributes } from 'preact';
 
 export function Field({ label, children, hint }: { label: string; children: ComponentChildren; hint?: string }) {
   return (
@@ -10,7 +10,7 @@ export function Field({ label, children, hint }: { label: string; children: Comp
   );
 }
 
-export function TextInput(props: JSX.InputHTMLAttributes<HTMLInputElement> & { value: string; onValue: (value: string) => void }) {
+export function TextInput(props: Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'role'> & { value: string; onValue: (value: string) => void }) {
   const { onValue, class: className, ...rest } = props;
   return (
     <input
@@ -22,7 +22,7 @@ export function TextInput(props: JSX.InputHTMLAttributes<HTMLInputElement> & { v
   );
 }
 
-export function TextArea(props: JSX.TextareaHTMLAttributes<HTMLTextAreaElement> & { value: string; onValue: (value: string) => void }) {
+export function TextArea(props: TextareaHTMLAttributes<HTMLTextAreaElement> & { value: string; onValue: (value: string) => void }) {
   const { onValue, class: className, ...rest } = props;
   return (
     <textarea

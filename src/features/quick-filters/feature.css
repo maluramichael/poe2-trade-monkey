@@ -128,3 +128,14 @@
 .ptm-qf__option[aria-checked='true'] {
   background: rgba(138, 86, 9, 0.4);
 }
+
+/* Narrow filter column (container from the layout feature): chips wrap instead of being cut. */
+@container ptm-filters (max-width: 640px) {
+  .ptm-qf .ptm-btn-group {
+    flex-wrap: wrap;
+  }
+
+  .ptm-qf .ptm-btn-group > * {
+    flex: 1 0 auto;
+  }
+}

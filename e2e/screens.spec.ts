@@ -106,3 +106,20 @@ test('narrow window: the sidebar covers the page instead of squeezing it', async
   await expect(page.locator('.ptm-expand-tab')).toBeFocused();
   await page.screenshot({ path: `${DIR}/09-narrow-collapsed.png` });
 });
+
+test('narrow filter column: labels and quick filters are not cut', async ({ context, page }) => {
+  await page.setViewportSize({ width: 1600, height: 1000 });
+  await setupFakeSite(context);
+  await context.route('https://web.poecdn.com/**', (route) => route.continue());
+  await page.goto(PAGE_URL);
+  test.skip((await addSiteCss(page)) > 0, 'the CDN dropped a site stylesheet, update SITE_CSS from the live page');
+  await page.evaluate(() => document.querySelector('head > style')?.remove());
+  await expect(page.locator('html.ptm-layout-split')).toBeAttached();
+  const cut = await page.evaluate(() =>
+    [...document.querySelectorAll<HTMLElement>('.filter-property .filter-title, .ptm-qf__btn > span')]
+      .filter((el) => el.offsetWidth > 0 && el.scrollWidth > el.clientWidth + 1)
+      .map((el) => el.textContent!.trim()),
+  );
+  expect(cut).toEqual([]);
+  await page.screenshot({ path: `${DIR}/10-narrow-filters-1600.png` });
+});

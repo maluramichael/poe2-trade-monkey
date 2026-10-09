@@ -46,6 +46,26 @@ html.ptm-layout.ptm-layout-split #trade > .top {
   grid-column: 1;
 }
 
+/* The filter column narrows with the window and the results' needs: size its content by the
+ * column, not the viewport. */
+html.ptm-layout.ptm-layout-split #trade > .top {
+  container: ptm-filters / inline-size;
+}
+
+/* Narrow column: one filter per row, and the site's fixed 271px selects leave their labels room
+ * (otherwise "Item Category" is cut to "Item Cat"). Stat filter rows are left alone. */
+@container ptm-filters (max-width: 640px) {
+  html.ptm-layout.ptm-layout-split #trade .filter-group-body > .filter:not(.full-span) {
+    width: 100%;
+  }
+
+  /* 100% in the table row: the label keeps its text width, the select takes the rest and still
+   * ends at the row edge, where the site positions its dropdown arrow. */
+  html.ptm-layout.ptm-layout-split #trade .filter-property .filter-select {
+    width: 100% !important;
+  }
+}
+
 /* Vue sets display: contents inline on the portal; it must be a real box to be the right column. */
 html.ptm-layout.ptm-layout-split #trade > #vue3-portal {
   display: block !important;
