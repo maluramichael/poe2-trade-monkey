@@ -63,6 +63,8 @@ or endorsed by Grinding Gear Games in any way.“
 - Quick-Filter-Leiste: Corrupted, Fractured, Desecrated, Mirrored, Sanctified als Dreistufen-Knopf
   (egal, ja, nein), Level/Attribute max, Item-Level min, Qualität, Sockel, Seltenheit.
 - Stat-Favoriten (Stern an Stat-Optionen, Favoriten oben).
+- Stat-Vorlagen neben „Add Stat Group“: Weighted Sum über alle Mod-Quellen für Stats ohne
+  Pseudo-Stat (Seltenheit, Geist, Zaubergeschwindigkeit und weitere).
 - Löschen-Knopf im Item-Suchfeld.
 
 ### Einstellungen

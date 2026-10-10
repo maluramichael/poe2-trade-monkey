@@ -123,3 +123,19 @@ test('narrow filter column: labels and quick filters are not cut', async ({ cont
   expect(cut).toEqual([]);
   await page.screenshot({ path: `${DIR}/10-narrow-filters-1600.png` });
 });
+
+test('stat presets dropdown next to "Add Stat Group"', async ({ context, page }) => {
+  await setupFakeSite(context);
+  await context.route('https://web.poecdn.com/**', (route) => route.continue());
+  await page.goto(PAGE_URL);
+  await addSiteCss(page);
+  await page.evaluate(() => document.querySelector('head > style')?.remove());
+  const presets = page.locator('.ptm-stat-presets');
+  await presets.scrollIntoViewIfNeeded();
+  const [ours, site] = await Promise.all([presets.boundingBox(), page.locator('#trade .filter-group-select').boundingBox()]);
+  expect(Math.abs(ours!.y - site!.y)).toBeLessThan(2);
+  expect(ours!.x + ours!.width).toBeLessThanOrEqual(site!.x);
+  await page.screenshot({ path: `${DIR}/11-stat-presets.png` });
+  await presets.getByRole('button', { name: '+ Stat Group Preset' }).click();
+  await page.screenshot({ path: `${DIR}/12-stat-presets-open.png` });
+});

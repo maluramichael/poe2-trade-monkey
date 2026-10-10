@@ -10,6 +10,7 @@ import { autoLoadMoreFeature } from './auto-load-more';
 import { layoutFeature } from './layout';
 import { quickFiltersFeature } from './quick-filters';
 import { statFavoritesFeature } from './stat-favorites';
+import { statPresetsFeature } from './stat-presets';
 import { searchClearFeature } from './search-clear';
 import { fuzzySearchFeature } from './fuzzy-search';
 import type { Feature } from './types';
@@ -28,6 +29,7 @@ export const features: Feature[] = [
   layoutFeature,
   quickFiltersFeature,
   statFavoritesFeature,
+  statPresetsFeature,
   searchClearFeature,
   fuzzySearchFeature,
 ];

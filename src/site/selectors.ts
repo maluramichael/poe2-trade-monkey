@@ -19,6 +19,8 @@ export const sel = {
   advancedPane: '#trade .search-advanced-pane',
   propertyPane: '#trade .search-advanced-pane.blue',
   statPane: '#trade .search-advanced-pane.brown',
+  /** "+ Add Stat Group" dropdown below the stat groups; its `.filter-body` fills the right half. */
+  statGroupSelect: '#trade .search-advanced-pane.brown .filter-group-select',
   filterGroup: '.filter-group',
   results: '#vue3-portal .results',
   resultTotal: '#vue3-portal .results .row-total',

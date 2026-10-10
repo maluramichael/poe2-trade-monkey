@@ -2,7 +2,7 @@
 // @name            PoE2 Trade Monkey
 // @name:de         PoE2 Trade Monkey
 // @namespace       https://github.com/maluramichael/poe2-trade-monkey
-// @version         0.3.1
+// @version         0.4.0
 // @description     Userscript that enhances the Path of Exile 2 trade site: bookmarks, history, pins, layout and result tools.
 // @description:de  Erweitert die Trade-Seite von Path of Exile 2: Lesezeichen für jede Liga, Verlauf, Pins, Schnellfilter, Zwei-Spalten-Layout und Werkzeuge für die Ergebnisse.
 // @author          Michael Malura
@@ -229,9 +229,9 @@ function __ptmPageScript() {
   function _(n2) {
     n2 && n2.parentNode && n2.remove();
   }
-  function g(n2, t20, i3) {
+  function g(n2, t21, i3) {
     var r3, u4, f3, o4 = {}, e3 = arguments.length;
-    for (f3 in t20) "key" == f3 ? r3 = t20[f3] : "ref" == f3 && "function" != typeof n2 ? u4 = t20[f3] : o4[f3] = t20[f3];
+    for (f3 in t21) "key" == f3 ? r3 = t21[f3] : "ref" == f3 && "function" != typeof n2 ? u4 = t21[f3] : o4[f3] = t21[f3];
     return e3 > 2 && (o4.children = e3 > 3 ? d.call(arguments, 2) : i3), b(n2, o4, r3, u4, null);
   }
   function b(i3, r3, u4, f3, o4) {
@@ -241,38 +241,38 @@ function __ptmPageScript() {
   function M(n2) {
     return n2.children;
   }
-  function $(n2, t20) {
-    this.props = n2, this.context = t20, this.__g = 0;
+  function $(n2, t21) {
+    this.props = n2, this.context = t21, this.__g = 0;
   }
-  function x(n2, t20) {
-    if (null == t20) return n2.__ ? x(n2.__, n2.__i + 1) : null;
-    for (var i3; t20 < n2.__k.length; t20++) if ((i3 = n2.__k[t20]) && i3.__e) return i3.__e;
+  function x(n2, t21) {
+    if (null == t21) return n2.__ ? x(n2.__, n2.__i + 1) : null;
+    for (var i3; t21 < n2.__k.length; t21++) if ((i3 = n2.__k[t21]) && i3.__e) return i3.__e;
     return "function" != typeof n2.type || n2.props.__P ? null : x(n2);
   }
   function S(n2) {
-    if ((n2 = n2.__) && n2.__c && !n2.props.__P) return n2.__e = null, n2.__k.some(function(t20) {
-      return t20 && (n2.__e = t20.__e);
+    if ((n2 = n2.__) && n2.__c && !n2.props.__P) return n2.__e = null, n2.__k.some(function(t21) {
+      return t21 && (n2.__e = t21.__e);
     }), S(n2);
   }
-  function C(t20) {
-    (8 & t20.__g || !(t20.__g |= 8) || !r.push(t20) || f++) && u == n.debounceRendering || ((u = n.debounceRendering) || queueMicrotask)(j);
+  function C(t21) {
+    (8 & t21.__g || !(t21.__g |= 8) || !r.push(t21) || f++) && u == n.debounceRendering || ((u = n.debounceRendering) || queueMicrotask)(j);
   }
   function j() {
-    var t20, i3, u4, e3, l3, c3, a3, s3, h3;
+    var t21, i3, u4, e3, l3, c3, a3, s3, h3;
     try {
-      for (i3 = 1; r.length; ) r.length > i3 && r.sort(o), t20 = r.shift(), i3 = r.length, 8 & t20.__g && (e3 = void 0, l3 = void 0, c3 = (l3 = (u4 = t20).__v).__e, a3 = [], s3 = [], (h3 = u4.__P) && ((e3 = w({ constructor: void 0 }, l3)).__v = l3.__v + 1, n.vnode && n.vnode(e3), N(h3, e3, l3, u4.__n, h3.namespaceURI, 32 & l3.__u ? [c3] : null, a3, c3 || x(l3), 32 & l3.__u, s3), e3.__v = l3.__v, e3.__.__k[e3.__i] = e3, z(a3, e3, s3), l3.__ = l3.__e = null, e3.__e != c3 && S(e3)));
+      for (i3 = 1; r.length; ) r.length > i3 && r.sort(o), t21 = r.shift(), i3 = r.length, 8 & t21.__g && (e3 = void 0, l3 = void 0, c3 = (l3 = (u4 = t21).__v).__e, a3 = [], s3 = [], (h3 = u4.__P) && ((e3 = w({ constructor: void 0 }, l3)).__v = l3.__v + 1, n.vnode && n.vnode(e3), N(h3, e3, l3, u4.__n, h3.namespaceURI, 32 & l3.__u ? [c3] : null, a3, c3 || x(l3), 32 & l3.__u, s3), e3.__v = l3.__v, e3.__.__k[e3.__i] = e3, z(a3, e3, s3), l3.__ = l3.__e = null, e3.__e != c3 && S(e3)));
     } finally {
       r.length = f = 0;
     }
   }
-  function L(n2, t20, i3, r3, u4, f3, o4, e3, l3, c3, a3) {
-    var s3, v3, y3, d3, w3, _3, g3 = r3.__k || p, k2 = t20.length;
-    for (l3 = H(i3, t20, g3, l3, k2), s3 = 0; s3 < k2; s3++) null != (y3 = i3.__k[s3]) && (v3 = ~y3.__i && g3[y3.__i] || h, y3.__i = s3, _3 = N(n2, y3, v3, u4, f3, o4, e3, l3, c3, a3), d3 = y3.__e, (v3.ref != y3.ref || 8 & v3.__u) && (v3.ref && D(v3.ref, null, y3, v3), y3.ref && a3.push(y3.ref, y3.__c || d3, y3)), w3 = w3 || d3, 4 & y3.__u ? (l3 = I(y3, l3, n2, !v3.__v), v3.__e && (v3.__e = null)) : "function" == typeof y3.type && void 0 !== _3 ? l3 = _3 : d3 && (l3 = d3.nextSibling), y3.__u &= -7);
+  function L(n2, t21, i3, r3, u4, f3, o4, e3, l3, c3, a3) {
+    var s3, v3, y3, d3, w3, _3, g3 = r3.__k || p, k2 = t21.length;
+    for (l3 = H(i3, t21, g3, l3, k2), s3 = 0; s3 < k2; s3++) null != (y3 = i3.__k[s3]) && (v3 = ~y3.__i && g3[y3.__i] || h, y3.__i = s3, _3 = N(n2, y3, v3, u4, f3, o4, e3, l3, c3, a3), d3 = y3.__e, (v3.ref != y3.ref || 8 & v3.__u) && (v3.ref && D(v3.ref, null, y3, v3), y3.ref && a3.push(y3.ref, y3.__c || d3, y3)), w3 = w3 || d3, 4 & y3.__u ? (l3 = I(y3, l3, n2, !v3.__v), v3.__e && (v3.__e = null)) : "function" == typeof y3.type && void 0 !== _3 ? l3 = _3 : d3 && (l3 = d3.nextSibling), y3.__u &= -7);
     return i3.__e = w3, l3;
   }
-  function H(n2, t20, i3, r3, u4) {
+  function H(n2, t21, i3, r3, u4) {
     var f3, o4, e3, l3, c3, a3, s3, h3, p3, v3, d3 = i3.length, w3 = d3, _3 = 0, g3 = false, k2 = n2.__k = Array(u4);
-    for (f3 = 0; f3 < u4; f3++) null != (o4 = t20[f3]) && "boolean" != typeof o4 && "function" != typeof o4 ? ("object" != typeof o4 || o4.constructor == String ? o4 = k2[f3] = b(null, o4) : y(o4) ? o4 = k2[f3] = b(M, { children: o4 }) : void 0 === o4.constructor && o4.__b ? o4 = k2[f3] = b(o4.type, o4.props, o4.key, o4.ref, o4.__v) : k2[f3] = o4, l3 = f3 + _3, o4.__ = n2, o4.__b = n2.__b + 1, e3 = null, ~(c3 = o4.__i = O(o4, i3, l3, w3)) && (w3--, (e3 = i3[c3]) && (e3.__u |= 2)), e3 && e3.__v ? (o4.__u |= 2, c3 == l3 - 1 ? _3-- : c3 == l3 + 1 ? _3++ : c3 != l3 && (c3 > l3 ? _3-- : _3++, g3 = true)) : (~c3 || (u4 > d3 ? _3-- : u4 < d3 && _3++), "function" != typeof o4.type && (o4.__u |= 4))) : k2[f3] = null;
+    for (f3 = 0; f3 < u4; f3++) null != (o4 = t21[f3]) && "boolean" != typeof o4 && "function" != typeof o4 ? ("object" != typeof o4 || o4.constructor == String ? o4 = k2[f3] = b(null, o4) : y(o4) ? o4 = k2[f3] = b(M, { children: o4 }) : void 0 === o4.constructor && o4.__b ? o4 = k2[f3] = b(o4.type, o4.props, o4.key, o4.ref, o4.__v) : k2[f3] = o4, l3 = f3 + _3, o4.__ = n2, o4.__b = n2.__b + 1, e3 = null, ~(c3 = o4.__i = O(o4, i3, l3, w3)) && (w3--, (e3 = i3[c3]) && (e3.__u |= 2)), e3 && e3.__v ? (o4.__u |= 2, c3 == l3 - 1 ? _3-- : c3 == l3 + 1 ? _3++ : c3 != l3 && (c3 > l3 ? _3-- : _3++, g3 = true)) : (~c3 || (u4 > d3 ? _3-- : u4 < d3 && _3++), "function" != typeof o4.type && (o4.__u |= 4))) : k2[f3] = null;
     if (g3) {
       for (a3 = [], s3 = [], f3 = 0; f3 < u4; f3++) if ((o4 = k2[f3]) && 2 & o4.__u) {
         for (h3 = 0, p3 = a3.length; h3 < p3; ) a3[v3 = h3 + p3 >> 1] < o4.__i ? h3 = v3 + 1 : p3 = v3;
@@ -283,57 +283,57 @@ function __ptmPageScript() {
     if (w3) for (f3 = 0; f3 < d3; f3++) !(e3 = i3[f3]) || 2 & e3.__u || (e3.__e == r3 && (r3 = x(e3)), E(e3, e3));
     return r3;
   }
-  function I(n2, t20, i3, r3) {
+  function I(n2, t21, i3, r3) {
     var u4, f3, o4;
     if ("function" == typeof n2.type) {
-      if (n2.props.__P) return t20;
-      if (u4 = n2.__k) for (f3 = 0; f3 < u4.length; f3++) u4[f3] && (u4[f3].__ = n2, t20 = I(u4[f3], t20, i3, false));
-      return t20;
+      if (n2.props.__P) return t21;
+      if (u4 = n2.__k) for (f3 = 0; f3 < u4.length; f3++) u4[f3] && (u4[f3].__ = n2, t21 = I(u4[f3], t21, i3, false));
+      return t21;
     }
-    for (t20 && !t20.parentNode && (t20 = x(n2)) && !t20.parentNode && (t20 = null), o4 = t20; o4 && 8 == o4.nodeType; ) o4 = o4.nextSibling;
-    for (n2.__e != o4 && (!r3 && i3.moveBefore && n2.__e.parentNode ? i3.moveBefore(n2.__e, t20) : i3.insertBefore(n2.__e, t20 || null)), t20 = n2.__e; (t20 = t20 && t20.nextSibling) && 8 == t20.nodeType; ) ;
-    return t20;
+    for (t21 && !t21.parentNode && (t21 = x(n2)) && !t21.parentNode && (t21 = null), o4 = t21; o4 && 8 == o4.nodeType; ) o4 = o4.nextSibling;
+    for (n2.__e != o4 && (!r3 && i3.moveBefore && n2.__e.parentNode ? i3.moveBefore(n2.__e, t21) : i3.insertBefore(n2.__e, t21 || null)), t21 = n2.__e; (t21 = t21 && t21.nextSibling) && 8 == t21.nodeType; ) ;
+    return t21;
   }
-  function O(n2, t20, i3, r3) {
-    var u4, f3, o4, e3 = n2.key, l3 = n2.type, c3 = t20[i3], a3 = c3 && !(2 & c3.__u);
+  function O(n2, t21, i3, r3) {
+    var u4, f3, o4, e3 = n2.key, l3 = n2.type, c3 = t21[i3], a3 = c3 && !(2 & c3.__u);
     if (null === c3 && null == e3 || a3 && e3 == c3.key && l3 == c3.type) return i3;
     if (r3 > (a3 ? 1 : 0)) {
-      for (u4 = i3 - 1, f3 = i3 + 1; u4 >= 0 || f3 < t20.length; ) if ((c3 = t20[o4 = u4 >= 0 ? u4-- : f3++]) && !(2 & c3.__u) && e3 == c3.key && l3 == c3.type) return o4;
+      for (u4 = i3 - 1, f3 = i3 + 1; u4 >= 0 || f3 < t21.length; ) if ((c3 = t21[o4 = u4 >= 0 ? u4-- : f3++]) && !(2 & c3.__u) && e3 == c3.key && l3 == c3.type) return o4;
     }
     return -1;
   }
-  function P(n2, t20, i3) {
-    null == i3 && (i3 = ""), "-" == t20[0] ? n2.setProperty(t20, i3) : n2[t20] = i3;
+  function P(n2, t21, i3) {
+    null == i3 && (i3 = ""), "-" == t21[0] ? n2.setProperty(t21, i3) : n2[t21] = i3;
   }
-  function T(n2, t20, i3, r3, u4) {
+  function T(n2, t21, i3, r3, u4) {
     var f3, o4;
-    n: if ("style" == t20) if ("string" == typeof i3) n2.style.cssText = i3;
+    n: if ("style" == t21) if ("string" == typeof i3) n2.style.cssText = i3;
     else {
-      if ("string" == typeof r3 && (n2.style.cssText = r3 = ""), r3) for (t20 in r3) i3 && t20 in i3 || P(n2.style, t20, "");
-      if (i3) for (t20 in i3) r3 && i3[t20] == r3[t20] || P(n2.style, t20, i3[t20]);
+      if ("string" == typeof r3 && (n2.style.cssText = r3 = ""), r3) for (t21 in r3) i3 && t21 in i3 || P(n2.style, t21, "");
+      if (i3) for (t21 in i3) r3 && i3[t21] == r3[t21] || P(n2.style, t21, i3[t21]);
     }
-    else if ("o" == t20[0] && "n" == t20[1]) (n2.__e || (n2.__e = {}))[t20] = i3, i3 && r3 || (o4 = a[t20] || (a[t20] = q(t20)), (n2.__a || (n2.__a = {}))[t20] = c, f3 = t20 != (t20 = t20.replace(l, "$1")), (t20 = t20.slice(2))[0] < "a" && (t20 = t20.toLowerCase()), i3 ? n2.addEventListener(t20, o4, f3) : n2.removeEventListener(t20, o4, f3));
+    else if ("o" == t21[0] && "n" == t21[1]) (n2.__e || (n2.__e = {}))[t21] = i3, i3 && r3 || (o4 = a[t21] || (a[t21] = q(t21)), (n2.__a || (n2.__a = {}))[t21] = c, f3 = t21 != (t21 = t21.replace(l, "$1")), (t21 = t21.slice(2))[0] < "a" && (t21 = t21.toLowerCase()), i3 ? n2.addEventListener(t21, o4, f3) : n2.removeEventListener(t21, o4, f3));
     else {
-      if ("http://www.w3.org/2000/svg" == u4) t20 = t20.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s");
-      else if ("width" != t20 && "height" != t20 && "href" != t20 && "list" != t20 && "form" != t20 && "tabIndex" != t20 && "download" != t20 && "rowSpan" != t20 && "colSpan" != t20 && "role" != t20 && "popover" != t20 && t20 in n2) try {
-        n2[t20] = null == i3 ? "" : i3;
+      if ("http://www.w3.org/2000/svg" == u4) t21 = t21.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s");
+      else if ("width" != t21 && "height" != t21 && "href" != t21 && "list" != t21 && "form" != t21 && "tabIndex" != t21 && "download" != t21 && "rowSpan" != t21 && "colSpan" != t21 && "role" != t21 && "popover" != t21 && t21 in n2) try {
+        n2[t21] = null == i3 ? "" : i3;
         break n;
       } catch (n3) {
       }
-      "function" == typeof i3 || (null == i3 || false === i3 && "-" != t20[4] ? n2.removeAttribute(t20) : n2.setAttribute(t20, "popover" == t20 && 1 == i3 ? "" : i3));
+      "function" == typeof i3 || (null == i3 || false === i3 && "-" != t21[4] ? n2.removeAttribute(t21) : n2.setAttribute(t21, "popover" == t21 && 1 == i3 ? "" : i3));
     }
   }
-  function q(t20) {
+  function q(t21) {
     return function(i3) {
       if (this.__e) {
-        var r3 = this.__e[t20];
+        var r3 = this.__e[t21];
         if (null == i3[e]) i3[e] = c++;
-        else if (i3[e] < this.__a[t20]) return;
+        else if (i3[e] < this.__a[t21]) return;
         return r3(n.event ? n.event(i3) : i3);
       }
     };
   }
-  function N(t20, i3, r3, u4, f3, o4, e3, l3, c3, a3) {
+  function N(t21, i3, r3, u4, f3, o4, e3, l3, c3, a3) {
     var s3, h3, v3, d3, g3, k2, b3, m2, S2, C3, j2, H2, I2, A2, O2, P2, T3, q2, N2, z3, D3 = i3.type;
     if (void 0 !== i3.constructor) return null;
     if (128 & r3.__u && (c3 = 32 & r3.__u, s3 = r3.__c.__z)) {
@@ -362,15 +362,15 @@ function __ptmPageScript() {
             k2.componentDidUpdate(b3, m2, S2);
           });
         } else j2 && !D3.getDerivedStateFromProps && k2.componentWillMount && k2.componentWillMount(), j2 && k2.componentDidMount && k2.__h.push(k2.componentDidMount);
-        if (k2.context = I2, k2.props = C3, k2.__P = t20, k2.__g &= -5, A2 = n.__r, O2 = 0, j2) k2.state = k2.__s, k2.__g &= -9, A2 && A2(i3), s3 = k2.render(k2.props, k2.state, k2.context), p.push.apply(k2.__h, k2.__k), k2.__k = [];
+        if (k2.context = I2, k2.props = C3, k2.__P = t21, k2.__g &= -5, A2 = n.__r, O2 = 0, j2) k2.state = k2.__s, k2.__g &= -9, A2 && A2(i3), s3 = k2.render(k2.props, k2.state, k2.context), p.push.apply(k2.__h, k2.__k), k2.__k = [];
         else do {
           k2.__g &= -9, A2 && A2(i3), s3 = k2.render(k2.props, k2.state, k2.context), k2.state = k2.__s;
         } while (8 & k2.__g && ++O2 < 25);
-        k2.state = k2.__s, k2.getChildContext && (u4 = w({}, u4, k2.getChildContext())), j2 && r3.__c && k2.getSnapshotBeforeUpdate && (S2 = k2.getSnapshotBeforeUpdate(b3, m2)), P2 = s3 && s3.type === M && null == s3.key ? s3.props.children : s3, C3.__P && (s3 = l3, f3 = (t20 = C3.__P).namespaceURI, c3 = o4 = null, r3.props && r3.props.__P != t20 && (r3.__k.some(function(n2) {
+        k2.state = k2.__s, k2.getChildContext && (u4 = w({}, u4, k2.getChildContext())), j2 && r3.__c && k2.getSnapshotBeforeUpdate && (S2 = k2.getSnapshotBeforeUpdate(b3, m2)), P2 = s3 && s3.type === M && null == s3.key ? s3.props.children : s3, C3.__P && (s3 = l3, f3 = (t21 = C3.__P).namespaceURI, c3 = o4 = null, r3.props && r3.props.__P != t21 && (r3.__k.some(function(n2) {
           n2 && E(n2, n2);
-        }), r3.__k = null), l3 = r3.__k ? x(r3, 0) : null), l3 = L(t20, y(P2) ? P2 : [P2], i3, r3, u4, f3, o4, e3, l3, c3, a3), C3.__P && (i3.__e = null, l3 = s3), i3.__u &= -161, 128 & r3.__u && (k2.__z = null), h3 && h3.some(_), k2.__h.length && e3.push(k2), 1 & k2.__g && (k2.__g &= -4);
-      } catch (t21) {
-        if (e3.length = g3, i3.__v = null, c3 || o4) if (t21.then) {
+        }), r3.__k = null), l3 = r3.__k ? x(r3, 0) : null), l3 = L(t21, y(P2) ? P2 : [P2], i3, r3, u4, f3, o4, e3, l3, c3, a3), C3.__P && (i3.__e = null, l3 = s3), i3.__u &= -161, 128 & r3.__u && (k2.__z = null), h3 && h3.some(_), k2.__h.length && e3.push(k2), 1 & k2.__g && (k2.__g &= -4);
+      } catch (t22) {
+        if (e3.length = g3, i3.__v = null, c3 || o4) if (t22.then) {
           if (T3 = 0, i3.__u |= c3 ? 160 : 128, o4) {
             for (~(N2 = o4.indexOf(l3 || void 0)) || (N2 = o4.length); (z3 = o4[N2 - 1]) && 8 == z3.nodeType; ) N2--;
             for (; N2 < o4.length; N2++) if (z3 = o4[N2]) {
@@ -390,77 +390,77 @@ function __ptmPageScript() {
           i3.__c.__z || (i3.__c.__z = q2), i3.__e = l3;
         } else o4 && o4.some(_);
         else i3.__e = r3.__e;
-        i3.__k || (i3.__k = r3.__k || []), t21.then || V(i3), n.__e(t21, i3, r3);
+        i3.__k || (i3.__k = r3.__k || []), t22.then || V(i3), n.__e(t22, i3, r3);
       }
-    } else l3 = i3.__e = B(r3.__e, i3, r3, u4, f3, o4, e3, c3, a3, t20);
+    } else l3 = i3.__e = B(r3.__e, i3, r3, u4, f3, o4, e3, c3, a3, t21);
     return (s3 = n.diffed) && s3(i3), 128 & i3.__u ? void 0 : l3;
   }
   function V(n2) {
     n2 && (n2.__c && (n2.__c.__g |= 4), n2.__k && n2.__k.some(V));
   }
-  function z(t20, i3, r3) {
+  function z(t21, i3, r3) {
     for (var u4 = 0; u4 < r3.length; ) D(r3[u4++], r3[u4++], r3[u4++]);
-    n.__c && n.__c(i3, t20), t20.some(function(i4) {
+    n.__c && n.__c(i3, t21), t21.some(function(i4) {
       try {
-        t20 = i4.__h, i4.__h = [], t20.some(function(n2) {
+        t21 = i4.__h, i4.__h = [], t21.some(function(n2) {
           n2.call(i4);
         });
-      } catch (t21) {
-        n.__e(t21, i4.__v);
+      } catch (t22) {
+        n.__e(t22, i4.__v);
       }
     });
   }
-  function B(t20, i3, r3, u4, f3, o4, e3, l3, c3, a3) {
+  function B(t21, i3, r3, u4, f3, o4, e3, l3, c3, a3) {
     var s3, p3, w3, g3, k2, b3, m2, M2, $2, S2 = r3.props || h, C3 = i3.props, j2 = i3.type;
     if ("svg" == j2 ? f3 = "http://www.w3.org/2000/svg" : "math" == j2 ? f3 = "http://www.w3.org/1998/Math/MathML" : f3 || (f3 = "http://www.w3.org/1999/xhtml"), o4) {
       for (s3 = 0; s3 < o4.length; s3++) if ((k2 = o4[s3]) && (j2 ? k2.localName == j2 : 3 == k2.nodeType)) {
-        t20 = k2, o4[s3] = null;
+        t21 = k2, o4[s3] = null;
         break;
       }
     }
-    if (!t20) {
+    if (!t21) {
       if (M2 = a3.ownerDocument || document, !j2) return M2.createTextNode(C3);
-      t20 = M2.createElementNS(f3, j2, C3.is && C3), l3 && (n.__m && n.__m(i3, o4), l3 = false), o4 = null;
+      t21 = M2.createElementNS(f3, j2, C3.is && C3), l3 && (n.__m && n.__m(i3, o4), l3 = false), o4 = null;
     }
     if (j2) {
-      if (a3 = "template" == j2 ? t20.content : t20, o4 = "textarea" == j2 && null != C3.defaultValue ? null : o4 && d.call(a3.childNodes), !l3 && o4) for (S2 = {}, s3 = 0; s3 < t20.attributes.length; s3++) S2[(k2 = t20.attributes[s3]).name] = k2.value;
-      for (s3 in S2) k2 = S2[s3], "dangerouslySetInnerHTML" == s3 ? w3 = k2 : "children" == s3 || s3 in C3 || "value" == s3 && "defaultValue" in C3 || "checked" == s3 && "defaultChecked" in C3 || T(t20, s3, null, k2, f3);
-      for (s3 in $2 = 1 & r3.__u, C3) k2 = C3[s3], "children" == s3 ? g3 = k2 : "dangerouslySetInnerHTML" == s3 ? p3 = k2 : "value" == s3 ? b3 = k2 : "checked" == s3 ? m2 = k2 : l3 && "function" != typeof k2 || !(S2[s3] !== k2 || $2 && null != k2) || T(t20, s3, k2, S2[s3], f3);
-      p3 ? (l3 || w3 && (p3.__html == w3.__html || p3.__html == t20.innerHTML) || (t20.innerHTML = p3.__html), i3.__k = []) : (w3 && (t20.textContent = ""), ("foreignObject" == j2 || "http://www.w3.org/1998/Math/MathML" == f3 && v.test(j2)) && (f3 = "http://www.w3.org/1999/xhtml"), L(a3, y(g3) ? g3 : [g3], i3, r3, u4, f3, o4, e3, o4 ? o4[0] : r3.__k && x(r3, 0), l3, c3), o4 && o4.some(_)), l3 && "textarea" != j2 || (s3 = "value", "progress" == j2 && null == b3 ? t20.removeAttribute(s3) : null == b3 || b3 === t20[s3] && ("progress" != j2 || b3) || T(t20, s3, b3, S2[s3], f3), s3 = "checked", null != m2 && m2 != t20[s3] && T(t20, s3, m2, S2[s3], f3));
-    } else S2 === C3 || l3 && t20.data == C3 || (t20.data = C3);
-    return t20;
+      if (a3 = "template" == j2 ? t21.content : t21, o4 = "textarea" == j2 && null != C3.defaultValue ? null : o4 && d.call(a3.childNodes), !l3 && o4) for (S2 = {}, s3 = 0; s3 < t21.attributes.length; s3++) S2[(k2 = t21.attributes[s3]).name] = k2.value;
+      for (s3 in S2) k2 = S2[s3], "dangerouslySetInnerHTML" == s3 ? w3 = k2 : "children" == s3 || s3 in C3 || "value" == s3 && "defaultValue" in C3 || "checked" == s3 && "defaultChecked" in C3 || T(t21, s3, null, k2, f3);
+      for (s3 in $2 = 1 & r3.__u, C3) k2 = C3[s3], "children" == s3 ? g3 = k2 : "dangerouslySetInnerHTML" == s3 ? p3 = k2 : "value" == s3 ? b3 = k2 : "checked" == s3 ? m2 = k2 : l3 && "function" != typeof k2 || !(S2[s3] !== k2 || $2 && null != k2) || T(t21, s3, k2, S2[s3], f3);
+      p3 ? (l3 || w3 && (p3.__html == w3.__html || p3.__html == t21.innerHTML) || (t21.innerHTML = p3.__html), i3.__k = []) : (w3 && (t21.textContent = ""), ("foreignObject" == j2 || "http://www.w3.org/1998/Math/MathML" == f3 && v.test(j2)) && (f3 = "http://www.w3.org/1999/xhtml"), L(a3, y(g3) ? g3 : [g3], i3, r3, u4, f3, o4, e3, o4 ? o4[0] : r3.__k && x(r3, 0), l3, c3), o4 && o4.some(_)), l3 && "textarea" != j2 || (s3 = "value", "progress" == j2 && null == b3 ? t21.removeAttribute(s3) : null == b3 || b3 === t21[s3] && ("progress" != j2 || b3) || T(t21, s3, b3, S2[s3], f3), s3 = "checked", null != m2 && m2 != t21[s3] && T(t21, s3, m2, S2[s3], f3));
+    } else S2 === C3 || l3 && t21.data == C3 || (t21.data = C3);
+    return t21;
   }
-  function D(t20, i3, r3, u4) {
+  function D(t21, i3, r3, u4) {
     try {
-      "function" == typeof t20 ? i3 ? i3.__x = t20(i3) || 1 : u4 && (u4 = u4.__c || u4.__e) && (i3 = u4.__x) && (u4.__x = null, "function" == typeof i3 ? i3() : t20(null)) : t20.current = i3;
-    } catch (t21) {
-      n.__e(t21, r3);
+      "function" == typeof t21 ? i3 ? i3.__x = t21(i3) || 1 : u4 && (u4 = u4.__c || u4.__e) && (i3 = u4.__x) && (u4.__x = null, "function" == typeof i3 ? i3() : t21(null)) : t21.current = i3;
+    } catch (t22) {
+      n.__e(t22, r3);
     }
   }
-  function E(t20, i3, r3) {
+  function E(t21, i3, r3) {
     var u4, f3;
-    if (n.unmount && n.unmount(t20), !(u4 = t20.ref) || u4.current && u4.current != t20.__e || D(u4, null, i3, t20), u4 = t20.__c) {
+    if (n.unmount && n.unmount(t21), !(u4 = t21.ref) || u4.current && u4.current != t21.__e || D(u4, null, i3, t21), u4 = t21.__c) {
       if (u4.componentWillUnmount) try {
         u4.componentWillUnmount();
-      } catch (t21) {
-        n.__e(t21, i3);
+      } catch (t22) {
+        n.__e(t22, i3);
       }
       u4.__P = u4.__n = null;
     }
-    if (u4 = t20.__k) for (f3 = 0; f3 < u4.length; f3++) u4[f3] && E(u4[f3], i3, "function" != typeof t20.type || r3 && !t20.props.__P);
-    (u4 = t20.__e) && (r3 || _(u4), u4.__e && (u4.__e = null)), t20.__e = t20.__c = t20.__ = null;
+    if (u4 = t21.__k) for (f3 = 0; f3 < u4.length; f3++) u4[f3] && E(u4[f3], i3, "function" != typeof t21.type || r3 && !t21.props.__P);
+    (u4 = t21.__e) && (r3 || _(u4), u4.__e && (u4.__e = null)), t21.__e = t21.__c = t21.__ = null;
   }
-  function F(n2, t20, i3) {
+  function F(n2, t21, i3) {
     return this.constructor(n2, i3);
   }
-  function G(t20, i3) {
+  function G(t21, i3) {
     var r3, u4, f3, o4;
-    n.__ && n.__(t20, i3), 9 == i3.nodeType && (i3 = i3.documentElement), u4 = (r3 = t20 && 32 & t20.__u) ? null : i3.__k, i3.__k = b(M, { children: [t20] }), f3 = [], o4 = [], N(i3, i3.__k, u4 || h, h, i3.namespaceURI, u4 ? null : i3.firstChild ? d.call(i3.childNodes) : null, f3, u4 ? u4.__e : i3.firstChild, r3, o4), z(f3, i3.__k, o4), i3.__k.props.children = null;
+    n.__ && n.__(t21, i3), 9 == i3.nodeType && (i3 = i3.documentElement), u4 = (r3 = t21 && 32 & t21.__u) ? null : i3.__k, i3.__k = b(M, { children: [t21] }), f3 = [], o4 = [], N(i3, i3.__k, u4 || h, h, i3.namespaceURI, u4 ? null : i3.firstChild ? d.call(i3.childNodes) : null, f3, u4 ? u4.__e : i3.firstChild, r3, o4), z(f3, i3.__k, o4), i3.__k.props.children = null;
   }
   function K(n2) {
-    function t20(n3) {
+    function t21(n3) {
       var i3, r3;
-      return this.getChildContext || (i3 = /* @__PURE__ */ new Set(), (r3 = {})[t20.__c] = this, this.getChildContext = function() {
+      return this.getChildContext || (i3 = /* @__PURE__ */ new Set(), (r3 = {})[t21.__c] = this, this.getChildContext = function() {
         return r3;
       }, this.shouldComponentUpdate = function(n4) {
         this.props.value != n4.value && i3.forEach(function(n5) {
@@ -468,35 +468,35 @@ function __ptmPageScript() {
         });
       }, this.sub = function(n4) {
         i3.add(n4);
-        var t21 = n4.componentWillUnmount;
+        var t22 = n4.componentWillUnmount;
         n4.componentWillUnmount = function() {
-          i3.delete(n4), t21 && t21.call(n4);
+          i3.delete(n4), t22 && t22.call(n4);
         };
       }), n3.children;
     }
-    return t20.__c = "__cC" + s++, t20.__ = n2, t20.Provider = (t20.Consumer = function(n3, t21) {
-      return n3.children(t21);
-    }).contextType = t20, t20;
+    return t21.__c = "__cC" + s++, t21.__ = n2, t21.Provider = (t21.Consumer = function(n3, t22) {
+      return n3.children(t22);
+    }).contextType = t21, t21;
   }
-  n = { __e: function(n2, t20, i3, r3) {
-    for (var u4, o4, e3; t20 = t20.__; ) if ((u4 = t20.__c) && !(1 & u4.__g)) {
+  n = { __e: function(n2, t21, i3, r3) {
+    for (var u4, o4, e3; t21 = t21.__; ) if ((u4 = t21.__c) && !(1 & u4.__g)) {
       u4.__g |= 4;
       try {
         if ((o4 = u4.constructor) && o4.getDerivedStateFromError && (u4.setState(o4.getDerivedStateFromError(n2)), e3 = 8 & u4.__g), u4.componentDidCatch && (u4.componentDidCatch(n2, r3 || {}), e3 = 8 & u4.__g), e3) return void (u4.__g |= 2);
-      } catch (t21) {
-        n2 = t21, e3 = 0;
+      } catch (t22) {
+        n2 = t22, e3 = 0;
       }
     }
     throw f = 0, n2;
   } }, t = 0, i = function(n2) {
     return null != n2 && void 0 === n2.constructor;
-  }, $.prototype.setState = function(n2, t20) {
+  }, $.prototype.setState = function(n2, t21) {
     var i3 = this.__s;
-    i3 && i3 != this.state || (i3 = this.__s = w({}, this.state)), "function" == typeof n2 && (n2 = n2(w({}, i3), this.props)), n2 && (w(i3, n2), this.__v && (t20 && this.__k.push(t20), C(this)));
+    i3 && i3 != this.state || (i3 = this.__s = w({}, this.state)), "function" == typeof n2 && (n2 = n2(w({}, i3), this.props)), n2 && (w(i3, n2), this.__v && (t21 && this.__k.push(t21), C(this)));
   }, $.prototype.forceUpdate = function(n2) {
     this.__v && (this.__g |= 4, n2 && this.__h.push(n2), C(this));
-  }, $.prototype.render = M, r = [], f = 0, o = function(n2, t20) {
-    return n2.__v.__b - t20.__v.__b;
+  }, $.prototype.render = M, r = [], f = 0, o = function(n2, t21) {
+    return n2.__v.__b - t21.__v.__b;
   }, e = /* @__PURE__ */ Symbol(), l = /(PointerCapture)$|Capture$/i, c = 0, a = {}, s = 0;
 
   // node_modules/preact/hooks/dist/hooks.mjs
@@ -515,8 +515,8 @@ function __ptmPageScript() {
   var s2 = a2.__c;
   var h2 = a2.unmount;
   var p2 = a2.__;
-  function y2(n2, t20) {
-    a2.__h && a2.__h(r2, n2, f2 || t20), f2 = 0;
+  function y2(n2, t21) {
+    a2.__h && a2.__h(r2, n2, f2 || t21), f2 = 0;
     var u4 = r2.__H || (r2.__H = { __: [], __h: [] });
     return n2 >= u4.__.length && u4.__.push({}), u4.__[n2];
   }
@@ -526,19 +526,19 @@ function __ptmPageScript() {
   function _2(n2, u4, i3) {
     var f3 = y2(t2++, 2);
     if (f3.t = n2, !f3.__c && (f3.__ = [i3 ? i3(u4) : G2(void 0, u4), function(n3) {
-      var t20 = f3.__N ? f3.__N[0] : f3.__[0], r3 = f3.t(t20, n3);
-      o2(t20, r3) || (f3.__N = [r3, f3.__[1]], f3.__c.setState({}));
+      var t21 = f3.__N ? f3.__N[0] : f3.__[0], r3 = f3.t(t21, n3);
+      o2(t21, r3) || (f3.__N = [r3, f3.__[1]], f3.__c.setState({}));
     }], f3.__c = r2, !r2.__f)) {
       r2.__f = true;
       var c3 = r2.shouldComponentUpdate;
-      r2.shouldComponentUpdate = function(n3, t20, r3) {
+      r2.shouldComponentUpdate = function(n3, t21, r3) {
         var u5 = this.__H;
         if (!u5) return true;
         var i4 = false, f4 = this.props != n3;
         if (u5.__.some(function(n4) {
           n4.__N && (i4 = true, o2(n4.__[0], n4.__N[0]) || (f4 = true));
         }), c3) {
-          var e3 = c3.call(this, n3, t20, r3);
+          var e3 = c3.call(this, n3, t21, r3);
           return i4 ? e3 || f4 : e3;
         }
         return !i4 || f4;
@@ -568,23 +568,23 @@ function __ptmPageScript() {
     do {
       for (; n2 = e2.shift(); ) try {
         C2(n2);
-      } catch (t21) {
-        a2.__e(t21, { __: (n2 = n2.__P) && n2.__v });
+      } catch (t22) {
+        a2.__e(t22, { __: (n2 = n2.__P) && n2.__v });
       }
       for (; n2 = c2.shift(); ) {
-        var t20 = n2.__H;
-        if (n2.__P && t20) try {
-          t20.__h.some(C2), t20.__h.some(D2), t20.__h = [];
+        var t21 = n2.__H;
+        if (n2.__P && t21) try {
+          t21.__h.some(C2), t21.__h.some(D2), t21.__h = [];
         } catch (r3) {
-          t20.__h = [], a2.__e(r3, n2.__v);
+          t21.__h = [], a2.__e(r3, n2.__v);
         }
       }
     } while (e2.length);
   }
   a2.__b = function(n2) {
     r2 = null, v2 && v2(n2);
-  }, a2.__ = function(n2, t20) {
-    n2 && t20.__k && t20.__k.__m && (n2.__m = t20.__k.__m), p2 && p2(n2, t20);
+  }, a2.__ = function(n2, t21) {
+    n2 && t21.__k && t21.__k.__m && (n2.__m = t21.__k.__m), p2 && p2(n2, t21);
   }, a2.__r = function(n2) {
     l2 && l2(n2), t2 = 0;
     var i3 = (r2 = n2.__c).__H;
@@ -593,25 +593,25 @@ function __ptmPageScript() {
     })), u2 = r2;
   }, a2.diffed = function(n2) {
     m && m(n2);
-    var t20 = n2.__c;
-    t20 && t20.__H && (t20.__H.__h.length && B2(c2.push(t20)), t20.__H.__.some(function(n3) {
+    var t21 = n2.__c;
+    t21 && t21.__H && (t21.__H.__h.length && B2(c2.push(t21)), t21.__H.__.some(function(n3) {
       n3.u && (n3.__H = n3.u);
     })), u2 = r2 = null;
-  }, a2.__c = function(n2, t20) {
-    t20.some(function(n3) {
+  }, a2.__c = function(n2, t21) {
+    t21.some(function(n3) {
       try {
         n3.__h.some(C2), n3.__h = n3.__h.filter(function(n4) {
           return !n4.__ || D2(n4);
         });
       } catch (r3) {
-        t20.some(function(n4) {
+        t21.some(function(n4) {
           n4.__h && (n4.__h = []);
-        }), t20 = [], a2.__e(r3, n3.__v);
+        }), t21 = [], a2.__e(r3, n3.__v);
       }
-    }), s2 && s2(n2, t20);
+    }), s2 && s2(n2, t21);
   }, a2.unmount = function(n2) {
     h2 && h2(n2);
-    var t20, r3, u4 = n2.__c;
+    var t21, r3, u4 = n2.__c;
     u4 && u4.__H && (u4.__H.__.some(function(u5) {
       try {
         if (u5.__P && u5.__c) {
@@ -622,35 +622,35 @@ function __ptmPageScript() {
           u5.__P = r3, B2(e2.push(u5));
         } else C2(u5);
       } catch (n3) {
-        t20 = n3;
+        t21 = n3;
       }
-    }), u4.__H = void 0, t20 && a2.__e(t20, u4.__v));
+    }), u4.__H = void 0, t21 && a2.__e(t21, u4.__v));
   };
   var k = "function" == typeof requestAnimationFrame;
   function z2(n2) {
-    var t20, r3 = function() {
-      clearTimeout(u4), k && cancelAnimationFrame(t20), setTimeout(n2);
+    var t21, r3 = function() {
+      clearTimeout(u4), k && cancelAnimationFrame(t21), setTimeout(n2);
     }, u4 = setTimeout(r3, 35);
-    k && (t20 = requestAnimationFrame(r3));
+    k && (t21 = requestAnimationFrame(r3));
   }
   function B2(n2) {
     1 != n2 && i2 == a2.requestAnimationFrame || ((i2 = a2.requestAnimationFrame) || z2)(g2);
   }
   function C2(n2) {
-    var t20 = r2, u4 = n2.__c;
-    "function" == typeof u4 && (n2.__c = void 0, u4()), r2 = t20;
+    var t21 = r2, u4 = n2.__c;
+    "function" == typeof u4 && (n2.__c = void 0, u4()), r2 = t21;
   }
   function D2(n2) {
-    var t20 = r2;
-    n2.__c = n2.__(), r2 = t20;
+    var t21 = r2;
+    n2.__c = n2.__(), r2 = t21;
   }
-  function E2(n2, t20) {
-    return !n2 || n2.length != t20.length || t20.some(function(t21, r3) {
-      return !o2(t21, n2[r3]);
+  function E2(n2, t21) {
+    return !n2 || n2.length != t21.length || t21.some(function(t22, r3) {
+      return !o2(t22, n2[r3]);
     });
   }
-  function G2(n2, t20) {
-    return "function" == typeof t20 ? t20(n2) : t20;
+  function G2(n2, t21) {
+    return "function" == typeof t21 ? t21(n2) : t21;
   }
 
   // src/core/store.ts
@@ -1035,11 +1035,11 @@ function __ptmPageScript() {
 
   // node_modules/preact/jsx-runtime/dist/jsxRuntime.mjs
   var o3 = 0;
-  function u3(t20, e3, n2, f3, u4, i3) {
+  function u3(t21, e3, n2, f3, u4, i3) {
     e3 || (e3 = {});
     var a3, c3, l3 = e3;
-    if ("ref" in l3 && "function" != typeof t20) for (c3 in l3 = {}, e3) "ref" == c3 ? a3 = e3[c3] : l3[c3] = e3[c3];
-    var p3 = { type: t20, props: l3, key: n2, ref: a3, __k: null, __: null, __b: 0, __e: null, __c: null, constructor: void 0, __v: --o3, __i: -1, __u: 0 };
+    if ("ref" in l3 && "function" != typeof t21) for (c3 in l3 = {}, e3) "ref" == c3 ? a3 = e3[c3] : l3[c3] = e3[c3];
+    var p3 = { type: t21, props: l3, key: n2, ref: a3, __k: null, __: null, __b: 0, __e: null, __c: null, constructor: void 0, __v: --o3, __i: -1, __u: 0 };
     return (u4 || i3) && (p3.__source = u4, p3.__self = i3), n.vnode && n.vnode(p3), p3;
   }
 
@@ -1130,7 +1130,7 @@ function __ptmPageScript() {
   var IconWarning = icon(/* @__PURE__ */ u3("path", { d: "m21.7 18-8-14a2 2 0 0 0-3.4 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3ZM12 9v4M12 17h.01" }));
 
   // src/features/bookmarks/feature.css
-  var feature_default = ".ptm-bm {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n\n.ptm-bm .ptm-toolbar {\n  margin-bottom: 0;\n}\n\n.ptm-bm-folders,\n.ptm-bm-trades {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n\n.ptm-bm-folders {\n  display: grid;\n  gap: 6px;\n}\n\n/* Folder */\n\n.ptm-bm-folder {\n  border: 1px solid var(--ptm-blue-border);\n  background: var(--ptm-surface);\n}\n\n.ptm-bm-folder__header {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  padding-right: 4px;\n  background: var(--ptm-blue);\n  transition: background-color 0.2s;\n}\n\n.ptm-bm-folder__header:hover {\n  background: var(--ptm-blue-hover);\n}\n\n.ptm-bm-folder__toggle {\n  flex: 1;\n  min-width: 0;\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  min-height: 36px;\n  padding: 4px 6px 4px 8px;\n  border: 0;\n  background: none;\n  font-family: var(--ptm-font-title) !important;\n  font-size: 15px;\n  text-align: left;\n  cursor: pointer;\n}\n\n.ptm-bm-folder__icon {\n  flex: none;\n  width: 26px;\n  height: 26px;\n  object-fit: contain;\n}\n\n.ptm-bm-folder__title {\n  flex: 1;\n  min-width: 0;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n.ptm-bm-chevron {\n  display: inline-flex;\n  transition: transform 0.2s;\n}\n\n.ptm-bm-chevron--open {\n  transform: rotate(180deg);\n}\n\n.ptm-bm-folder__divider {\n  flex: none;\n  width: 1px;\n  height: 15px;\n  background: var(--ptm-blue-border);\n}\n\n.ptm-bm-folder__body {\n  display: grid;\n  gap: 6px;\n  padding-bottom: 6px;\n}\n\n.ptm-bm-folder__empty {\n  margin: 0;\n  padding: 6px 7px 0;\n  font-size: 11px;\n  color: var(--ptm-muted);\n}\n\n.ptm-bm-save {\n  display: block;\n  padding: 0 6px;\n}\n\n/* Trades */\n\n.ptm-bm-trade {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  padding: 6px 4px 6px 7px;\n  border-bottom: 1px solid var(--ptm-blue-line);\n}\n\n.ptm-bm-trade:hover,\n.ptm-bm-trade:focus-within {\n  background: linear-gradient(to right, rgba(138, 86, 9, 0.4), transparent);\n}\n\n.ptm-bm-trade__check {\n  display: inline-flex;\n  color: var(--ptm-green-border);\n}\n\n.ptm-bm-trade__title {\n  flex: 1;\n  min-width: 0;\n  overflow: hidden;\n  font-family: var(--ptm-font-title);\n  font-size: 14px;\n  color: var(--ptm-text);\n  text-decoration: none;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n.ptm-bm-trade__title:hover {\n  color: var(--ptm-beige);\n}\n\n.ptm-bm-trade--current {\n  box-shadow: inset 3px 0 0 var(--ptm-gold-border);\n}\n\n.ptm-bm-trade--current .ptm-bm-trade__title {\n  color: var(--ptm-beige);\n}\n\n.ptm-bm-trade--completed .ptm-bm-trade__title {\n  opacity: 0.5;\n}\n\n.ptm-bm-badge {\n  flex: none;\n  padding: 1px 5px;\n  border: 1px solid var(--ptm-yellow-border);\n  background: var(--ptm-yellow);\n  font-size: 11px;\n  color: var(--ptm-text);\n  white-space: nowrap;\n}\n\n.ptm-bm-handle {\n  cursor: grab;\n  touch-action: none;\n}\n\n.ptm-bm-dragging {\n  opacity: 0.4;\n}\n\nhtml.ptm-bm-sorting,\nhtml.ptm-bm-sorting * {\n  cursor: grabbing !important;\n  user-select: none !important;\n}\n\n.ptm-bm-drop-line {\n  position: fixed;\n  z-index: 1300;\n  height: 2px;\n  background: var(--ptm-gold-border);\n  box-shadow: 0 0 4px var(--ptm-gold-border);\n  pointer-events: none;\n}\n\n/* Actions and backup (layout comes from .ptm-actions and .ptm-btn-group in core.css) */\n\n.ptm-bm-backup {\n  padding-top: 10px;\n  border-top: 1px solid var(--ptm-blue-line);\n}\n\n/* Modals */\n\n.ptm-bm-form {\n  display: grid;\n  gap: 14px;\n}\n\n.ptm-bm-preview {\n  margin: 0;\n  font-family: var(--ptm-font-title);\n  font-size: 15px;\n  color: var(--ptm-beige);\n}\n\n.ptm-bm-icons {\n  display: grid;\n  gap: 10px;\n}\n\n.ptm-bm-icons__grid {\n  display: grid;\n  gap: 6px;\n}\n\n.ptm-bm-icons__grid--currency {\n  grid-template-columns: repeat(auto-fill, 50px);\n}\n\n.ptm-bm-icons__grid--ascendancy {\n  grid-template-columns: repeat(auto-fill, 75px);\n}\n\n.ptm-bm-icons__cell {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  padding: 4px;\n  border: 1px solid transparent;\n  background: rgba(255, 255, 255, 0.04);\n  cursor: pointer;\n  transition: background-color 0.2s, border-color 0.2s;\n}\n\n.ptm-bm-icons__grid--currency .ptm-bm-icons__cell {\n  width: 50px;\n  height: 50px;\n}\n\n.ptm-bm-icons__grid--ascendancy .ptm-bm-icons__cell {\n  width: 75px;\n  height: 75px;\n}\n\n.ptm-bm-icons__cell img {\n  max-width: 100%;\n  max-height: 100%;\n  object-fit: contain;\n}\n\n.ptm-bm-icons__cell:hover {\n  background: rgba(138, 86, 9, 0.25);\n}\n\n.ptm-bm-icons__cell[aria-pressed='true'] {\n  border-color: var(--ptm-gold-border);\n  background: rgba(138, 86, 9, 0.5);\n}\n";
+  var feature_default = ".ptm-bm {\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 8px;\r\n}\r\n\r\n.ptm-bm .ptm-toolbar {\r\n  margin-bottom: 0;\r\n}\r\n\r\n.ptm-bm-folders,\r\n.ptm-bm-trades {\r\n  margin: 0;\r\n  padding: 0;\r\n  list-style: none;\r\n}\r\n\r\n.ptm-bm-folders {\r\n  display: grid;\r\n  gap: 6px;\r\n}\r\n\r\n/* Folder */\r\n\r\n.ptm-bm-folder {\r\n  border: 1px solid var(--ptm-blue-border);\r\n  background: var(--ptm-surface);\r\n}\r\n\r\n.ptm-bm-folder__header {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 4px;\r\n  padding-right: 4px;\r\n  background: var(--ptm-blue);\r\n  transition: background-color 0.2s;\r\n}\r\n\r\n.ptm-bm-folder__header:hover {\r\n  background: var(--ptm-blue-hover);\r\n}\r\n\r\n.ptm-bm-folder__toggle {\r\n  flex: 1;\r\n  min-width: 0;\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  min-height: 36px;\r\n  padding: 4px 6px 4px 8px;\r\n  border: 0;\r\n  background: none;\r\n  font-family: var(--ptm-font-title) !important;\r\n  font-size: 15px;\r\n  text-align: left;\r\n  cursor: pointer;\r\n}\r\n\r\n.ptm-bm-folder__icon {\r\n  flex: none;\r\n  width: 26px;\r\n  height: 26px;\r\n  object-fit: contain;\r\n}\r\n\r\n.ptm-bm-folder__title {\r\n  flex: 1;\r\n  min-width: 0;\r\n  overflow: hidden;\r\n  text-overflow: ellipsis;\r\n  white-space: nowrap;\r\n}\r\n\r\n.ptm-bm-chevron {\r\n  display: inline-flex;\r\n  transition: transform 0.2s;\r\n}\r\n\r\n.ptm-bm-chevron--open {\r\n  transform: rotate(180deg);\r\n}\r\n\r\n.ptm-bm-folder__divider {\r\n  flex: none;\r\n  width: 1px;\r\n  height: 15px;\r\n  background: var(--ptm-blue-border);\r\n}\r\n\r\n.ptm-bm-folder__body {\r\n  display: grid;\r\n  gap: 6px;\r\n  padding-bottom: 6px;\r\n}\r\n\r\n.ptm-bm-folder__empty {\r\n  margin: 0;\r\n  padding: 6px 7px 0;\r\n  font-size: 11px;\r\n  color: var(--ptm-muted);\r\n}\r\n\r\n.ptm-bm-save {\r\n  display: block;\r\n  padding: 0 6px;\r\n}\r\n\r\n/* Trades */\r\n\r\n.ptm-bm-trade {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 4px;\r\n  padding: 6px 4px 6px 7px;\r\n  border-bottom: 1px solid var(--ptm-blue-line);\r\n}\r\n\r\n.ptm-bm-trade:hover,\r\n.ptm-bm-trade:focus-within {\r\n  background: linear-gradient(to right, rgba(138, 86, 9, 0.4), transparent);\r\n}\r\n\r\n.ptm-bm-trade__check {\r\n  display: inline-flex;\r\n  color: var(--ptm-green-border);\r\n}\r\n\r\n.ptm-bm-trade__title {\r\n  flex: 1;\r\n  min-width: 0;\r\n  overflow: hidden;\r\n  font-family: var(--ptm-font-title);\r\n  font-size: 14px;\r\n  color: var(--ptm-text);\r\n  text-decoration: none;\r\n  text-overflow: ellipsis;\r\n  white-space: nowrap;\r\n}\r\n\r\n.ptm-bm-trade__title:hover {\r\n  color: var(--ptm-beige);\r\n}\r\n\r\n.ptm-bm-trade--current {\r\n  box-shadow: inset 3px 0 0 var(--ptm-gold-border);\r\n}\r\n\r\n.ptm-bm-trade--current .ptm-bm-trade__title {\r\n  color: var(--ptm-beige);\r\n}\r\n\r\n.ptm-bm-trade--completed .ptm-bm-trade__title {\r\n  opacity: 0.5;\r\n}\r\n\r\n.ptm-bm-badge {\r\n  flex: none;\r\n  padding: 1px 5px;\r\n  border: 1px solid var(--ptm-yellow-border);\r\n  background: var(--ptm-yellow);\r\n  font-size: 11px;\r\n  color: var(--ptm-text);\r\n  white-space: nowrap;\r\n}\r\n\r\n.ptm-bm-handle {\r\n  cursor: grab;\r\n  touch-action: none;\r\n}\r\n\r\n.ptm-bm-dragging {\r\n  opacity: 0.4;\r\n}\r\n\r\nhtml.ptm-bm-sorting,\r\nhtml.ptm-bm-sorting * {\r\n  cursor: grabbing !important;\r\n  user-select: none !important;\r\n}\r\n\r\n.ptm-bm-drop-line {\r\n  position: fixed;\r\n  z-index: 1300;\r\n  height: 2px;\r\n  background: var(--ptm-gold-border);\r\n  box-shadow: 0 0 4px var(--ptm-gold-border);\r\n  pointer-events: none;\r\n}\r\n\r\n/* Actions and backup (layout comes from .ptm-actions and .ptm-btn-group in core.css) */\r\n\r\n.ptm-bm-backup {\r\n  padding-top: 10px;\r\n  border-top: 1px solid var(--ptm-blue-line);\r\n}\r\n\r\n/* Modals */\r\n\r\n.ptm-bm-form {\r\n  display: grid;\r\n  gap: 14px;\r\n}\r\n\r\n.ptm-bm-preview {\r\n  margin: 0;\r\n  font-family: var(--ptm-font-title);\r\n  font-size: 15px;\r\n  color: var(--ptm-beige);\r\n}\r\n\r\n.ptm-bm-icons {\r\n  display: grid;\r\n  gap: 10px;\r\n}\r\n\r\n.ptm-bm-icons__grid {\r\n  display: grid;\r\n  gap: 6px;\r\n}\r\n\r\n.ptm-bm-icons__grid--currency {\r\n  grid-template-columns: repeat(auto-fill, 50px);\r\n}\r\n\r\n.ptm-bm-icons__grid--ascendancy {\r\n  grid-template-columns: repeat(auto-fill, 75px);\r\n}\r\n\r\n.ptm-bm-icons__cell {\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  padding: 4px;\r\n  border: 1px solid transparent;\r\n  background: rgba(255, 255, 255, 0.04);\r\n  cursor: pointer;\r\n  transition: background-color 0.2s, border-color 0.2s;\r\n}\r\n\r\n.ptm-bm-icons__grid--currency .ptm-bm-icons__cell {\r\n  width: 50px;\r\n  height: 50px;\r\n}\r\n\r\n.ptm-bm-icons__grid--ascendancy .ptm-bm-icons__cell {\r\n  width: 75px;\r\n  height: 75px;\r\n}\r\n\r\n.ptm-bm-icons__cell img {\r\n  max-width: 100%;\r\n  max-height: 100%;\r\n  object-fit: contain;\r\n}\r\n\r\n.ptm-bm-icons__cell:hover {\r\n  background: rgba(138, 86, 9, 0.25);\r\n}\r\n\r\n.ptm-bm-icons__cell[aria-pressed='true'] {\r\n  border-color: var(--ptm-gold-border);\r\n  background: rgba(138, 86, 9, 0.5);\r\n}\r\n";
 
   // src/features/bookmarks/messages.ts
   var t3 = createTranslator({
@@ -1413,8 +1413,8 @@ function __ptmPageScript() {
       const el = dialog.current;
       const body = el.querySelector(".ptm-modal__body");
       const foot = el.querySelector(".ptm-modal__footer");
-      const start6 = el.querySelector("[data-autofocus]") ?? (body && focusables(body)[0]) ?? (foot && focusables(foot)[0]) ?? el;
-      start6.focus();
+      const start7 = el.querySelector("[data-autofocus]") ?? (body && focusables(body)[0]) ?? (foot && focusables(foot)[0]) ?? el;
+      start7.focus();
       stack.push(token.current);
       const onKey = (event) => {
         if (event.key !== "Escape" || stack[stack.length - 1] !== token.current) return;
@@ -1481,7 +1481,7 @@ function __ptmPageScript() {
   }
 
   // src/ui/components/Menu.tsx
-  function Menu({ items, label }) {
+  function Menu({ items, label, trigger: triggerContent, class: className }) {
     const [open, setOpen] = d2(false);
     const root = T2(null);
     const trigger = T2(null);
@@ -1512,7 +1512,7 @@ function __ptmPageScript() {
     return /* @__PURE__ */ u3(
       "div",
       {
-        class: "ptm-menu",
+        class: ["ptm-menu", className].filter(Boolean).join(" "),
         ref: root,
         onFocusOut: (event) => {
           if (open && !root.current?.contains(event.relatedTarget)) setOpen(false);
@@ -1523,7 +1523,7 @@ function __ptmPageScript() {
             {
               ref: trigger,
               type: "button",
-              class: "ptm-icon-btn",
+              class: triggerContent === void 0 ? "ptm-icon-btn" : "ptm-menu__trigger",
               title: label,
               "aria-label": label,
               "aria-expanded": open,
@@ -1532,7 +1532,7 @@ function __ptmPageScript() {
                 event.stopPropagation();
                 setOpen(!open);
               },
-              children: /* @__PURE__ */ u3(IconEllipsis, { size: 16 })
+              children: triggerContent ?? /* @__PURE__ */ u3(IconEllipsis, { size: 16 })
             }
           ),
           open && /* @__PURE__ */ u3("ul", { class: "ptm-menu__list", ref: list, onKeyDown, children: items.filter((item) => !item.hidden).map((item) => /* @__PURE__ */ u3("li", { children: /* @__PURE__ */ u3(
@@ -1769,8 +1769,8 @@ function __ptmPageScript() {
     return typeof f3 === "object" && f3 !== null && isString(f3.title) && isNullableString(f3.icon) && isNullableString(f3.archivedAt) && Array.isArray(f3.trades) && f3.trades.every(isTrade);
   }
   function isTrade(value2) {
-    const t20 = value2;
-    return typeof t20 === "object" && t20 !== null && isString(t20.title) && TYPES2.has(t20.type) && isString(t20.realm) && isRealm(t20.realm) && isString(t20.searchId) && SEARCH_ID.test(t20.searchId) && isString(t20.savedLeague) && (t20.payload === null || typeof t20.payload === "object" && typeof t20.payload.query === "object") && isNullableString(t20.completedAt) && isString(t20.createdAt) && isString(t20.updatedAt);
+    const t21 = value2;
+    return typeof t21 === "object" && t21 !== null && isString(t21.title) && TYPES2.has(t21.type) && isString(t21.realm) && isRealm(t21.realm) && isString(t21.searchId) && SEARCH_ID.test(t21.searchId) && isString(t21.savedLeague) && (t21.payload === null || typeof t21.payload === "object" && typeof t21.payload.query === "object") && isNullableString(t21.completedAt) && isString(t21.createdAt) && isString(t21.updatedAt);
   }
   function toBase64(text2) {
     let binary = "";
@@ -2516,7 +2516,7 @@ function __ptmPageScript() {
     }
     deleteTrade(tradeId) {
       this.#setFolders(
-        (folders) => folders.map((f3) => f3.trades.some((t20) => t20.id === tradeId) ? { ...f3, trades: f3.trades.filter((t20) => t20.id !== tradeId) } : f3)
+        (folders) => folders.map((f3) => f3.trades.some((t21) => t21.id === tradeId) ? { ...f3, trades: f3.trades.filter((t21) => t21.id !== tradeId) } : f3)
       );
     }
     /** `toIndex` counts in the target list after the trade was taken out. */
@@ -2565,8 +2565,8 @@ function __ptmPageScript() {
             counts.trades += folder.trades.length;
             continue;
           }
-          const known = new Set(target.trades.map((t20) => t20.searchId));
-          const added = folder.trades.filter((t20) => !known.has(t20.searchId) && known.add(t20.searchId)).map((t20) => ({ ...t20, id: newId() }));
+          const known = new Set(target.trades.map((t21) => t21.searchId));
+          const added = folder.trades.filter((t21) => !known.has(t21.searchId) && known.add(t21.searchId)).map((t21) => ({ ...t21, id: newId() }));
           if (added.length) result[index] = { ...target, trades: [...target.trades, ...added] };
           counts.trades += added.length;
         }
@@ -2577,13 +2577,13 @@ function __ptmPageScript() {
     /** The bookmark for a search id, preferring active folders over archived ones. */
     findTradeBySearchId(searchId) {
       const matches = this.data.get().folders.flatMap(
-        (folder) => folder.trades.filter((t20) => t20.searchId === searchId).map((trade) => ({ folder, trade }))
+        (folder) => folder.trades.filter((t21) => t21.searchId === searchId).map((trade) => ({ folder, trade }))
       );
       return matches.find((m2) => !m2.folder.archivedAt) ?? matches[0] ?? null;
     }
     #findTrade(tradeId) {
       for (const folder of this.data.get().folders) {
-        const trade = folder.trades.find((t20) => t20.id === tradeId);
+        const trade = folder.trades.find((t21) => t21.id === tradeId);
         if (trade) return { folder, trade };
       }
       return null;
@@ -2597,7 +2597,7 @@ function __ptmPageScript() {
     #mapTrade(tradeId, fn) {
       const folderId = this.#findTrade(tradeId)?.folder.id;
       if (!folderId) return;
-      this.#mapFolder(folderId, (folder) => ({ ...folder, trades: folder.trades.map((t20) => t20.id === tradeId ? fn(t20) : t20) }));
+      this.#mapFolder(folderId, (folder) => ({ ...folder, trades: folder.trades.map((t21) => t21.id === tradeId ? fn(t21) : t21) }));
     }
   };
   function fromSearch({ location: location2, payload }) {
@@ -2637,7 +2637,7 @@ function __ptmPageScript() {
   };
 
   // src/features/history/feature.css
-  var feature_default2 = ".ptm-history {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n\n.ptm-history__list {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n  background: var(--ptm-surface);\n  border: 1px solid var(--ptm-blue-border);\n}\n\n.ptm-history__item {\n  padding: 6px 7px;\n  border-top: 1px solid var(--ptm-blue-line);\n}\n\n.ptm-history__item:first-child {\n  border-top: 0;\n}\n\n.ptm-history__item:hover {\n  background: linear-gradient(to right, rgba(138, 86, 9, 0.4), transparent);\n}\n\n.ptm-history__title {\n  display: block;\n  overflow: hidden;\n  font-family: var(--ptm-font-title);\n  font-size: 14px;\n  color: var(--ptm-text);\n  text-decoration: none;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n.ptm-history__title:hover {\n  color: var(--ptm-beige);\n  text-decoration: underline;\n}\n\n.ptm-history__other {\n  font-size: 11px;\n  color: var(--ptm-beige);\n}\n";
+  var feature_default2 = ".ptm-history {\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 8px;\r\n}\r\n\r\n.ptm-history__list {\r\n  margin: 0;\r\n  padding: 0;\r\n  list-style: none;\r\n  background: var(--ptm-surface);\r\n  border: 1px solid var(--ptm-blue-border);\r\n}\r\n\r\n.ptm-history__item {\r\n  padding: 6px 7px;\r\n  border-top: 1px solid var(--ptm-blue-line);\r\n}\r\n\r\n.ptm-history__item:first-child {\r\n  border-top: 0;\r\n}\r\n\r\n.ptm-history__item:hover {\r\n  background: linear-gradient(to right, rgba(138, 86, 9, 0.4), transparent);\r\n}\r\n\r\n.ptm-history__title {\r\n  display: block;\r\n  overflow: hidden;\r\n  font-family: var(--ptm-font-title);\r\n  font-size: 14px;\r\n  color: var(--ptm-text);\r\n  text-decoration: none;\r\n  text-overflow: ellipsis;\r\n  white-space: nowrap;\r\n}\r\n\r\n.ptm-history__title:hover {\r\n  color: var(--ptm-beige);\r\n  text-decoration: underline;\r\n}\r\n\r\n.ptm-history__other {\r\n  font-size: 11px;\r\n  color: var(--ptm-beige);\r\n}\r\n";
 
   // src/features/history/Panel.tsx
   var t6 = createTranslator({
@@ -2791,6 +2791,8 @@ function __ptmPageScript() {
     advancedPane: "#trade .search-advanced-pane",
     propertyPane: "#trade .search-advanced-pane.blue",
     statPane: "#trade .search-advanced-pane.brown",
+    /** "+ Add Stat Group" dropdown below the stat groups; its `.filter-body` fills the right half. */
+    statGroupSelect: "#trade .search-advanced-pane.brown .filter-group-select",
     filterGroup: ".filter-group",
     results: "#vue3-portal .results",
     resultTotal: "#vue3-portal .results .row-total",
@@ -2818,7 +2820,7 @@ function __ptmPageScript() {
   };
 
   // src/features/pins/feature.css
-  var feature_default3 = '.ptm-pinned {\n  box-shadow: inset 0 0 10px 2px var(--ptm-blue-border);\n}\n\n.ptm-pin-glow {\n  animation: ptm-pin-glow 1s ease;\n}\n\n@keyframes ptm-pin-glow {\n  0%, 50%, 100% { box-shadow: inset 0 0 10px 2px var(--ptm-blue-border); }\n  25%, 75% { box-shadow: inset 0 0 20px 10px var(--ptm-blue-border); }\n}\n\n/* Same width for "Pin" and "Unpin", so the button bar does not jump. */\n.ptm-pin-btn {\n  min-width: 60px;\n}\n\n.ptm-pins {\n  display: grid;\n  gap: 10px;\n}\n\n.ptm-pin {\n  min-width: 0;\n  border: 1px solid var(--ptm-blue-line);\n  background: #000;\n}\n\n/* The site sizes item cards for the result list; in the 380px sidebar they must shrink. */\n.ptm-pin__item {\n  display: flex;\n  justify-content: center;\n  overflow: hidden;\n}\n\n.ptm-pin__item .item-popup {\n  width: 100%;\n  min-width: 0;\n  max-width: 100%;\n  margin: 0;\n}\n\n.ptm-pin__price {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  gap: 3px;\n  padding: 5px 10px 0;\n  color: var(--ptm-muted);\n}\n\n.ptm-pin__price img {\n  height: 25px;\n}\n\n/* Keep the currency name: without it a missing image leaves only the trade id ("exalted"). */\n.ptm-pin__price br,\n.ptm-pin__price .price-label {\n  display: none;\n}\n\n.ptm-pin__seller {\n  padding: 4px 10px 0;\n  text-align: center;\n}\n\n.ptm-pin__actions {\n  padding: 8px 10px 10px;\n}\n';
+  var feature_default3 = '.ptm-pinned {\r\n  box-shadow: inset 0 0 10px 2px var(--ptm-blue-border);\r\n}\r\n\r\n.ptm-pin-glow {\r\n  animation: ptm-pin-glow 1s ease;\r\n}\r\n\r\n@keyframes ptm-pin-glow {\r\n  0%, 50%, 100% { box-shadow: inset 0 0 10px 2px var(--ptm-blue-border); }\r\n  25%, 75% { box-shadow: inset 0 0 20px 10px var(--ptm-blue-border); }\r\n}\r\n\r\n/* Same width for "Pin" and "Unpin", so the button bar does not jump. */\r\n.ptm-pin-btn {\r\n  min-width: 60px;\r\n}\r\n\r\n.ptm-pins {\r\n  display: grid;\r\n  gap: 10px;\r\n}\r\n\r\n.ptm-pin {\r\n  min-width: 0;\r\n  border: 1px solid var(--ptm-blue-line);\r\n  background: #000;\r\n}\r\n\r\n/* The site sizes item cards for the result list; in the 380px sidebar they must shrink. */\r\n.ptm-pin__item {\r\n  display: flex;\r\n  justify-content: center;\r\n  overflow: hidden;\r\n}\r\n\r\n.ptm-pin__item .item-popup {\r\n  width: 100%;\r\n  min-width: 0;\r\n  max-width: 100%;\r\n  margin: 0;\r\n}\r\n\r\n.ptm-pin__price {\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  gap: 3px;\r\n  padding: 5px 10px 0;\r\n  color: var(--ptm-muted);\r\n}\r\n\r\n.ptm-pin__price img {\r\n  height: 25px;\r\n}\r\n\r\n/* Keep the currency name: without it a missing image leaves only the trade id ("exalted"). */\r\n.ptm-pin__price br,\r\n.ptm-pin__price .price-label {\r\n  display: none;\r\n}\r\n\r\n.ptm-pin__seller {\r\n  padding: 4px 10px 0;\r\n  text-align: center;\r\n}\r\n\r\n.ptm-pin__actions {\r\n  padding: 8px 10px 10px;\r\n}\r\n';
 
   // src/features/pins/index.tsx
   var t8 = createTranslator({
@@ -3066,7 +3068,7 @@ function __ptmPageScript() {
   };
 
   // src/features/highlight-mods/feature.css
-  var feature_default4 = ".ptm-mod-highlight {\n  background: rgba(138, 86, 9, 0.25);\n}\n";
+  var feature_default4 = ".ptm-mod-highlight {\r\n  background: rgba(138, 86, 9, 0.25);\r\n}\r\n";
 
   // src/features/highlight-mods/index.ts
   var t10 = createTranslator({
@@ -3122,7 +3124,7 @@ function __ptmPageScript() {
   };
 
   // src/features/regroup-similar/feature.css
-  var feature_default5 = ".ptm-regroup-hidden {\n  display: none !important;\n}\n\n.ptm-regroup-shown {\n  background: rgba(16, 16, 16, 0.8) !important;\n}\n\n.ptm-regroup-btn {\n  margin-left: 5px;\n}\n";
+  var feature_default5 = ".ptm-regroup-hidden {\r\n  display: none !important;\r\n}\r\n\r\n.ptm-regroup-shown {\r\n  background: rgba(16, 16, 16, 0.8) !important;\r\n}\r\n\r\n.ptm-regroup-btn {\r\n  margin-left: 5px;\r\n}\r\n";
 
   // src/features/regroup-similar/index.ts
   var t11 = createTranslator({
@@ -3214,7 +3216,7 @@ function __ptmPageScript() {
   };
 
   // src/features/price-equivalent/feature.css
-  var feature_default6 = ".ptm-price-equivalent {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: center;\n  gap: 0 8px;\n  margin-top: 4px;\n  padding-top: 4px;\n  border-top: 1px solid rgba(163, 141, 109, 0.25);\n  font-family: var(--ptm-font-title);\n  font-size: 13px;\n  color: var(--ptm-muted);\n}\n\n.ptm-price-equivalent__part {\n  display: inline-flex;\n  align-items: center;\n  gap: 3px;\n}\n\n/* The site sizes every image in the price box; keep ours square. */\n.ptm-price-equivalent .ptm-price-equivalent__icon {\n  width: 18px !important;\n  height: 18px !important;\n  min-width: 18px;\n  max-width: none !important;\n  margin: 0 !important;\n  object-fit: contain;\n  vertical-align: middle;\n}\n";
+  var feature_default6 = ".ptm-price-equivalent {\r\n  display: flex;\r\n  flex-wrap: wrap;\r\n  justify-content: center;\r\n  gap: 0 8px;\r\n  margin-top: 4px;\r\n  padding-top: 4px;\r\n  border-top: 1px solid rgba(163, 141, 109, 0.25);\r\n  font-family: var(--ptm-font-title);\r\n  font-size: 13px;\r\n  color: var(--ptm-muted);\r\n}\r\n\r\n.ptm-price-equivalent__part {\r\n  display: inline-flex;\r\n  align-items: center;\r\n  gap: 3px;\r\n}\r\n\r\n/* The site sizes every image in the price box; keep ours square. */\r\n.ptm-price-equivalent .ptm-price-equivalent__icon {\r\n  width: 18px !important;\r\n  height: 18px !important;\r\n  min-width: 18px;\r\n  max-width: none !important;\r\n  margin: 0 !important;\r\n  object-fit: contain;\r\n  vertical-align: middle;\r\n}\r\n";
 
   // src/features/price-equivalent/format.ts
   var MIN_DIVINE = 0.1;
@@ -3392,7 +3394,7 @@ function __ptmPageScript() {
   }
 
   // src/features/mod-actions/feature.css
-  var feature_default7 = ".item-mod:has(> .ptm-mod-action) {\n  position: relative;\n}\n\n/* Sits just outside the left edge of the item card, so the site's tier labels stay readable. */\n.ptm-mod-action {\n  position: absolute;\n  top: 50%;\n  left: -41px;\n  z-index: 1;\n  width: 20px;\n  height: 20px;\n  margin-top: -10px;\n  padding: 0;\n  border: 1px solid var(--ptm-blue-border);\n  background: var(--ptm-blue);\n  color: var(--ptm-text);\n  font: 13px/18px var(--ptm-font-title);\n  text-align: center;\n  cursor: pointer;\n  opacity: 0;\n  transition: opacity 0.2s, background 0.2s;\n}\n\n.ptm-mod-action--exclude {\n  left: -22px;\n  border-color: var(--ptm-red-border);\n  background: var(--ptm-red);\n}\n\n.item-mod:hover > .ptm-mod-action,\n.ptm-mod-action:focus-visible {\n  opacity: 1;\n}\n\n.ptm-mod-action--add:hover {\n  background: var(--ptm-blue-hover);\n}\n\n.ptm-mod-action--exclude:hover {\n  background: var(--ptm-red-hover);\n}\n\n.ptm-mod-flash-ok {\n  animation: ptm-mod-flash-ok 0.9s ease;\n}\n\n.ptm-mod-flash-fail {\n  animation: ptm-mod-flash-fail 0.9s ease;\n}\n\n@keyframes ptm-mod-flash-ok {\n  0%, 60% { background: var(--ptm-green); }\n  100% { background: transparent; }\n}\n\n@keyframes ptm-mod-flash-fail {\n  0%, 60% { background: var(--ptm-red-border); }\n  100% { background: transparent; }\n}\n\n@media (hover: none) {\n  .ptm-mod-action {\n    opacity: 0.6;\n  }\n}\n";
+  var feature_default7 = ".item-mod:has(> .ptm-mod-action) {\r\n  position: relative;\r\n}\r\n\r\n/* Sits just outside the left edge of the item card, so the site's tier labels stay readable. */\r\n.ptm-mod-action {\r\n  position: absolute;\r\n  top: 50%;\r\n  left: -41px;\r\n  z-index: 1;\r\n  width: 20px;\r\n  height: 20px;\r\n  margin-top: -10px;\r\n  padding: 0;\r\n  border: 1px solid var(--ptm-blue-border);\r\n  background: var(--ptm-blue);\r\n  color: var(--ptm-text);\r\n  font: 13px/18px var(--ptm-font-title);\r\n  text-align: center;\r\n  cursor: pointer;\r\n  opacity: 0;\r\n  transition: opacity 0.2s, background 0.2s;\r\n}\r\n\r\n.ptm-mod-action--exclude {\r\n  left: -22px;\r\n  border-color: var(--ptm-red-border);\r\n  background: var(--ptm-red);\r\n}\r\n\r\n.item-mod:hover > .ptm-mod-action,\r\n.ptm-mod-action:focus-visible {\r\n  opacity: 1;\r\n}\r\n\r\n.ptm-mod-action--add:hover {\r\n  background: var(--ptm-blue-hover);\r\n}\r\n\r\n.ptm-mod-action--exclude:hover {\r\n  background: var(--ptm-red-hover);\r\n}\r\n\r\n.ptm-mod-flash-ok {\r\n  animation: ptm-mod-flash-ok 0.9s ease;\r\n}\r\n\r\n.ptm-mod-flash-fail {\r\n  animation: ptm-mod-flash-fail 0.9s ease;\r\n}\r\n\r\n@keyframes ptm-mod-flash-ok {\r\n  0%, 60% { background: var(--ptm-green); }\r\n  100% { background: transparent; }\r\n}\r\n\r\n@keyframes ptm-mod-flash-fail {\r\n  0%, 60% { background: var(--ptm-red-border); }\r\n  100% { background: transparent; }\r\n}\r\n\r\n@media (hover: none) {\r\n  .ptm-mod-action {\r\n    opacity: 0.6;\r\n  }\r\n}\r\n";
 
   // src/features/mod-actions/index.ts
   var t13 = createTranslator({
@@ -3609,236 +3611,236 @@ function __ptmPageScript() {
   };
 
   // src/features/layout/feature.css
-  var feature_default8 = `/*
- * Layout feature. Everything is scoped under html.ptm-layout (set while the feature runs).
- * html.ptm-layout-split is set by JS when there is room for two columns (see index.ts).
- * --ptm-layout-top is the document offset of the columns, measured by JS.
- */
-
-/* Always: full width, no background art, smaller header. */
-html.ptm-layout body {
-  background: #0e1115;
-}
-
-html.ptm-layout #trade {
-  max-width: 1920px;
-}
-
-/* Live tuning: header height comes from the logo, the status bar is absolute. */
-html.ptm-layout .logo a {
-  max-width: 110px;
-}
-
-/* Two columns: navigation on top, filters left, results right. */
-html.ptm-layout.ptm-layout-split #trade {
-  display: grid;
-  /* Results need 740px: icon 120 + item card (min-width 400 in the site CSS) + price 200 + scrollbar. */
-  grid-template-columns: minmax(440px, 1fr) minmax(740px, 1fr);
-  column-gap: 8px;
-  margin-bottom: 0;
-}
-
-html.ptm-layout.ptm-layout-split #trade > .navigation {
-  grid-column: 1 / -1;
-  grid-row: 1;
-}
-
-html.ptm-layout.ptm-layout-split #trade > .top,
-html.ptm-layout.ptm-layout-split #trade > #vue3-portal {
-  grid-row: 2;
-  /* Leaves room for the site footer (GGG copyright and legal links) below the columns. */
-  height: calc(100vh - var(--ptm-layout-top, 0px) - 48px);
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-html.ptm-layout.ptm-layout-split #trade > .top {
-  grid-column: 1;
-}
-
-/* The filter column narrows with the window and the results' needs: size its content by the
- * column, not the viewport. */
-html.ptm-layout.ptm-layout-split #trade > .top {
-  container: ptm-filters / inline-size;
-}
-
-/* Narrow column: one filter per row, and the site's fixed 271px selects leave their labels room
- * (otherwise "Item Category" is cut to "Item Cat"). Stat filter rows are left alone. */
-@container ptm-filters (max-width: 640px) {
-  html.ptm-layout.ptm-layout-split #trade .filter-group-body > .filter:not(.full-span) {
-    width: 100%;
-  }
-
-  /* 100% in the table row: the label keeps its text width, the select takes the rest and still
-   * ends at the row edge, where the site positions its dropdown arrow. */
-  html.ptm-layout.ptm-layout-split #trade .filter-property .filter-select {
-    width: 100% !important;
-  }
-}
-
-/* Vue sets display: contents inline on the portal; it must be a real box to be the right column. */
-html.ptm-layout.ptm-layout-split #trade > #vue3-portal {
-  display: block !important;
-  grid-column: 2;
-}
-
-/*
- * The site splits a result row 25/50/25 %, which squeezes the item card below its 400px minimum in
- * a half-width column, so the price overlapped it. Fixed side columns leave the card the rest.
- */
-html.ptm-layout.ptm-layout-split #vue3-portal .resultset > .row > .left {
-  width: 120px;
-}
-
-html.ptm-layout.ptm-layout-split #vue3-portal .resultset > .row > .middle {
-  width: calc(100% - 320px);
-}
-
-html.ptm-layout.ptm-layout-split #vue3-portal .resultset > .row > .right {
-  width: 200px;
-}
-
-/* Clearfix divs would take grid cells. */
-html.ptm-layout.ptm-layout-split #trade > .clear {
-  display: none;
-}
-
-/* Left column: one filter pane per row, item search above league and status. */
-html.ptm-layout.ptm-layout-split #trade .top .search-bar .search-left,
-html.ptm-layout.ptm-layout-split #trade .top .search-bar .search-right,
-html.ptm-layout.ptm-layout-split #trade .top .search-bar .search-advanced-pane {
-  width: 100%;
-}
-
-/*
- * The control bar (quick filters + Search / Clear / Live) stays at the bottom of the screen while
- * the filters scroll: in the left column in two-column mode, in the window otherwise.
- */
-html.ptm-layout #trade .top .controls {
-  position: sticky;
-  bottom: 0;
-  z-index: 3;
-  background: #000;
-  border-top: 1px solid #5a3806;
-  box-shadow: 0 -6px 12px rgba(0, 0, 0, 0.6);
-}
-
-html.ptm-layout.ptm-layout-split #trade .top .controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  padding: 0 6px 8px;
-}
-
-html.ptm-layout.ptm-layout-split #trade .top .controls > .ptm-qf {
-  flex: 1 0 100%;
-}
-
-/* Live search and Clear keep their label width, Search takes the rest. */
-html.ptm-layout.ptm-layout-split #trade .top .controls > .controls-left,
-html.ptm-layout.ptm-layout-split #trade .top .controls > .controls-right {
-  width: auto;
-  flex: 0 0 auto;
-  padding: 0;
-}
-
-html.ptm-layout.ptm-layout-split #trade .top .controls > .controls-center {
-  width: auto;
-  flex: 1 1 0;
-  padding: 0;
-}
-
-html.ptm-layout.ptm-layout-split #trade .top .controls > .clear {
-  display: none;
-}
-
-html.ptm-layout.ptm-layout-split #trade .top .controls .livesearch-btn {
-  white-space: nowrap;
-}
-
-html.ptm-layout.ptm-layout-split #trade .top .controls .search-btn {
-  width: 100%;
-  min-width: 0;
-}
-
-html.ptm-layout.ptm-layout-split #trade .top .controls .controls-right {
-  display: flex;
-  justify-content: flex-end;
-  gap: 4px;
-}
-
-html.ptm-layout.ptm-layout-split #trade .top .controls .clear-btn,
-html.ptm-layout.ptm-layout-split #trade .top .controls .toggle-search-btn {
-  min-width: 0;
-}
-
-/* The window does not scroll in split mode, so JS shows "Back to top" for the results column. */
-html.ptm-layout.ptm-layout-split #trade > .top-btn {
-  display: none !important;
-}
-
-html.ptm-layout.ptm-layout-split.ptm-layout-scrolled #trade > .top-btn {
-  display: block !important;
-  opacity: 1 !important;
-}
-
-/* Keep "Back to top" clear of our sidebar. */
-html.ptm-layout.ptm-sidebar-open #trade > .top-btn {
-  right: calc(var(--ptm-sidebar-width, 400px) + 20px);
-}
-
-/*
- * In two columns the filters always stay open: the site collapses them after every search, which
- * makes no sense when they have their own column. Its show/hide toggle is hidden for that reason.
- */
-html.ptm-layout.ptm-layout-split #trade .search-advanced.search-advanced-hidden,
-html.ptm-layout.ptm-layout-split #trade .search-advanced.search-advanced-hidden .search-advanced-items {
-  height: auto !important;
-  overflow: visible !important;
-}
-
-html.ptm-layout.ptm-layout-split #trade .controls .toggle-search-btn {
-  display: none;
-}
-
-/*
- * Row actions (Travel to Hideout / Direct Whisper, Ignore Player, Pin, "N similar") as one vertical
- * button group: same width, shared borders, no loose buttons. Status and IGN stay above as text.
- */
-html.ptm-layout #vue3-portal .resultset > .row .details .btns {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0;
-}
-
-html.ptm-layout #vue3-portal .resultset > .row .details .btns > .btn-group,
-html.ptm-layout #vue3-portal .resultset > .row .details .btns > span:has(> .btn) {
-  display: block;
-  float: none;
-  margin: 0;
-}
-
-html.ptm-layout #vue3-portal .resultset > .row .details .btns .btn {
-  display: block;
-  float: none;
-  width: 100%;
-  min-height: 26px;
-  margin: 0 0 -1px !important;
-  padding: 4px 8px;
-  border-radius: 0;
-  font-size: 13px;
-  line-height: 16px;
-  text-align: center;
-}
-
-html.ptm-layout #vue3-portal .resultset > .row .details .btns > .status,
-html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name {
-  margin-bottom: 4px;
-  text-align: center;
-}
+  var feature_default8 = `/*\r
+ * Layout feature. Everything is scoped under html.ptm-layout (set while the feature runs).\r
+ * html.ptm-layout-split is set by JS when there is room for two columns (see index.ts).\r
+ * --ptm-layout-top is the document offset of the columns, measured by JS.\r
+ */\r
+\r
+/* Always: full width, no background art, smaller header. */\r
+html.ptm-layout body {\r
+  background: #0e1115;\r
+}\r
+\r
+html.ptm-layout #trade {\r
+  max-width: 1920px;\r
+}\r
+\r
+/* Live tuning: header height comes from the logo, the status bar is absolute. */\r
+html.ptm-layout .logo a {\r
+  max-width: 110px;\r
+}\r
+\r
+/* Two columns: navigation on top, filters left, results right. */\r
+html.ptm-layout.ptm-layout-split #trade {\r
+  display: grid;\r
+  /* Results need 740px: icon 120 + item card (min-width 400 in the site CSS) + price 200 + scrollbar. */\r
+  grid-template-columns: minmax(440px, 1fr) minmax(740px, 1fr);\r
+  column-gap: 8px;\r
+  margin-bottom: 0;\r
+}\r
+\r
+html.ptm-layout.ptm-layout-split #trade > .navigation {\r
+  grid-column: 1 / -1;\r
+  grid-row: 1;\r
+}\r
+\r
+html.ptm-layout.ptm-layout-split #trade > .top,\r
+html.ptm-layout.ptm-layout-split #trade > #vue3-portal {\r
+  grid-row: 2;\r
+  /* Leaves room for the site footer (GGG copyright and legal links) below the columns. */\r
+  height: calc(100vh - var(--ptm-layout-top, 0px) - 48px);\r
+  min-height: 0;\r
+  overflow-y: auto;\r
+  overscroll-behavior: contain;\r
+}\r
+\r
+html.ptm-layout.ptm-layout-split #trade > .top {\r
+  grid-column: 1;\r
+}\r
+\r
+/* The filter column narrows with the window and the results' needs: size its content by the\r
+ * column, not the viewport. */\r
+html.ptm-layout.ptm-layout-split #trade > .top {\r
+  container: ptm-filters / inline-size;\r
+}\r
+\r
+/* Narrow column: one filter per row, and the site's fixed 271px selects leave their labels room\r
+ * (otherwise "Item Category" is cut to "Item Cat"). Stat filter rows are left alone. */\r
+@container ptm-filters (max-width: 640px) {\r
+  html.ptm-layout.ptm-layout-split #trade .filter-group-body > .filter:not(.full-span) {\r
+    width: 100%;\r
+  }\r
+\r
+  /* 100% in the table row: the label keeps its text width, the select takes the rest and still\r
+   * ends at the row edge, where the site positions its dropdown arrow. */\r
+  html.ptm-layout.ptm-layout-split #trade .filter-property .filter-select {\r
+    width: 100% !important;\r
+  }\r
+}\r
+\r
+/* Vue sets display: contents inline on the portal; it must be a real box to be the right column. */\r
+html.ptm-layout.ptm-layout-split #trade > #vue3-portal {\r
+  display: block !important;\r
+  grid-column: 2;\r
+}\r
+\r
+/*\r
+ * The site splits a result row 25/50/25 %, which squeezes the item card below its 400px minimum in\r
+ * a half-width column, so the price overlapped it. Fixed side columns leave the card the rest.\r
+ */\r
+html.ptm-layout.ptm-layout-split #vue3-portal .resultset > .row > .left {\r
+  width: 120px;\r
+}\r
+\r
+html.ptm-layout.ptm-layout-split #vue3-portal .resultset > .row > .middle {\r
+  width: calc(100% - 320px);\r
+}\r
+\r
+html.ptm-layout.ptm-layout-split #vue3-portal .resultset > .row > .right {\r
+  width: 200px;\r
+}\r
+\r
+/* Clearfix divs would take grid cells. */\r
+html.ptm-layout.ptm-layout-split #trade > .clear {\r
+  display: none;\r
+}\r
+\r
+/* Left column: one filter pane per row, item search above league and status. */\r
+html.ptm-layout.ptm-layout-split #trade .top .search-bar .search-left,\r
+html.ptm-layout.ptm-layout-split #trade .top .search-bar .search-right,\r
+html.ptm-layout.ptm-layout-split #trade .top .search-bar .search-advanced-pane {\r
+  width: 100%;\r
+}\r
+\r
+/*\r
+ * The control bar (quick filters + Search / Clear / Live) stays at the bottom of the screen while\r
+ * the filters scroll: in the left column in two-column mode, in the window otherwise.\r
+ */\r
+html.ptm-layout #trade .top .controls {\r
+  position: sticky;\r
+  bottom: 0;\r
+  z-index: 3;\r
+  background: #000;\r
+  border-top: 1px solid #5a3806;\r
+  box-shadow: 0 -6px 12px rgba(0, 0, 0, 0.6);\r
+}\r
+\r
+html.ptm-layout.ptm-layout-split #trade .top .controls {\r
+  display: flex;\r
+  flex-wrap: wrap;\r
+  align-items: center;\r
+  gap: 6px;\r
+  padding: 0 6px 8px;\r
+}\r
+\r
+html.ptm-layout.ptm-layout-split #trade .top .controls > .ptm-qf {\r
+  flex: 1 0 100%;\r
+}\r
+\r
+/* Live search and Clear keep their label width, Search takes the rest. */\r
+html.ptm-layout.ptm-layout-split #trade .top .controls > .controls-left,\r
+html.ptm-layout.ptm-layout-split #trade .top .controls > .controls-right {\r
+  width: auto;\r
+  flex: 0 0 auto;\r
+  padding: 0;\r
+}\r
+\r
+html.ptm-layout.ptm-layout-split #trade .top .controls > .controls-center {\r
+  width: auto;\r
+  flex: 1 1 0;\r
+  padding: 0;\r
+}\r
+\r
+html.ptm-layout.ptm-layout-split #trade .top .controls > .clear {\r
+  display: none;\r
+}\r
+\r
+html.ptm-layout.ptm-layout-split #trade .top .controls .livesearch-btn {\r
+  white-space: nowrap;\r
+}\r
+\r
+html.ptm-layout.ptm-layout-split #trade .top .controls .search-btn {\r
+  width: 100%;\r
+  min-width: 0;\r
+}\r
+\r
+html.ptm-layout.ptm-layout-split #trade .top .controls .controls-right {\r
+  display: flex;\r
+  justify-content: flex-end;\r
+  gap: 4px;\r
+}\r
+\r
+html.ptm-layout.ptm-layout-split #trade .top .controls .clear-btn,\r
+html.ptm-layout.ptm-layout-split #trade .top .controls .toggle-search-btn {\r
+  min-width: 0;\r
+}\r
+\r
+/* The window does not scroll in split mode, so JS shows "Back to top" for the results column. */\r
+html.ptm-layout.ptm-layout-split #trade > .top-btn {\r
+  display: none !important;\r
+}\r
+\r
+html.ptm-layout.ptm-layout-split.ptm-layout-scrolled #trade > .top-btn {\r
+  display: block !important;\r
+  opacity: 1 !important;\r
+}\r
+\r
+/* Keep "Back to top" clear of our sidebar. */\r
+html.ptm-layout.ptm-sidebar-open #trade > .top-btn {\r
+  right: calc(var(--ptm-sidebar-width, 400px) + 20px);\r
+}\r
+\r
+/*\r
+ * In two columns the filters always stay open: the site collapses them after every search, which\r
+ * makes no sense when they have their own column. Its show/hide toggle is hidden for that reason.\r
+ */\r
+html.ptm-layout.ptm-layout-split #trade .search-advanced.search-advanced-hidden,\r
+html.ptm-layout.ptm-layout-split #trade .search-advanced.search-advanced-hidden .search-advanced-items {\r
+  height: auto !important;\r
+  overflow: visible !important;\r
+}\r
+\r
+html.ptm-layout.ptm-layout-split #trade .controls .toggle-search-btn {\r
+  display: none;\r
+}\r
+\r
+/*\r
+ * Row actions (Travel to Hideout / Direct Whisper, Ignore Player, Pin, "N similar") as one vertical\r
+ * button group: same width, shared borders, no loose buttons. Status and IGN stay above as text.\r
+ */\r
+html.ptm-layout #vue3-portal .resultset > .row .details .btns {\r
+  display: flex;\r
+  flex-direction: column;\r
+  align-items: stretch;\r
+  gap: 0;\r
+}\r
+\r
+html.ptm-layout #vue3-portal .resultset > .row .details .btns > .btn-group,\r
+html.ptm-layout #vue3-portal .resultset > .row .details .btns > span:has(> .btn) {\r
+  display: block;\r
+  float: none;\r
+  margin: 0;\r
+}\r
+\r
+html.ptm-layout #vue3-portal .resultset > .row .details .btns .btn {\r
+  display: block;\r
+  float: none;\r
+  width: 100%;\r
+  min-height: 26px;\r
+  margin: 0 0 -1px !important;\r
+  padding: 4px 8px;\r
+  border-radius: 0;\r
+  font-size: 13px;\r
+  line-height: 16px;\r
+  text-align: center;\r
+}\r
+\r
+html.ptm-layout #vue3-portal .resultset > .row .details .btns > .status,\r
+html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name {\r
+  margin-bottom: 4px;\r
+  text-align: center;\r
+}\r
 `;
 
   // src/features/layout/index.ts
@@ -3905,147 +3907,147 @@ html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name 
   };
 
   // src/features/quick-filters/feature.css
-  var feature_default9 = `/* Two rows of button groups at the top of the site's control bar; buttons come from the UI kit. */
-.ptm-qf {
-  width: 100%;
-}
-
-.ptm-qf__strip {
-  display: grid;
-  gap: 5px;
-  padding: 6px 0;
-}
-
-.ptm-qf__row {
-  display: flex;
-  gap: 5px;
-}
-
-.ptm-qf__anchor {
-  position: relative;
-  display: flex;
-}
-
-.ptm-qf__anchor > .ptm-btn {
-  width: 100%;
-}
-
-.ptm-qf__btn {
-  position: relative;
-  overflow: hidden;
-}
-
-/* "No": red border and a red diagonal strike. */
-.ptm-qf__btn--no {
-  border-color: var(--ptm-red-border);
-  color: var(--ptm-beige);
-}
-
-.ptm-qf__btn--no::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top right, transparent calc(50% - 1px), #d02020 calc(50% - 1px), #d02020 calc(50% + 1px), transparent calc(50% + 1px));
-  pointer-events: none;
-}
-
-.ptm-qf__clear {
-  flex: none;
-  width: 30px;
-  padding: 0;
-}
-
-.ptm-qf__badge {
-  padding: 1px 4px;
-  background: rgba(0, 0, 0, 0.45);
-  font-family: var(--ptm-font-body);
-  font-size: 11px;
-  color: var(--ptm-text);
-}
-
-.ptm-qf__btn[data-rarity='normal'],
-.ptm-qf__option[data-rarity='normal'] { color: #c8c8c8; }
-.ptm-qf__btn[data-rarity='magic'],
-.ptm-qf__option[data-rarity='magic'] { color: #8888ff; }
-.ptm-qf__btn[data-rarity='rare'],
-.ptm-qf__option[data-rarity='rare'] { color: #ffff77; }
-.ptm-qf__btn[data-rarity^='unique'],
-.ptm-qf__option[data-rarity^='unique'] { color: #af6025; }
-
-/* Opens upwards: the search bar below may be sticky at the bottom of the screen. */
-.ptm-qf__pop {
-  position: absolute;
-  bottom: calc(100% + 4px);
-  left: 0;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 5px;
-  background: var(--ptm-surface);
-  border: 1px solid var(--ptm-gold-border);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-}
-
-.ptm-qf__pop--list {
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0;
-  min-width: 160px;
-}
-
-.ptm-qf__input {
-  width: 64px;
-  height: 26px;
-  padding: 0 6px;
-  border: 0;
-  background: var(--ptm-input);
-  color: var(--ptm-text);
-  font-family: var(--ptm-font-body);
-  font-size: 13px;
-}
-
-.ptm-qf__quick,
-.ptm-qf__option {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 26px;
-  min-width: 28px;
-  padding: 0 6px;
-  border: 1px solid var(--ptm-blue-border);
-  background: var(--ptm-blue);
-  color: var(--ptm-text);
-  font-family: var(--ptm-font-body);
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.ptm-qf__option {
-  justify-content: flex-start;
-  border: 0;
-  background: transparent;
-  font-family: var(--ptm-font-title);
-  font-size: 13px;
-  text-align: left;
-}
-
-.ptm-qf__quick:hover,
-.ptm-qf__option:hover,
-.ptm-qf__option[aria-checked='true'] {
-  background: rgba(138, 86, 9, 0.4);
-}
-
-/* Narrow filter column (container from the layout feature): chips wrap instead of being cut. */
-@container ptm-filters (max-width: 640px) {
-  .ptm-qf .ptm-btn-group {
-    flex-wrap: wrap;
-  }
-
-  .ptm-qf .ptm-btn-group > * {
-    flex: 1 0 auto;
-  }
-}
+  var feature_default9 = `/* Two rows of button groups at the top of the site's control bar; buttons come from the UI kit. */\r
+.ptm-qf {\r
+  width: 100%;\r
+}\r
+\r
+.ptm-qf__strip {\r
+  display: grid;\r
+  gap: 5px;\r
+  padding: 6px 0;\r
+}\r
+\r
+.ptm-qf__row {\r
+  display: flex;\r
+  gap: 5px;\r
+}\r
+\r
+.ptm-qf__anchor {\r
+  position: relative;\r
+  display: flex;\r
+}\r
+\r
+.ptm-qf__anchor > .ptm-btn {\r
+  width: 100%;\r
+}\r
+\r
+.ptm-qf__btn {\r
+  position: relative;\r
+  overflow: hidden;\r
+}\r
+\r
+/* "No": red border and a red diagonal strike. */\r
+.ptm-qf__btn--no {\r
+  border-color: var(--ptm-red-border);\r
+  color: var(--ptm-beige);\r
+}\r
+\r
+.ptm-qf__btn--no::after {\r
+  content: '';\r
+  position: absolute;\r
+  inset: 0;\r
+  background: linear-gradient(to top right, transparent calc(50% - 1px), #d02020 calc(50% - 1px), #d02020 calc(50% + 1px), transparent calc(50% + 1px));\r
+  pointer-events: none;\r
+}\r
+\r
+.ptm-qf__clear {\r
+  flex: none;\r
+  width: 30px;\r
+  padding: 0;\r
+}\r
+\r
+.ptm-qf__badge {\r
+  padding: 1px 4px;\r
+  background: rgba(0, 0, 0, 0.45);\r
+  font-family: var(--ptm-font-body);\r
+  font-size: 11px;\r
+  color: var(--ptm-text);\r
+}\r
+\r
+.ptm-qf__btn[data-rarity='normal'],\r
+.ptm-qf__option[data-rarity='normal'] { color: #c8c8c8; }\r
+.ptm-qf__btn[data-rarity='magic'],\r
+.ptm-qf__option[data-rarity='magic'] { color: #8888ff; }\r
+.ptm-qf__btn[data-rarity='rare'],\r
+.ptm-qf__option[data-rarity='rare'] { color: #ffff77; }\r
+.ptm-qf__btn[data-rarity^='unique'],\r
+.ptm-qf__option[data-rarity^='unique'] { color: #af6025; }\r
+\r
+/* Opens upwards: the search bar below may be sticky at the bottom of the screen. */\r
+.ptm-qf__pop {\r
+  position: absolute;\r
+  bottom: calc(100% + 4px);\r
+  left: 0;\r
+  z-index: 50;\r
+  display: flex;\r
+  align-items: center;\r
+  gap: 4px;\r
+  padding: 5px;\r
+  background: var(--ptm-surface);\r
+  border: 1px solid var(--ptm-gold-border);\r
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);\r
+}\r
+\r
+.ptm-qf__pop--list {\r
+  flex-direction: column;\r
+  align-items: stretch;\r
+  gap: 0;\r
+  min-width: 160px;\r
+}\r
+\r
+.ptm-qf__input {\r
+  width: 64px;\r
+  height: 26px;\r
+  padding: 0 6px;\r
+  border: 0;\r
+  background: var(--ptm-input);\r
+  color: var(--ptm-text);\r
+  font-family: var(--ptm-font-body);\r
+  font-size: 13px;\r
+}\r
+\r
+.ptm-qf__quick,\r
+.ptm-qf__option {\r
+  display: inline-flex;\r
+  align-items: center;\r
+  justify-content: center;\r
+  height: 26px;\r
+  min-width: 28px;\r
+  padding: 0 6px;\r
+  border: 1px solid var(--ptm-blue-border);\r
+  background: var(--ptm-blue);\r
+  color: var(--ptm-text);\r
+  font-family: var(--ptm-font-body);\r
+  font-size: 12px;\r
+  cursor: pointer;\r
+}\r
+\r
+.ptm-qf__option {\r
+  justify-content: flex-start;\r
+  border: 0;\r
+  background: transparent;\r
+  font-family: var(--ptm-font-title);\r
+  font-size: 13px;\r
+  text-align: left;\r
+}\r
+\r
+.ptm-qf__quick:hover,\r
+.ptm-qf__option:hover,\r
+.ptm-qf__option[aria-checked='true'] {\r
+  background: rgba(138, 86, 9, 0.4);\r
+}\r
+\r
+/* Narrow filter column (container from the layout feature): chips wrap instead of being cut. */\r
+@container ptm-filters (max-width: 640px) {\r
+  .ptm-qf .ptm-btn-group {\r
+    flex-wrap: wrap;\r
+  }\r
+\r
+  .ptm-qf .ptm-btn-group > * {\r
+    flex: 1 0 auto;\r
+  }\r
+}\r
 `;
 
   // src/features/quick-filters/model.ts
@@ -4387,7 +4389,7 @@ html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name 
   };
 
   // src/features/stat-favorites/feature.css
-  var feature_default10 = "/* Favorites float to the top via `order`; vue-multiselect sets display: inline-block inline. */\n.ptm-stat-fav-list {\n  display: flex !important;\n  flex-direction: column;\n}\n\n.ptm-stat-fav-list > li.ptm-stat-fav {\n  order: -1;\n}\n\n.ptm-stat-fav-list.ptm-stat-has-fav::before {\n  content: attr(data-ptm-fav-label);\n  order: -2;\n  padding: 4px 12px;\n  font: 13px var(--ptm-font-title);\n  color: var(--ptm-muted);\n}\n\n/* Separator after the favorites block, before the first group header. */\n.ptm-stat-fav-list.ptm-stat-has-fav::after {\n  content: '';\n  order: -1;\n  border-bottom: 1px solid var(--ptm-gold-border);\n}\n\n.multiselect__option:has(> .ptm-stat-star) {\n  position: relative;\n  padding-right: 32px;\n}\n\n.ptm-stat-star {\n  position: absolute;\n  top: 50%;\n  right: 4px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 24px;\n  height: 24px;\n  margin-top: -12px;\n  padding: 0;\n  border: 0;\n  background: none;\n  color: var(--ptm-muted);\n  cursor: pointer;\n  opacity: 0.45;\n  transition: opacity 0.2s, color 0.2s;\n}\n\n.multiselect__option:hover > .ptm-stat-star,\n.ptm-stat-star[aria-pressed='true'] {\n  opacity: 1;\n}\n\n.ptm-stat-star:hover {\n  color: var(--ptm-beige);\n}\n\n.ptm-stat-star[aria-pressed='true'] {\n  color: var(--ptm-gold-border);\n  filter: brightness(1.6);\n}\n\n.ptm-stat-star[aria-pressed='true'] svg {\n  fill: currentColor;\n}\n\n@media (hover: none) {\n  .ptm-stat-star {\n    opacity: 0.6;\n  }\n}\n";
+  var feature_default10 = "/* Favorites float to the top via `order`; vue-multiselect sets display: inline-block inline. */\r\n.ptm-stat-fav-list {\r\n  display: flex !important;\r\n  flex-direction: column;\r\n}\r\n\r\n.ptm-stat-fav-list > li.ptm-stat-fav {\r\n  order: -1;\r\n}\r\n\r\n.ptm-stat-fav-list.ptm-stat-has-fav::before {\r\n  content: attr(data-ptm-fav-label);\r\n  order: -2;\r\n  padding: 4px 12px;\r\n  font: 13px var(--ptm-font-title);\r\n  color: var(--ptm-muted);\r\n}\r\n\r\n/* Separator after the favorites block, before the first group header. */\r\n.ptm-stat-fav-list.ptm-stat-has-fav::after {\r\n  content: '';\r\n  order: -1;\r\n  border-bottom: 1px solid var(--ptm-gold-border);\r\n}\r\n\r\n.multiselect__option:has(> .ptm-stat-star) {\r\n  position: relative;\r\n  padding-right: 32px;\r\n}\r\n\r\n.ptm-stat-star {\r\n  position: absolute;\r\n  top: 50%;\r\n  right: 4px;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  width: 24px;\r\n  height: 24px;\r\n  margin-top: -12px;\r\n  padding: 0;\r\n  border: 0;\r\n  background: none;\r\n  color: var(--ptm-muted);\r\n  cursor: pointer;\r\n  opacity: 0.45;\r\n  transition: opacity 0.2s, color 0.2s;\r\n}\r\n\r\n.multiselect__option:hover > .ptm-stat-star,\r\n.ptm-stat-star[aria-pressed='true'] {\r\n  opacity: 1;\r\n}\r\n\r\n.ptm-stat-star:hover {\r\n  color: var(--ptm-beige);\r\n}\r\n\r\n.ptm-stat-star[aria-pressed='true'] {\r\n  color: var(--ptm-gold-border);\r\n  filter: brightness(1.6);\r\n}\r\n\r\n.ptm-stat-star[aria-pressed='true'] svg {\r\n  fill: currentColor;\r\n}\r\n\r\n@media (hover: none) {\r\n  .ptm-stat-star {\r\n    opacity: 0.6;\r\n  }\r\n}\r\n";
 
   // src/features/stat-favorites/index.ts
   var t17 = createTranslator({
@@ -4513,17 +4515,215 @@ html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name 
     start: start3
   };
 
+  // src/features/stat-presets/feature.css
+  var feature_default11 = `/* The site's "+ Add Stat Group" body is the right half (inline width 50%, margin-left 50%).
+   Our dropdown sits in the empty left half, same height, 6px gap. */
+.filter-body:has(> .ptm-stat-presets) {
+  position: relative;
+}
+
+.ptm-stat-presets {
+  position: absolute;
+  top: 0;
+  right: calc(100% + 6px);
+  bottom: 0;
+  width: calc(100% - 6px);
+}
+
+.ptm-stat-presets__menu {
+  height: 100%;
+}
+
+/* Looks like the site's multiselect: dark field, centred small caps, caret on the right. */
+.ptm-stat-presets .ptm-menu__trigger {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 30px;
+  padding: 0 32px;
+  border: 1px solid transparent;
+  background: var(--ptm-input);
+  color: var(--ptm-text);
+  font-family: var(--ptm-font-title) !important;
+  font-size: 15px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.ptm-stat-presets .ptm-menu__trigger > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ptm-stat-presets .ptm-menu__trigger > svg {
+  position: absolute;
+  right: 14px;
+  color: var(--ptm-muted);
+}
+
+.ptm-stat-presets .ptm-menu__trigger:hover,
+.ptm-stat-presets .ptm-menu__trigger[aria-expanded='true'] {
+  border-color: var(--ptm-gold-border);
+}
+
+.ptm-stat-presets .ptm-menu__list {
+  left: 0;
+  right: 0;
+  z-index: 60;
+  width: auto;
+  min-width: 260px;
+  max-height: 320px;
+  overflow-y: auto;
+  background: var(--ptm-surface);
+  border-color: var(--ptm-gold-border);
+}
+
+.ptm-stat-presets .ptm-menu__item {
+  padding: 7px 10px;
+  color: var(--ptm-beige);
+}
+
+.ptm-stat-presets .ptm-menu__item:hover {
+  background: linear-gradient(90deg, rgba(138, 86, 9, 0.4), transparent);
+}
+`;
+
+  // src/features/stat-presets/presets.ts
+  var PRESETS = [
+    { stat: "stat_3917489142", text: "#% increased Rarity of Items found" },
+    { stat: "stat_3981240776", text: "# to Spirit" },
+    { stat: "stat_2891184298", text: "#% increased Cast Speed" },
+    { stat: "stat_681332047", text: "#% increased Attack Speed" },
+    { stat: "stat_2974417149", text: "#% increased Spell Damage" },
+    { stat: "stat_2694482655", text: "#% to Critical Damage Bonus" },
+    { stat: "stat_983749596", text: "#% increased maximum Life" },
+    { stat: "stat_789117908", text: "#% increased Mana Regeneration Rate" },
+    { stat: "stat_803737631", text: "# to Accuracy Rating" },
+    { stat: "stat_124131830", text: "# to Level of all Spell Skills" },
+    { stat: "stat_2162097452", text: "# to Level of all Minion Skills" }
+  ];
+  var SOURCES = ["explicit", "implicit", "fractured", "crafted", "enchant", "rune", "desecrated"];
+  var WEIGHTED_SUM = "weight";
+  function presetText(preset, stats) {
+    for (const source of SOURCES) {
+      const entry = stats?.get(`${source}.${preset.stat}`);
+      if (entry) return entry.text;
+    }
+    return preset.text;
+  }
+  function presetGroup(preset, stats) {
+    const filters = SOURCES.map((source) => `${source}.${preset.stat}`).filter((id) => stats.has(id)).map((id) => ({ id, value: { weight: 1 } }));
+    return filters.length ? { type: WEIGHTED_SUM, filters, value: { min: 1 } } : null;
+  }
+
+  // src/features/stat-presets/index.tsx
+  var t18 = createTranslator({
+    de: {
+      label: "Stat-Vorlagen",
+      description: "Knopf neben „Add Stat Group“, der fertige Gruppen anlegt, z. B. Seltenheit aus allen Mod-Quellen als Weighted Sum.",
+      trigger: "+ Stat-Vorlage",
+      added: "Gruppe hinzugefügt: {text} ({n} Quellen)",
+      unknown: "Diesen Stat kennt die Trade-Seite nicht mehr: {text}"
+    },
+    en: {
+      label: "Stat group presets",
+      description: 'Button next to "Add Stat Group" that adds ready-made groups, e.g. rarity from every mod source as a weighted sum.',
+      trigger: "+ Stat Group Preset",
+      added: "Group added: {text} ({n} sources)",
+      unknown: "The trade site no longer knows this stat: {text}"
+    }
+  });
+  async function applyPreset(ctx, preset) {
+    try {
+      const stats = await ctx.data.stats();
+      const group = presetGroup(preset, stats);
+      const text2 = presetText(preset, stats);
+      if (!group) {
+        ctx.toast(t18("unknown", { text: text2 }), "warning");
+        return false;
+      }
+      const index = ((await ctx.bridge.getState()).stats ?? []).length;
+      await ctx.bridge.commit("pushStatGroup", { type: group.type, filters: group.filters });
+      await ctx.bridge.commit("setStatGroupValue", { group: index, value: group.value });
+      ctx.toast(t18("added", { text: text2, n: group.filters.length }));
+      return true;
+    } catch (error) {
+      log.error("stat-presets: adding the group failed", error);
+      ctx.toast(errorText(error), "error");
+      return false;
+    }
+  }
+  function PresetMenu({ stats, apply }) {
+    const map = useStore(stats);
+    return /* @__PURE__ */ u3(
+      Menu,
+      {
+        class: "ptm-stat-presets__menu",
+        label: t18("trigger"),
+        trigger: /* @__PURE__ */ u3(M, { children: [
+          /* @__PURE__ */ u3("span", { children: t18("trigger") }),
+          /* @__PURE__ */ u3(IconChevronDown, { size: 12 })
+        ] }),
+        items: PRESETS.map((preset) => ({ label: presetText(preset, map), onSelect: () => apply(preset) }))
+      }
+    );
+  }
+  function start4(ctx) {
+    const { doc } = ctx;
+    const stats = new Store(null);
+    let disposed = false;
+    let queue = Promise.resolve();
+    ctx.data.stats().then((map) => {
+      if (!disposed) stats.set(map);
+    }).catch(() => {
+    });
+    const apply = (preset) => {
+      queue = queue.then(async () => void await applyPreset(ctx, preset));
+    };
+    const host = doc.createElement("div");
+    host.className = "ptm-stat-presets";
+    const place = () => {
+      const body = doc.querySelector(sel.statGroupSelect)?.parentElement;
+      if (body && host.parentElement !== body) body.append(host);
+    };
+    const observer = new MutationObserver(place);
+    observer.observe(doc.body, { childList: true, subtree: true });
+    place();
+    G(/* @__PURE__ */ u3(PresetMenu, { stats, apply }), host);
+    return {
+      dispose() {
+        disposed = true;
+        observer.disconnect();
+        G(null, host);
+        host.remove();
+      }
+    };
+  }
+  var statPresetsFeature = {
+    id: "stat-presets",
+    label: () => t18("label"),
+    description: () => t18("description"),
+    toggleable: true,
+    defaultEnabled: true,
+    css: feature_default11,
+    start: start4
+  };
+
   // src/features/search-clear/feature.css
-  var feature_default11 = ".search-left:has(> .ptm-search-clear) {\n  position: relative;\n}\n\n.search-left:has(> .ptm-search-clear:not([hidden])) .multiselect__tags {\n  padding-right: 68px;\n}\n\n/* Left of the multiselect caret (40px wide). */\n.ptm-search-clear {\n  position: absolute;\n  top: 50%;\n  right: 40px;\n  z-index: 51;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 24px;\n  height: 24px;\n  margin-top: -12px;\n  padding: 0;\n  border: 0;\n  background: none;\n  color: var(--ptm-muted);\n  cursor: pointer;\n  transition: color 0.2s;\n}\n\n.ptm-search-clear[hidden] {\n  display: none;\n}\n\n.ptm-search-clear:hover,\n.ptm-search-clear:focus-visible {\n  color: var(--ptm-beige);\n}\n";
+  var feature_default12 = ".search-left:has(> .ptm-search-clear) {\r\n  position: relative;\r\n}\r\n\r\n.search-left:has(> .ptm-search-clear:not([hidden])) .multiselect__tags {\r\n  padding-right: 68px;\r\n}\r\n\r\n/* Left of the multiselect caret (40px wide). */\r\n.ptm-search-clear {\r\n  position: absolute;\r\n  top: 50%;\r\n  right: 40px;\r\n  z-index: 51;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  width: 24px;\r\n  height: 24px;\r\n  margin-top: -12px;\r\n  padding: 0;\r\n  border: 0;\r\n  background: none;\r\n  color: var(--ptm-muted);\r\n  cursor: pointer;\r\n  transition: color 0.2s;\r\n}\r\n\r\n.ptm-search-clear[hidden] {\r\n  display: none;\r\n}\r\n\r\n.ptm-search-clear:hover,\r\n.ptm-search-clear:focus-visible {\r\n  color: var(--ptm-beige);\r\n}\r\n";
 
   // src/features/search-clear/index.ts
-  var t18 = createTranslator({
+  var t19 = createTranslator({
     de: { label: "Suchfeld leeren", description: "Löschen-Knopf im Item-Suchfeld.", clear: "Item-Suche leeren" },
     en: { label: "Clear item search", description: "Clear button in the item search field.", clear: "Clear item search" }
   });
   var BUTTON2 = "ptm-search-clear";
   var CONTAINER = "#trade .search-bar .search-left";
-  async function start4(ctx) {
+  async function start5(ctx) {
     const { doc, bridge: bridge2 } = ctx;
     let hasItem = false;
     let stateRequest = 0;
@@ -4532,8 +4732,8 @@ html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name 
     button.type = "button";
     button.className = BUTTON2;
     button.hidden = true;
-    button.setAttribute("aria-label", t18("clear"));
-    button.title = t18("clear");
+    button.setAttribute("aria-label", t19("clear"));
+    button.title = t19("clear");
     G(g(IconClose, { size: 14 }), button);
     const update = () => {
       button.hidden = !hasItem && !input()?.value;
@@ -4589,16 +4789,16 @@ html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name 
   }
   var searchClearFeature = {
     id: "search-clear",
-    label: () => t18("label"),
-    description: () => t18("description"),
+    label: () => t19("label"),
+    description: () => t19("description"),
     toggleable: true,
     defaultEnabled: true,
-    css: feature_default11,
-    start: start4
+    css: feature_default12,
+    start: start5
   };
 
   // src/features/fuzzy-search/index.ts
-  var t19 = createTranslator({
+  var t20 = createTranslator({
     de: {
       label: "Immer unscharf suchen",
       description: "Setzt automatisch ~ vor die Eingabe in den Suchfeldern, damit die Seite unscharf sucht."
@@ -4609,7 +4809,7 @@ html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name 
     }
   });
   var ACTIVE = "multiselect--active";
-  function start5({ doc }) {
+  function start6({ doc }) {
     const handled = /* @__PURE__ */ new WeakSet();
     const observer = new MutationObserver((records) => {
       for (const { target } of records) {
@@ -4634,11 +4834,11 @@ html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name 
   }
   var fuzzySearchFeature = {
     id: "fuzzy-search",
-    label: () => t19("label"),
-    description: () => t19("description"),
+    label: () => t20("label"),
+    description: () => t20("description"),
     toggleable: true,
     defaultEnabled: true,
-    start: start5
+    start: start6
   };
 
   // src/features/index.ts
@@ -4655,6 +4855,7 @@ html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name 
     layoutFeature,
     quickFiltersFeature,
     statFavoritesFeature,
+    statPresetsFeature,
     searchClearFeature,
     fuzzySearchFeature
   ];
@@ -5042,7 +5243,7 @@ html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name 
         feature.id
       )) }),
       /* @__PURE__ */ u3("p", { class: "ptm-meta", children: [
-        t4("version", { version: "0.3.1" }),
+        t4("version", { version: "0.4.0" }),
         " ·",
         " ",
         /* @__PURE__ */ u3("a", { href: "https://github.com/maluramichael/poe2-trade-monkey", target: "_blank", rel: "noreferrer", children: t4("sourceCode") })
@@ -5157,7 +5358,7 @@ html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name 
   }
 
   // src/ui/core.css
-  var core_default = "/* Shared UI shell. Tokens and components follow DESIGN.md. Components are scoped to #ptm-root. */\n\n/* Tokens live on :root so feature styles inside the trade page can use them too. */\n:root {\n  --ptm-sidebar-width: 400px;\n  --ptm-focus: #c59a50;\n  --ptm-bg: rgba(10, 10, 10, 0.88);\n  --ptm-surface: #161616;\n  --ptm-input: #1e2124;\n  --ptm-blue: #0f304d;\n  --ptm-blue-hover: #133d62;\n  --ptm-blue-border: #4c4c7d;\n  --ptm-blue-line: rgba(76, 76, 125, 0.4);\n  --ptm-gold: #5a3806;\n  --ptm-gold-hover: #724708;\n  --ptm-gold-border: #8a5609;\n  --ptm-red: #5a0a09;\n  --ptm-red-hover: #710d0b;\n  --ptm-red-border: #6d2725;\n  --ptm-green: #4b7e42;\n  --ptm-green-border: #5e9954;\n  --ptm-yellow: #666521;\n  --ptm-yellow-border: #7a7921;\n  --ptm-text: #ffffff;\n  --ptm-beige: #fff8e1;\n  --ptm-muted: #a38d6d;\n  --ptm-menu: #373737;\n  --ptm-menu-border: #7a7a7a;\n  --ptm-font-title: FontinSmallCaps, FontinSmallcaps, Verdana, Arial, sans-serif;\n  --ptm-font-body: Verdana, Arial, Helvetica, sans-serif;\n}\n\n#ptm-root {\n  font-family: var(--ptm-font-body);\n  font-size: 13px;\n  color: var(--ptm-text);\n  line-height: 1.35;\n}\n\n#ptm-root *,\n#ptm-root *::before,\n#ptm-root *::after {\n  box-sizing: border-box;\n}\n\n#ptm-root button {\n  font: inherit;\n  color: inherit;\n}\n\n/* Page gets pushed left instead of being covered (Better Trading overlays it since PoE2 0.5). */\nhtml.ptm-sidebar-open body {\n  padding-right: var(--ptm-sidebar-width, 400px);\n}\n\n/* Animate only after boot, so the first paint does not slide. */\nhtml.ptm-ready body {\n  transition: padding-right 0.2s;\n}\n\n/* Small windows: the sidebar covers the page instead of squeezing it. */\n@media (max-width: 999px) {\n  html.ptm-sidebar-open body {\n    padding-right: 0;\n  }\n\n  /* Covering the page, so the page must not show through. */\n  html .ptm-sidebar {\n    background: #0a0a0a;\n  }\n}\n\n.ptm-icon {\n  flex: none;\n  vertical-align: middle;\n}\n\n/* Sidebar */\n\n.ptm-sidebar {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  width: min(var(--ptm-sidebar-width), 100vw);\n  z-index: 1000;\n  display: flex;\n  flex-direction: column;\n  padding: 5px 10px;\n  background: var(--ptm-bg);\n  border-left: 1px solid #000;\n  transition: right 0.2s;\n}\n\nhtml:not(.ptm-sidebar-open) .ptm-sidebar {\n  right: calc(-1 * var(--ptm-sidebar-width) - 2px);\n}\n\n.ptm-sidebar__header {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  padding: 4px 0 8px;\n}\n\n.ptm-sidebar__brand {\n  flex: 1;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  gap: 8px;\n  font-family: var(--ptm-font-title);\n  font-size: 20px;\n  color: var(--ptm-beige);\n  white-space: nowrap;\n}\n\n.ptm-sidebar__brand .ptm-logo {\n  transition: transform 0.2s;\n}\n\n.ptm-sidebar__brand:hover .ptm-logo {\n  transform: rotate(5deg);\n}\n\n.ptm-sidebar__panel {\n  flex: 1;\n  overflow-x: hidden;\n  overflow-y: auto;\n  padding: 8px 0;\n  scrollbar-width: thin;\n}\n\n.ptm-expand-tab {\n  position: fixed;\n  top: 50px;\n  right: 0;\n  z-index: 1000;\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  padding: 6px 8px 6px 10px;\n  border: 1px solid var(--ptm-blue-border);\n  border-right: 0;\n  background: var(--ptm-blue);\n  cursor: pointer;\n  transition: padding-left 0.2s, background-color 0.2s;\n}\n\n.ptm-expand-tab:hover {\n  padding-left: 15px;\n  background: var(--ptm-blue-hover);\n}\n\n/* Tabs */\n\n.ptm-tabs {\n  display: flex;\n}\n\n.ptm-tab {\n  flex: 1;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  gap: 5px;\n  padding: 6px 0;\n  border: 0;\n  border-bottom: 2px solid transparent;\n  background: none;\n  font-family: var(--ptm-font-title) !important;\n  font-size: 14px;\n  cursor: pointer;\n}\n\n.ptm-tab:hover {\n  background: rgba(90, 56, 6, 0.2);\n}\n\n.ptm-tab--active {\n  border-bottom-color: var(--ptm-gold-border);\n}\n\n/* Buttons: one height, one font, no wrapping. Variants only change colours. */\n\n.ptm-btn {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  gap: 6px;\n  height: 30px;\n  min-width: 0;\n  padding: 0 12px;\n  border: 1px solid;\n  border-radius: 0;\n  font-family: var(--ptm-font-title) !important;\n  font-size: 13px;\n  line-height: 1;\n  letter-spacing: 0.3px;\n  white-space: nowrap;\n  color: var(--ptm-text);\n  cursor: pointer;\n  transition: background-color 0.15s, border-color 0.15s, color 0.15s;\n  user-select: none;\n}\n\na.ptm-btn,\na.ptm-btn:hover {\n  text-decoration: none;\n}\n\n.ptm-btn > span {\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n\n:is(#ptm-root, .ptm-qf) :is(a, button, input, select, textarea, [tabindex]):focus-visible,\n:is(.ptm-mod-action, .ptm-stat-star, .ptm-search-clear, .ptm-pin-btn, .ptm-regroup-btn):focus-visible {\n  outline: 2px solid var(--ptm-focus, #c59a50);\n  outline-offset: 1px;\n}\n\n/* Joined buttons overlap their borders: lift the focused one so its ring stays visible. */\n.ptm-btn:focus-visible {\n  position: relative;\n  z-index: 1;\n}\n\n.ptm-btn:disabled {\n  opacity: 0.45;\n  cursor: default;\n}\n\n.ptm-btn--sm {\n  height: 26px;\n  padding: 0 9px;\n  font-size: 12px;\n  gap: 4px;\n}\n\n.ptm-btn--block {\n  display: flex;\n  width: 100%;\n}\n\n.ptm-btn--blue { background: var(--ptm-blue); border-color: var(--ptm-blue-border); }\n.ptm-btn--blue:hover:not(:disabled) { background: var(--ptm-blue-hover); }\n.ptm-btn--gold { background: var(--ptm-gold); border-color: var(--ptm-gold-border); }\n.ptm-btn--gold:hover:not(:disabled) { background: var(--ptm-gold-hover); }\n.ptm-btn--red { background: var(--ptm-red); border-color: var(--ptm-red-border); }\n.ptm-btn--red:hover:not(:disabled) { background: var(--ptm-red-hover); }\n.ptm-btn--plain { background: rgba(255, 255, 255, 0.03); border-color: #3a3a3a; color: var(--ptm-beige); }\n.ptm-btn--plain:hover:not(:disabled) { background: rgba(255, 255, 255, 0.08); border-color: var(--ptm-menu-border); }\n\n/* Pressed toggles look the same in every variant. */\n.ptm-btn.ptm-btn--active {\n  background: var(--ptm-gold);\n  border-color: #c59a50;\n  color: #f3d278;\n}\n\n/* Groups: buttons share borders, no gaps, outer group decides the width. */\n.ptm-btn-group {\n  display: inline-flex;\n  max-width: 100%;\n}\n\n.ptm-btn-group > * + * {\n  margin-left: -1px;\n}\n\n.ptm-btn-group > .ptm-btn:hover:not(:disabled) {\n  position: relative;\n  z-index: 1;\n}\n\n.ptm-btn-group--block {\n  display: flex;\n  width: 100%;\n}\n\n.ptm-btn-group--block > * {\n  flex: 1 1 0;\n  min-width: 0;\n}\n\n/* Stack of groups, e.g. a panel footer. */\n.ptm-actions {\n  display: grid;\n  gap: 6px;\n  margin-top: 10px;\n}\n\n/* The site's CSS shows hidden file inputs; keep [hidden] meaning hidden inside our UI. */\n#ptm-root [hidden] {\n  display: none !important;\n}\n\n.ptm-icon-btn {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  min-width: 24px;\n  height: 24px;\n  padding: 0 3px;\n  border: 0;\n  background: none;\n  color: rgba(255, 255, 255, 0.8);\n  cursor: pointer;\n}\n\n.ptm-icon-btn:hover {\n  color: #fff;\n}\n\n.ptm-toolbar {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: flex-end;\n  gap: 5px;\n  margin-bottom: 8px;\n}\n\n\n/* Menu */\n\n.ptm-menu {\n  position: relative;\n}\n\n.ptm-menu__list {\n  position: absolute;\n  top: 100%;\n  right: 0;\n  z-index: 10;\n  width: 200px;\n  margin: 2px 0 0;\n  padding: 0;\n  list-style: none;\n  background: var(--ptm-menu);\n  border: 1px solid var(--ptm-menu-border);\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);\n}\n\n.ptm-menu__item {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  width: 100%;\n  padding: 5px 8px;\n  border: 0;\n  background: none;\n  font-family: var(--ptm-font-body) !important;\n  font-size: 13px;\n  text-align: left;\n  cursor: pointer;\n}\n\n.ptm-menu__item:hover {\n  background: linear-gradient(90deg, var(--ptm-menu-border), transparent);\n}\n\n.ptm-menu__item--danger {\n  color: #ef7d7d !important;\n}\n\n/* Modal */\n\n.ptm-modal-overlay {\n  position: fixed;\n  inset: 0;\n  z-index: 1100;\n  display: flex;\n  align-items: flex-start;\n  justify-content: center;\n  padding-top: 8vh;\n  background: rgba(0, 0, 0, 0.6);\n  animation: ptm-fade-in 0.2s;\n}\n\n.ptm-modal {\n  max-height: 84vh;\n  display: flex;\n  flex-direction: column;\n  background: rgba(20, 20, 20, 0.95);\n  border: 1px solid var(--ptm-gold-border);\n  backdrop-filter: blur(2px);\n  animation: ptm-slide-in 0.2s;\n}\n\n.ptm-modal__header {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  padding: 10px 12px;\n  border-bottom: 1px solid var(--ptm-gold-border);\n}\n\n.ptm-modal__title {\n  flex: 1;\n  margin: 0;\n  font-family: var(--ptm-font-title);\n  font-size: 15px;\n  font-weight: normal;\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n  color: var(--ptm-beige);\n}\n\n.ptm-modal__body {\n  overflow-y: auto;\n  padding: 14px;\n  display: grid;\n  gap: 14px;\n}\n\n.ptm-modal__footer {\n  display: flex;\n  justify-content: flex-end;\n  gap: 5px;\n  padding: 10px 14px;\n  border-top: 1px solid rgba(138, 86, 9, 0.5);\n}\n\n/* Forms */\n\n.ptm-field {\n  display: grid;\n  gap: 6px;\n}\n\n.ptm-field__label {\n  font-family: var(--ptm-font-title);\n  font-size: 15px;\n  letter-spacing: 0.5px;\n  color: var(--ptm-beige);\n}\n\n.ptm-field__hint {\n  font-size: 11px;\n  color: rgba(255, 248, 225, 0.7);\n}\n\n.ptm-input {\n  width: 100%;\n  height: 30px;\n  padding: 0 8px;\n  border: 1px solid transparent;\n  background: var(--ptm-input);\n  color: var(--ptm-text);\n  font-family: var(--ptm-font-body);\n  font-size: 13px;\n}\n\n.ptm-input:focus {\n  outline: 2px solid var(--ptm-focus);\n  outline-offset: 0;\n  border-color: var(--ptm-gold-border);\n}\n\n.ptm-textarea {\n  height: 120px;\n  padding: 6px 8px;\n  resize: vertical;\n  font-family: Consolas, monospace;\n  font-size: 12px;\n}\n\n.ptm-checkbox {\n  display: flex;\n  align-items: flex-start;\n  gap: 8px;\n  cursor: pointer;\n}\n\n.ptm-checkbox input {\n  position: absolute;\n  opacity: 0;\n  pointer-events: none;\n}\n\n.ptm-checkbox__box {\n  flex: none;\n  position: relative;\n  width: 15px;\n  height: 15px;\n  margin-top: 1px;\n  border: 2px solid #8a6a3a;\n}\n\n.ptm-checkbox__box::after {\n  content: '';\n  position: absolute;\n  inset: 2px;\n  background: #fff;\n  transform: scale(0);\n  transition: transform 0.15s;\n}\n\n.ptm-checkbox input:checked + .ptm-checkbox__box::after {\n  transform: scale(1);\n}\n\n.ptm-checkbox input:focus-visible + .ptm-checkbox__box {\n  outline: 1px solid var(--ptm-gold-border);\n}\n\n.ptm-checkbox__text {\n  display: grid;\n  gap: 2px;\n}\n\n.ptm-checkbox__label {\n  font-family: var(--ptm-font-title);\n  font-size: 14px;\n  color: var(--ptm-beige);\n}\n\n.ptm-checkbox__description {\n  font-size: 11px;\n  color: var(--ptm-muted);\n}\n\n.ptm-settings-grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));\n  gap: 12px 18px;\n}\n\n.ptm-section-title {\n  margin: 4px 0 0;\n  font-family: var(--ptm-font-title);\n  font-size: 15px;\n  font-weight: normal;\n  color: var(--ptm-beige);\n  border-bottom: 1px solid rgba(138, 86, 9, 0.5);\n  padding-bottom: 4px;\n}\n\n/* Text, alerts, toasts */\n\n.ptm-text {\n  margin: 0;\n}\n\n.ptm-meta {\n  margin: 0;\n  font-size: 11px;\n  color: var(--ptm-muted);\n}\n\n.ptm-meta a {\n  color: var(--ptm-beige);\n}\n\n.ptm-empty {\n  margin: 12px 0;\n  padding: 8px;\n  color: var(--ptm-muted);\n  text-align: center;\n}\n\n.ptm-alert {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  padding: 8px;\n  border: 1px solid;\n}\n\n.ptm-alert--warning { background: var(--ptm-yellow); border-color: var(--ptm-yellow-border); }\n.ptm-alert--error { background: var(--ptm-red); border-color: var(--ptm-red-border); }\n.ptm-alert--success { background: var(--ptm-green); border-color: var(--ptm-green-border); }\n\n.ptm-toasts {\n  position: fixed;\n  right: 30px;\n  bottom: 20px;\n  z-index: 1200;\n  display: grid;\n  gap: 6px;\n  justify-items: end;\n}\n\n.ptm-toasts > div {\n  display: grid;\n  gap: 6px;\n  justify-items: end;\n}\n\nhtml.ptm-sidebar-open .ptm-toasts {\n  right: calc(var(--ptm-sidebar-width) + 20px);\n}\n\n.ptm-toast {\n  max-width: 340px;\n  padding: 8px 12px;\n  border: 1px solid;\n  text-align: left;\n  cursor: pointer;\n  animation: ptm-slide-in 0.2s;\n}\n\n.ptm-toast--success { background: var(--ptm-green); border-color: var(--ptm-green-border); }\n.ptm-toast--warning { background: var(--ptm-yellow); border-color: var(--ptm-yellow-border); }\n.ptm-toast--error { background: var(--ptm-red); border-color: var(--ptm-red-border); }\n\n@keyframes ptm-fade-in {\n  from { opacity: 0; }\n}\n\n@keyframes ptm-slide-in {\n  from { opacity: 0; transform: translateY(10px); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  #ptm-root *,\n  .ptm-modal-overlay,\n  .ptm-modal,\n  .ptm-toast,\n  .ptm-pin-glow,\n  .ptm-mod-flash-ok,\n  .ptm-mod-flash-fail,\n  .ptm-mod-action,\n  .ptm-stat-star,\n  html.ptm-ready body {\n    animation: none !important;\n    transition: none !important;\n  }\n}\n";
+  var core_default = "/* Shared UI shell. Tokens and components follow DESIGN.md. Components are scoped to #ptm-root. */\r\n\r\n/* Tokens live on :root so feature styles inside the trade page can use them too. */\r\n:root {\r\n  --ptm-sidebar-width: 400px;\r\n  --ptm-focus: #c59a50;\r\n  --ptm-bg: rgba(10, 10, 10, 0.88);\r\n  --ptm-surface: #161616;\r\n  --ptm-input: #1e2124;\r\n  --ptm-blue: #0f304d;\r\n  --ptm-blue-hover: #133d62;\r\n  --ptm-blue-border: #4c4c7d;\r\n  --ptm-blue-line: rgba(76, 76, 125, 0.4);\r\n  --ptm-gold: #5a3806;\r\n  --ptm-gold-hover: #724708;\r\n  --ptm-gold-border: #8a5609;\r\n  --ptm-red: #5a0a09;\r\n  --ptm-red-hover: #710d0b;\r\n  --ptm-red-border: #6d2725;\r\n  --ptm-green: #4b7e42;\r\n  --ptm-green-border: #5e9954;\r\n  --ptm-yellow: #666521;\r\n  --ptm-yellow-border: #7a7921;\r\n  --ptm-text: #ffffff;\r\n  --ptm-beige: #fff8e1;\r\n  --ptm-muted: #a38d6d;\r\n  --ptm-menu: #373737;\r\n  --ptm-menu-border: #7a7a7a;\r\n  --ptm-font-title: FontinSmallCaps, FontinSmallcaps, Verdana, Arial, sans-serif;\r\n  --ptm-font-body: Verdana, Arial, Helvetica, sans-serif;\r\n}\r\n\r\n#ptm-root {\r\n  font-family: var(--ptm-font-body);\r\n  font-size: 13px;\r\n  color: var(--ptm-text);\r\n  line-height: 1.35;\r\n}\r\n\r\n#ptm-root *,\r\n#ptm-root *::before,\r\n#ptm-root *::after {\r\n  box-sizing: border-box;\r\n}\r\n\r\n#ptm-root button {\r\n  font: inherit;\r\n  color: inherit;\r\n}\r\n\r\n/* Page gets pushed left instead of being covered (Better Trading overlays it since PoE2 0.5). */\r\nhtml.ptm-sidebar-open body {\r\n  padding-right: var(--ptm-sidebar-width, 400px);\r\n}\r\n\r\n/* Animate only after boot, so the first paint does not slide. */\r\nhtml.ptm-ready body {\r\n  transition: padding-right 0.2s;\r\n}\r\n\r\n/* Small windows: the sidebar covers the page instead of squeezing it. */\r\n@media (max-width: 999px) {\r\n  html.ptm-sidebar-open body {\r\n    padding-right: 0;\r\n  }\r\n\r\n  /* Covering the page, so the page must not show through. */\r\n  html .ptm-sidebar {\r\n    background: #0a0a0a;\r\n  }\r\n}\r\n\r\n.ptm-icon {\r\n  flex: none;\r\n  vertical-align: middle;\r\n}\r\n\r\n/* Sidebar */\r\n\r\n.ptm-sidebar {\r\n  position: fixed;\r\n  top: 0;\r\n  right: 0;\r\n  bottom: 0;\r\n  width: min(var(--ptm-sidebar-width), 100vw);\r\n  z-index: 1000;\r\n  display: flex;\r\n  flex-direction: column;\r\n  padding: 5px 10px;\r\n  background: var(--ptm-bg);\r\n  border-left: 1px solid #000;\r\n  transition: right 0.2s;\r\n}\r\n\r\nhtml:not(.ptm-sidebar-open) .ptm-sidebar {\r\n  right: calc(-1 * var(--ptm-sidebar-width) - 2px);\r\n}\r\n\r\n.ptm-sidebar__header {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  padding: 4px 0 8px;\r\n}\r\n\r\n.ptm-sidebar__brand {\r\n  flex: 1;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  gap: 8px;\r\n  font-family: var(--ptm-font-title);\r\n  font-size: 20px;\r\n  color: var(--ptm-beige);\r\n  white-space: nowrap;\r\n}\r\n\r\n.ptm-sidebar__brand .ptm-logo {\r\n  transition: transform 0.2s;\r\n}\r\n\r\n.ptm-sidebar__brand:hover .ptm-logo {\r\n  transform: rotate(5deg);\r\n}\r\n\r\n.ptm-sidebar__panel {\r\n  flex: 1;\r\n  overflow-x: hidden;\r\n  overflow-y: auto;\r\n  padding: 8px 0;\r\n  scrollbar-width: thin;\r\n}\r\n\r\n.ptm-expand-tab {\r\n  position: fixed;\r\n  top: 50px;\r\n  right: 0;\r\n  z-index: 1000;\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 6px;\r\n  padding: 6px 8px 6px 10px;\r\n  border: 1px solid var(--ptm-blue-border);\r\n  border-right: 0;\r\n  background: var(--ptm-blue);\r\n  cursor: pointer;\r\n  transition: padding-left 0.2s, background-color 0.2s;\r\n}\r\n\r\n.ptm-expand-tab:hover {\r\n  padding-left: 15px;\r\n  background: var(--ptm-blue-hover);\r\n}\r\n\r\n/* Tabs */\r\n\r\n.ptm-tabs {\r\n  display: flex;\r\n}\r\n\r\n.ptm-tab {\r\n  flex: 1;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  gap: 5px;\r\n  padding: 6px 0;\r\n  border: 0;\r\n  border-bottom: 2px solid transparent;\r\n  background: none;\r\n  font-family: var(--ptm-font-title) !important;\r\n  font-size: 14px;\r\n  cursor: pointer;\r\n}\r\n\r\n.ptm-tab:hover {\r\n  background: rgba(90, 56, 6, 0.2);\r\n}\r\n\r\n.ptm-tab--active {\r\n  border-bottom-color: var(--ptm-gold-border);\r\n}\r\n\r\n/* Buttons: one height, one font, no wrapping. Variants only change colours. */\r\n\r\n.ptm-btn {\r\n  display: inline-flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  gap: 6px;\r\n  height: 30px;\r\n  min-width: 0;\r\n  padding: 0 12px;\r\n  border: 1px solid;\r\n  border-radius: 0;\r\n  font-family: var(--ptm-font-title) !important;\r\n  font-size: 13px;\r\n  line-height: 1;\r\n  letter-spacing: 0.3px;\r\n  white-space: nowrap;\r\n  color: var(--ptm-text);\r\n  cursor: pointer;\r\n  transition: background-color 0.15s, border-color 0.15s, color 0.15s;\r\n  user-select: none;\r\n}\r\n\r\na.ptm-btn,\r\na.ptm-btn:hover {\r\n  text-decoration: none;\r\n}\r\n\r\n.ptm-btn > span {\r\n  overflow: hidden;\r\n  text-overflow: ellipsis;\r\n}\r\n\r\n:is(#ptm-root, .ptm-qf) :is(a, button, input, select, textarea, [tabindex]):focus-visible,\r\n:is(.ptm-mod-action, .ptm-stat-star, .ptm-search-clear, .ptm-pin-btn, .ptm-regroup-btn, .ptm-stat-presets button):focus-visible {\r\n  outline: 2px solid var(--ptm-focus, #c59a50);\r\n  outline-offset: 1px;\r\n}\r\n\r\n/* Joined buttons overlap their borders: lift the focused one so its ring stays visible. */\r\n.ptm-btn:focus-visible {\r\n  position: relative;\r\n  z-index: 1;\r\n}\r\n\r\n.ptm-btn:disabled {\r\n  opacity: 0.45;\r\n  cursor: default;\r\n}\r\n\r\n.ptm-btn--sm {\r\n  height: 26px;\r\n  padding: 0 9px;\r\n  font-size: 12px;\r\n  gap: 4px;\r\n}\r\n\r\n.ptm-btn--block {\r\n  display: flex;\r\n  width: 100%;\r\n}\r\n\r\n.ptm-btn--blue { background: var(--ptm-blue); border-color: var(--ptm-blue-border); }\r\n.ptm-btn--blue:hover:not(:disabled) { background: var(--ptm-blue-hover); }\r\n.ptm-btn--gold { background: var(--ptm-gold); border-color: var(--ptm-gold-border); }\r\n.ptm-btn--gold:hover:not(:disabled) { background: var(--ptm-gold-hover); }\r\n.ptm-btn--red { background: var(--ptm-red); border-color: var(--ptm-red-border); }\r\n.ptm-btn--red:hover:not(:disabled) { background: var(--ptm-red-hover); }\r\n.ptm-btn--plain { background: rgba(255, 255, 255, 0.03); border-color: #3a3a3a; color: var(--ptm-beige); }\r\n.ptm-btn--plain:hover:not(:disabled) { background: rgba(255, 255, 255, 0.08); border-color: var(--ptm-menu-border); }\r\n\r\n/* Pressed toggles look the same in every variant. */\r\n.ptm-btn.ptm-btn--active {\r\n  background: var(--ptm-gold);\r\n  border-color: #c59a50;\r\n  color: #f3d278;\r\n}\r\n\r\n/* Groups: buttons share borders, no gaps, outer group decides the width. */\r\n.ptm-btn-group {\r\n  display: inline-flex;\r\n  max-width: 100%;\r\n}\r\n\r\n.ptm-btn-group > * + * {\r\n  margin-left: -1px;\r\n}\r\n\r\n.ptm-btn-group > .ptm-btn:hover:not(:disabled) {\r\n  position: relative;\r\n  z-index: 1;\r\n}\r\n\r\n.ptm-btn-group--block {\r\n  display: flex;\r\n  width: 100%;\r\n}\r\n\r\n.ptm-btn-group--block > * {\r\n  flex: 1 1 0;\r\n  min-width: 0;\r\n}\r\n\r\n/* Stack of groups, e.g. a panel footer. */\r\n.ptm-actions {\r\n  display: grid;\r\n  gap: 6px;\r\n  margin-top: 10px;\r\n}\r\n\r\n/* The site's CSS shows hidden file inputs; keep [hidden] meaning hidden inside our UI. */\r\n#ptm-root [hidden] {\r\n  display: none !important;\r\n}\r\n\r\n.ptm-icon-btn {\r\n  display: inline-flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  min-width: 24px;\r\n  height: 24px;\r\n  padding: 0 3px;\r\n  border: 0;\r\n  background: none;\r\n  color: rgba(255, 255, 255, 0.8);\r\n  cursor: pointer;\r\n}\r\n\r\n.ptm-icon-btn:hover {\r\n  color: #fff;\r\n}\r\n\r\n.ptm-toolbar {\r\n  display: flex;\r\n  flex-wrap: wrap;\r\n  justify-content: flex-end;\r\n  gap: 5px;\r\n  margin-bottom: 8px;\r\n}\r\n\r\n\r\n/* Menu */\r\n\r\n.ptm-menu {\r\n  position: relative;\r\n}\r\n\r\n.ptm-menu__list {\r\n  position: absolute;\r\n  top: 100%;\r\n  right: 0;\r\n  z-index: 10;\r\n  width: 200px;\r\n  margin: 2px 0 0;\r\n  padding: 0;\r\n  list-style: none;\r\n  background: var(--ptm-menu);\r\n  border: 1px solid var(--ptm-menu-border);\r\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);\r\n}\r\n\r\n.ptm-menu__item {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  width: 100%;\r\n  padding: 5px 8px;\r\n  border: 0;\r\n  background: none;\r\n  font-family: var(--ptm-font-body) !important;\r\n  font-size: 13px;\r\n  text-align: left;\r\n  cursor: pointer;\r\n}\r\n\r\n.ptm-menu__item:hover {\r\n  background: linear-gradient(90deg, var(--ptm-menu-border), transparent);\r\n}\r\n\r\n.ptm-menu__item--danger {\r\n  color: #ef7d7d !important;\r\n}\r\n\r\n/* Modal */\r\n\r\n.ptm-modal-overlay {\r\n  position: fixed;\r\n  inset: 0;\r\n  z-index: 1100;\r\n  display: flex;\r\n  align-items: flex-start;\r\n  justify-content: center;\r\n  padding-top: 8vh;\r\n  background: rgba(0, 0, 0, 0.6);\r\n  animation: ptm-fade-in 0.2s;\r\n}\r\n\r\n.ptm-modal {\r\n  max-height: 84vh;\r\n  display: flex;\r\n  flex-direction: column;\r\n  background: rgba(20, 20, 20, 0.95);\r\n  border: 1px solid var(--ptm-gold-border);\r\n  backdrop-filter: blur(2px);\r\n  animation: ptm-slide-in 0.2s;\r\n}\r\n\r\n.ptm-modal__header {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 10px;\r\n  padding: 10px 12px;\r\n  border-bottom: 1px solid var(--ptm-gold-border);\r\n}\r\n\r\n.ptm-modal__title {\r\n  flex: 1;\r\n  margin: 0;\r\n  font-family: var(--ptm-font-title);\r\n  font-size: 15px;\r\n  font-weight: normal;\r\n  text-transform: uppercase;\r\n  letter-spacing: 0.5px;\r\n  color: var(--ptm-beige);\r\n}\r\n\r\n.ptm-modal__body {\r\n  overflow-y: auto;\r\n  padding: 14px;\r\n  display: grid;\r\n  gap: 14px;\r\n}\r\n\r\n.ptm-modal__footer {\r\n  display: flex;\r\n  justify-content: flex-end;\r\n  gap: 5px;\r\n  padding: 10px 14px;\r\n  border-top: 1px solid rgba(138, 86, 9, 0.5);\r\n}\r\n\r\n/* Forms */\r\n\r\n.ptm-field {\r\n  display: grid;\r\n  gap: 6px;\r\n}\r\n\r\n.ptm-field__label {\r\n  font-family: var(--ptm-font-title);\r\n  font-size: 15px;\r\n  letter-spacing: 0.5px;\r\n  color: var(--ptm-beige);\r\n}\r\n\r\n.ptm-field__hint {\r\n  font-size: 11px;\r\n  color: rgba(255, 248, 225, 0.7);\r\n}\r\n\r\n.ptm-input {\r\n  width: 100%;\r\n  height: 30px;\r\n  padding: 0 8px;\r\n  border: 1px solid transparent;\r\n  background: var(--ptm-input);\r\n  color: var(--ptm-text);\r\n  font-family: var(--ptm-font-body);\r\n  font-size: 13px;\r\n}\r\n\r\n.ptm-input:focus {\r\n  outline: 2px solid var(--ptm-focus);\r\n  outline-offset: 0;\r\n  border-color: var(--ptm-gold-border);\r\n}\r\n\r\n.ptm-textarea {\r\n  height: 120px;\r\n  padding: 6px 8px;\r\n  resize: vertical;\r\n  font-family: Consolas, monospace;\r\n  font-size: 12px;\r\n}\r\n\r\n.ptm-checkbox {\r\n  display: flex;\r\n  align-items: flex-start;\r\n  gap: 8px;\r\n  cursor: pointer;\r\n}\r\n\r\n.ptm-checkbox input {\r\n  position: absolute;\r\n  opacity: 0;\r\n  pointer-events: none;\r\n}\r\n\r\n.ptm-checkbox__box {\r\n  flex: none;\r\n  position: relative;\r\n  width: 15px;\r\n  height: 15px;\r\n  margin-top: 1px;\r\n  border: 2px solid #8a6a3a;\r\n}\r\n\r\n.ptm-checkbox__box::after {\r\n  content: '';\r\n  position: absolute;\r\n  inset: 2px;\r\n  background: #fff;\r\n  transform: scale(0);\r\n  transition: transform 0.15s;\r\n}\r\n\r\n.ptm-checkbox input:checked + .ptm-checkbox__box::after {\r\n  transform: scale(1);\r\n}\r\n\r\n.ptm-checkbox input:focus-visible + .ptm-checkbox__box {\r\n  outline: 1px solid var(--ptm-gold-border);\r\n}\r\n\r\n.ptm-checkbox__text {\r\n  display: grid;\r\n  gap: 2px;\r\n}\r\n\r\n.ptm-checkbox__label {\r\n  font-family: var(--ptm-font-title);\r\n  font-size: 14px;\r\n  color: var(--ptm-beige);\r\n}\r\n\r\n.ptm-checkbox__description {\r\n  font-size: 11px;\r\n  color: var(--ptm-muted);\r\n}\r\n\r\n.ptm-settings-grid {\r\n  display: grid;\r\n  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));\r\n  gap: 12px 18px;\r\n}\r\n\r\n.ptm-section-title {\r\n  margin: 4px 0 0;\r\n  font-family: var(--ptm-font-title);\r\n  font-size: 15px;\r\n  font-weight: normal;\r\n  color: var(--ptm-beige);\r\n  border-bottom: 1px solid rgba(138, 86, 9, 0.5);\r\n  padding-bottom: 4px;\r\n}\r\n\r\n/* Text, alerts, toasts */\r\n\r\n.ptm-text {\r\n  margin: 0;\r\n}\r\n\r\n.ptm-meta {\r\n  margin: 0;\r\n  font-size: 11px;\r\n  color: var(--ptm-muted);\r\n}\r\n\r\n.ptm-meta a {\r\n  color: var(--ptm-beige);\r\n}\r\n\r\n.ptm-empty {\r\n  margin: 12px 0;\r\n  padding: 8px;\r\n  color: var(--ptm-muted);\r\n  text-align: center;\r\n}\r\n\r\n.ptm-alert {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 6px;\r\n  padding: 8px;\r\n  border: 1px solid;\r\n}\r\n\r\n.ptm-alert--warning { background: var(--ptm-yellow); border-color: var(--ptm-yellow-border); }\r\n.ptm-alert--error { background: var(--ptm-red); border-color: var(--ptm-red-border); }\r\n.ptm-alert--success { background: var(--ptm-green); border-color: var(--ptm-green-border); }\r\n\r\n.ptm-toasts {\r\n  position: fixed;\r\n  right: 30px;\r\n  bottom: 20px;\r\n  z-index: 1200;\r\n  display: grid;\r\n  gap: 6px;\r\n  justify-items: end;\r\n}\r\n\r\n.ptm-toasts > div {\r\n  display: grid;\r\n  gap: 6px;\r\n  justify-items: end;\r\n}\r\n\r\nhtml.ptm-sidebar-open .ptm-toasts {\r\n  right: calc(var(--ptm-sidebar-width) + 20px);\r\n}\r\n\r\n.ptm-toast {\r\n  max-width: 340px;\r\n  padding: 8px 12px;\r\n  border: 1px solid;\r\n  text-align: left;\r\n  cursor: pointer;\r\n  animation: ptm-slide-in 0.2s;\r\n}\r\n\r\n.ptm-toast--success { background: var(--ptm-green); border-color: var(--ptm-green-border); }\r\n.ptm-toast--warning { background: var(--ptm-yellow); border-color: var(--ptm-yellow-border); }\r\n.ptm-toast--error { background: var(--ptm-red); border-color: var(--ptm-red-border); }\r\n\r\n@keyframes ptm-fade-in {\r\n  from { opacity: 0; }\r\n}\r\n\r\n@keyframes ptm-slide-in {\r\n  from { opacity: 0; transform: translateY(10px); }\r\n}\r\n\r\n@media (prefers-reduced-motion: reduce) {\r\n  #ptm-root *,\r\n  .ptm-modal-overlay,\r\n  .ptm-modal,\r\n  .ptm-toast,\r\n  .ptm-pin-glow,\r\n  .ptm-mod-flash-ok,\r\n  .ptm-mod-flash-fail,\r\n  .ptm-mod-action,\r\n  .ptm-stat-star,\r\n  html.ptm-ready body {\r\n    animation: none !important;\r\n    transition: none !important;\r\n  }\r\n}\r\n";
 
   // src/main.tsx
   var bridge = new PageBridge(window);
@@ -5215,7 +5416,7 @@ html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name 
       void host.restart();
     });
     document.documentElement.classList.add("ptm-ready");
-    log.info(`v${"0.3.1"} ready with ${features.length} features`);
+    log.info(`v${"0.4.0"} ready with ${features.length} features`);
   }
   function waitForApp() {
     return Promise.race([bridge.whenReady().then(() => true), delay(3e4).then(() => false)]);

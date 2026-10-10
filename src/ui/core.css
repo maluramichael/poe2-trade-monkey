@@ -215,7 +215,7 @@ a.ptm-btn:hover {
 }
 
 :is(#ptm-root, .ptm-qf) :is(a, button, input, select, textarea, [tabindex]):focus-visible,
-:is(.ptm-mod-action, .ptm-stat-star, .ptm-search-clear, .ptm-pin-btn, .ptm-regroup-btn):focus-visible {
+:is(.ptm-mod-action, .ptm-stat-star, .ptm-search-clear, .ptm-pin-btn, .ptm-regroup-btn, .ptm-stat-presets button):focus-visible {
   outline: 2px solid var(--ptm-focus, #c59a50);
   outline-offset: 1px;
 }

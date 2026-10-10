@@ -86,6 +86,9 @@ Every feature can be switched off in the settings (gear icon in the sidebar).
 - Quick filter bar: corrupted, fractured, desecrated, mirrored, sanctified, identified,
   item level, quality, level, rune sockets, rarity.
 - Star stats in the stat filter dropdown to keep them on top.
+- Stat group presets next to "Add Stat Group": one click adds a weighted sum over every mod
+  source (explicit, implicit, fractured, crafted, enchant, augment, desecrated) for stats without
+  a pseudo stat, e.g. item rarity, spirit or cast speed.
 - Clear button in the item search field.
 
 ![Quick filter bar above Search and Clear](docs/screenshots/quick-filters.png)

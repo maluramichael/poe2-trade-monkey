@@ -127,3 +127,18 @@ test('fuzzy search: opening the item search adds ~ and selects the rest', async 
   await expect(input).toHaveValue('~Gold');
   expect(await input.evaluate((el: HTMLInputElement) => [el.selectionStart, el.selectionEnd])).toEqual([1, 5]);
 });
+
+test('stat presets: rarity adds a weighted sum group over every source', async ({ page }) => {
+  await open(page);
+  const presets = page.locator('.ptm-stat-presets');
+  await presets.getByRole('button', { name: '+ Stat Group Preset' }).click();
+  await presets.getByRole('button', { name: '#% increased Rarity of Items found' }).click();
+  await expect.poll(async () => (await persistent(page)).stats.length).toBe(2);
+  const group = (await persistent(page)).stats[1];
+  expect(group.type).toBe('weight');
+  expect(group.value).toEqual({ min: 1 });
+  expect(group.filters.map((f: { id: string }) => f.id.split('.')[0])).toEqual([
+    'explicit', 'implicit', 'fractured', 'crafted', 'enchant', 'rune', 'desecrated',
+  ]);
+  expect(group.filters.every((f: { value: unknown }) => JSON.stringify(f.value) === '{"weight":1}')).toBe(true);
+});

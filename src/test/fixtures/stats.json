@@ -92,6 +92,61 @@
      "type": "implicit"
     }
    ]
+  },
+  {
+   "id": "fractured",
+   "label": "Fractured",
+   "entries": [
+    {
+     "id": "fractured.stat_3917489142",
+     "text": "#% increased Rarity of Items found",
+     "type": "fractured"
+    }
+   ]
+  },
+  {
+   "id": "crafted",
+   "label": "Crafted",
+   "entries": [
+    {
+     "id": "crafted.stat_3917489142",
+     "text": "#% increased Rarity of Items found",
+     "type": "crafted"
+    }
+   ]
+  },
+  {
+   "id": "enchant",
+   "label": "Enchant",
+   "entries": [
+    {
+     "id": "enchant.stat_3917489142",
+     "text": "#% increased Rarity of Items found",
+     "type": "enchant"
+    }
+   ]
+  },
+  {
+   "id": "rune",
+   "label": "Augment",
+   "entries": [
+    {
+     "id": "rune.stat_3917489142",
+     "text": "#% increased Rarity of Items found",
+     "type": "augment"
+    }
+   ]
+  },
+  {
+   "id": "desecrated",
+   "label": "Desecrated",
+   "entries": [
+    {
+     "id": "desecrated.stat_3917489142",
+     "text": "#% increased Rarity of Items found",
+     "type": "desecrated"
+    }
+   ]
   }
  ]
 }

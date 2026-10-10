@@ -47,6 +47,7 @@ const pageScript = `(() => {
       else t.stats[e.group].filters.push(e.value);
     },
     pushStatGroup(t, e) { t.stats.push({ filters: e.filters || [], type: e.type }); },
+    setStatGroupValue(t, n) { if (isEmpty(n.value)) delete t.stats[n.group].value; else t.stats[n.group].value = n.value; },
   };
   const subscribers = [];
   const $store = {

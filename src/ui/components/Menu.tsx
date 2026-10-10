@@ -13,8 +13,14 @@ export interface MenuItem {
 /**
  * "…" button that opens a small list of actions below it (disclosure pattern). Arrow keys, Home and
  * End move between entries. Closes on outside click, Escape and when focus leaves.
+ * `trigger` replaces the "…" icon with own content (a text dropdown), `class` goes on the root.
  */
-export function Menu({ items, label }: { items: MenuItem[]; label: string }) {
+export function Menu({ items, label, trigger: triggerContent, class: className }: {
+  items: MenuItem[];
+  label: string;
+  trigger?: ComponentChildren;
+  class?: string;
+}) {
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -47,7 +53,7 @@ export function Menu({ items, label }: { items: MenuItem[]; label: string }) {
 
   return (
     <div
-      class="ptm-menu"
+      class={['ptm-menu', className].filter(Boolean).join(' ')}
       ref={root}
       onFocusOut={(event) => {
         if (open && !root.current?.contains(event.relatedTarget as Node | null)) setOpen(false);
@@ -56,7 +62,7 @@ export function Menu({ items, label }: { items: MenuItem[]; label: string }) {
       <button
         ref={trigger}
         type="button"
-        class="ptm-icon-btn"
+        class={triggerContent === undefined ? 'ptm-icon-btn' : 'ptm-menu__trigger'}
         title={label}
         aria-label={label}
         aria-expanded={open}
@@ -66,7 +72,7 @@ export function Menu({ items, label }: { items: MenuItem[]; label: string }) {
           setOpen(!open);
         }}
       >
-        <IconEllipsis size={16} />
+        {triggerContent ?? <IconEllipsis size={16} />}
       </button>
       {open && (
         <ul class="ptm-menu__list" ref={list} onKeyDown={onKeyDown}>

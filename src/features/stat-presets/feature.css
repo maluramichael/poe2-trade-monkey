@@ -1,0 +1,74 @@
+/* The site's "+ Add Stat Group" body is the right half (inline width 50%, margin-left 50%).
+   Our dropdown sits in the empty left half, same height, 6px gap. */
+.filter-body:has(> .ptm-stat-presets) {
+  position: relative;
+}
+
+.ptm-stat-presets {
+  position: absolute;
+  top: 0;
+  right: calc(100% + 6px);
+  bottom: 0;
+  width: calc(100% - 6px);
+}
+
+.ptm-stat-presets__menu {
+  height: 100%;
+}
+
+/* Looks like the site's multiselect: dark field, centred small caps, caret on the right. */
+.ptm-stat-presets .ptm-menu__trigger {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 30px;
+  padding: 0 32px;
+  border: 1px solid transparent;
+  background: var(--ptm-input);
+  color: var(--ptm-text);
+  font-family: var(--ptm-font-title) !important;
+  font-size: 15px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.ptm-stat-presets .ptm-menu__trigger > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ptm-stat-presets .ptm-menu__trigger > svg {
+  position: absolute;
+  right: 14px;
+  color: var(--ptm-muted);
+}
+
+.ptm-stat-presets .ptm-menu__trigger:hover,
+.ptm-stat-presets .ptm-menu__trigger[aria-expanded='true'] {
+  border-color: var(--ptm-gold-border);
+}
+
+.ptm-stat-presets .ptm-menu__list {
+  left: 0;
+  right: 0;
+  z-index: 60;
+  width: auto;
+  min-width: 260px;
+  max-height: 320px;
+  overflow-y: auto;
+  background: var(--ptm-surface);
+  border-color: var(--ptm-gold-border);
+}
+
+.ptm-stat-presets .ptm-menu__item {
+  padding: 7px 10px;
+  color: var(--ptm-beige);
+}
+
+.ptm-stat-presets .ptm-menu__item:hover {
+  background: linear-gradient(90deg, rgba(138, 86, 9, 0.4), transparent);
+}
