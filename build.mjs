@@ -63,6 +63,18 @@ const writeMetaFile = {
   },
 };
 
+// Windows checkouts with core.autocrlf have CRLF files; embedded CSS must not depend on the OS,
+// otherwise dist/ differs between machines and the pre-push check fails.
+const lfCss = {
+  name: 'lf-css',
+  setup(build) {
+    build.onLoad({ filter: /\.css$/ }, (args) => ({
+      contents: readFileSync(args.path, 'utf8').replace(/\r\n/g, '\n'),
+      loader: 'text',
+    }));
+  },
+};
+
 mkdirSync('dist', { recursive: true });
 
 /**
@@ -97,7 +109,7 @@ const options = {
   legalComments: 'none',
   charset: 'utf8',
   define: { __VERSION__: JSON.stringify(pkg.version) },
-  plugins: [writeMetaFile],
+  plugins: [lfCss, writeMetaFile],
 };
 
 if (process.argv.includes('--watch')) {

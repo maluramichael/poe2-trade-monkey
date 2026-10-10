@@ -1130,7 +1130,7 @@ function __ptmPageScript() {
   var IconWarning = icon(/* @__PURE__ */ u3("path", { d: "m21.7 18-8-14a2 2 0 0 0-3.4 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3ZM12 9v4M12 17h.01" }));
 
   // src/features/bookmarks/feature.css
-  var feature_default = ".ptm-bm {\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 8px;\r\n}\r\n\r\n.ptm-bm .ptm-toolbar {\r\n  margin-bottom: 0;\r\n}\r\n\r\n.ptm-bm-folders,\r\n.ptm-bm-trades {\r\n  margin: 0;\r\n  padding: 0;\r\n  list-style: none;\r\n}\r\n\r\n.ptm-bm-folders {\r\n  display: grid;\r\n  gap: 6px;\r\n}\r\n\r\n/* Folder */\r\n\r\n.ptm-bm-folder {\r\n  border: 1px solid var(--ptm-blue-border);\r\n  background: var(--ptm-surface);\r\n}\r\n\r\n.ptm-bm-folder__header {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 4px;\r\n  padding-right: 4px;\r\n  background: var(--ptm-blue);\r\n  transition: background-color 0.2s;\r\n}\r\n\r\n.ptm-bm-folder__header:hover {\r\n  background: var(--ptm-blue-hover);\r\n}\r\n\r\n.ptm-bm-folder__toggle {\r\n  flex: 1;\r\n  min-width: 0;\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  min-height: 36px;\r\n  padding: 4px 6px 4px 8px;\r\n  border: 0;\r\n  background: none;\r\n  font-family: var(--ptm-font-title) !important;\r\n  font-size: 15px;\r\n  text-align: left;\r\n  cursor: pointer;\r\n}\r\n\r\n.ptm-bm-folder__icon {\r\n  flex: none;\r\n  width: 26px;\r\n  height: 26px;\r\n  object-fit: contain;\r\n}\r\n\r\n.ptm-bm-folder__title {\r\n  flex: 1;\r\n  min-width: 0;\r\n  overflow: hidden;\r\n  text-overflow: ellipsis;\r\n  white-space: nowrap;\r\n}\r\n\r\n.ptm-bm-chevron {\r\n  display: inline-flex;\r\n  transition: transform 0.2s;\r\n}\r\n\r\n.ptm-bm-chevron--open {\r\n  transform: rotate(180deg);\r\n}\r\n\r\n.ptm-bm-folder__divider {\r\n  flex: none;\r\n  width: 1px;\r\n  height: 15px;\r\n  background: var(--ptm-blue-border);\r\n}\r\n\r\n.ptm-bm-folder__body {\r\n  display: grid;\r\n  gap: 6px;\r\n  padding-bottom: 6px;\r\n}\r\n\r\n.ptm-bm-folder__empty {\r\n  margin: 0;\r\n  padding: 6px 7px 0;\r\n  font-size: 11px;\r\n  color: var(--ptm-muted);\r\n}\r\n\r\n.ptm-bm-save {\r\n  display: block;\r\n  padding: 0 6px;\r\n}\r\n\r\n/* Trades */\r\n\r\n.ptm-bm-trade {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 4px;\r\n  padding: 6px 4px 6px 7px;\r\n  border-bottom: 1px solid var(--ptm-blue-line);\r\n}\r\n\r\n.ptm-bm-trade:hover,\r\n.ptm-bm-trade:focus-within {\r\n  background: linear-gradient(to right, rgba(138, 86, 9, 0.4), transparent);\r\n}\r\n\r\n.ptm-bm-trade__check {\r\n  display: inline-flex;\r\n  color: var(--ptm-green-border);\r\n}\r\n\r\n.ptm-bm-trade__title {\r\n  flex: 1;\r\n  min-width: 0;\r\n  overflow: hidden;\r\n  font-family: var(--ptm-font-title);\r\n  font-size: 14px;\r\n  color: var(--ptm-text);\r\n  text-decoration: none;\r\n  text-overflow: ellipsis;\r\n  white-space: nowrap;\r\n}\r\n\r\n.ptm-bm-trade__title:hover {\r\n  color: var(--ptm-beige);\r\n}\r\n\r\n.ptm-bm-trade--current {\r\n  box-shadow: inset 3px 0 0 var(--ptm-gold-border);\r\n}\r\n\r\n.ptm-bm-trade--current .ptm-bm-trade__title {\r\n  color: var(--ptm-beige);\r\n}\r\n\r\n.ptm-bm-trade--completed .ptm-bm-trade__title {\r\n  opacity: 0.5;\r\n}\r\n\r\n.ptm-bm-badge {\r\n  flex: none;\r\n  padding: 1px 5px;\r\n  border: 1px solid var(--ptm-yellow-border);\r\n  background: var(--ptm-yellow);\r\n  font-size: 11px;\r\n  color: var(--ptm-text);\r\n  white-space: nowrap;\r\n}\r\n\r\n.ptm-bm-handle {\r\n  cursor: grab;\r\n  touch-action: none;\r\n}\r\n\r\n.ptm-bm-dragging {\r\n  opacity: 0.4;\r\n}\r\n\r\nhtml.ptm-bm-sorting,\r\nhtml.ptm-bm-sorting * {\r\n  cursor: grabbing !important;\r\n  user-select: none !important;\r\n}\r\n\r\n.ptm-bm-drop-line {\r\n  position: fixed;\r\n  z-index: 1300;\r\n  height: 2px;\r\n  background: var(--ptm-gold-border);\r\n  box-shadow: 0 0 4px var(--ptm-gold-border);\r\n  pointer-events: none;\r\n}\r\n\r\n/* Actions and backup (layout comes from .ptm-actions and .ptm-btn-group in core.css) */\r\n\r\n.ptm-bm-backup {\r\n  padding-top: 10px;\r\n  border-top: 1px solid var(--ptm-blue-line);\r\n}\r\n\r\n/* Modals */\r\n\r\n.ptm-bm-form {\r\n  display: grid;\r\n  gap: 14px;\r\n}\r\n\r\n.ptm-bm-preview {\r\n  margin: 0;\r\n  font-family: var(--ptm-font-title);\r\n  font-size: 15px;\r\n  color: var(--ptm-beige);\r\n}\r\n\r\n.ptm-bm-icons {\r\n  display: grid;\r\n  gap: 10px;\r\n}\r\n\r\n.ptm-bm-icons__grid {\r\n  display: grid;\r\n  gap: 6px;\r\n}\r\n\r\n.ptm-bm-icons__grid--currency {\r\n  grid-template-columns: repeat(auto-fill, 50px);\r\n}\r\n\r\n.ptm-bm-icons__grid--ascendancy {\r\n  grid-template-columns: repeat(auto-fill, 75px);\r\n}\r\n\r\n.ptm-bm-icons__cell {\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  padding: 4px;\r\n  border: 1px solid transparent;\r\n  background: rgba(255, 255, 255, 0.04);\r\n  cursor: pointer;\r\n  transition: background-color 0.2s, border-color 0.2s;\r\n}\r\n\r\n.ptm-bm-icons__grid--currency .ptm-bm-icons__cell {\r\n  width: 50px;\r\n  height: 50px;\r\n}\r\n\r\n.ptm-bm-icons__grid--ascendancy .ptm-bm-icons__cell {\r\n  width: 75px;\r\n  height: 75px;\r\n}\r\n\r\n.ptm-bm-icons__cell img {\r\n  max-width: 100%;\r\n  max-height: 100%;\r\n  object-fit: contain;\r\n}\r\n\r\n.ptm-bm-icons__cell:hover {\r\n  background: rgba(138, 86, 9, 0.25);\r\n}\r\n\r\n.ptm-bm-icons__cell[aria-pressed='true'] {\r\n  border-color: var(--ptm-gold-border);\r\n  background: rgba(138, 86, 9, 0.5);\r\n}\r\n";
+  var feature_default = ".ptm-bm {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n\n.ptm-bm .ptm-toolbar {\n  margin-bottom: 0;\n}\n\n.ptm-bm-folders,\n.ptm-bm-trades {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n\n.ptm-bm-folders {\n  display: grid;\n  gap: 6px;\n}\n\n/* Folder */\n\n.ptm-bm-folder {\n  border: 1px solid var(--ptm-blue-border);\n  background: var(--ptm-surface);\n}\n\n.ptm-bm-folder__header {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  padding-right: 4px;\n  background: var(--ptm-blue);\n  transition: background-color 0.2s;\n}\n\n.ptm-bm-folder__header:hover {\n  background: var(--ptm-blue-hover);\n}\n\n.ptm-bm-folder__toggle {\n  flex: 1;\n  min-width: 0;\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  min-height: 36px;\n  padding: 4px 6px 4px 8px;\n  border: 0;\n  background: none;\n  font-family: var(--ptm-font-title) !important;\n  font-size: 15px;\n  text-align: left;\n  cursor: pointer;\n}\n\n.ptm-bm-folder__icon {\n  flex: none;\n  width: 26px;\n  height: 26px;\n  object-fit: contain;\n}\n\n.ptm-bm-folder__title {\n  flex: 1;\n  min-width: 0;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n.ptm-bm-chevron {\n  display: inline-flex;\n  transition: transform 0.2s;\n}\n\n.ptm-bm-chevron--open {\n  transform: rotate(180deg);\n}\n\n.ptm-bm-folder__divider {\n  flex: none;\n  width: 1px;\n  height: 15px;\n  background: var(--ptm-blue-border);\n}\n\n.ptm-bm-folder__body {\n  display: grid;\n  gap: 6px;\n  padding-bottom: 6px;\n}\n\n.ptm-bm-folder__empty {\n  margin: 0;\n  padding: 6px 7px 0;\n  font-size: 11px;\n  color: var(--ptm-muted);\n}\n\n.ptm-bm-save {\n  display: block;\n  padding: 0 6px;\n}\n\n/* Trades */\n\n.ptm-bm-trade {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  padding: 6px 4px 6px 7px;\n  border-bottom: 1px solid var(--ptm-blue-line);\n}\n\n.ptm-bm-trade:hover,\n.ptm-bm-trade:focus-within {\n  background: linear-gradient(to right, rgba(138, 86, 9, 0.4), transparent);\n}\n\n.ptm-bm-trade__check {\n  display: inline-flex;\n  color: var(--ptm-green-border);\n}\n\n.ptm-bm-trade__title {\n  flex: 1;\n  min-width: 0;\n  overflow: hidden;\n  font-family: var(--ptm-font-title);\n  font-size: 14px;\n  color: var(--ptm-text);\n  text-decoration: none;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n.ptm-bm-trade__title:hover {\n  color: var(--ptm-beige);\n}\n\n.ptm-bm-trade--current {\n  box-shadow: inset 3px 0 0 var(--ptm-gold-border);\n}\n\n.ptm-bm-trade--current .ptm-bm-trade__title {\n  color: var(--ptm-beige);\n}\n\n.ptm-bm-trade--completed .ptm-bm-trade__title {\n  opacity: 0.5;\n}\n\n.ptm-bm-badge {\n  flex: none;\n  padding: 1px 5px;\n  border: 1px solid var(--ptm-yellow-border);\n  background: var(--ptm-yellow);\n  font-size: 11px;\n  color: var(--ptm-text);\n  white-space: nowrap;\n}\n\n.ptm-bm-handle {\n  cursor: grab;\n  touch-action: none;\n}\n\n.ptm-bm-dragging {\n  opacity: 0.4;\n}\n\nhtml.ptm-bm-sorting,\nhtml.ptm-bm-sorting * {\n  cursor: grabbing !important;\n  user-select: none !important;\n}\n\n.ptm-bm-drop-line {\n  position: fixed;\n  z-index: 1300;\n  height: 2px;\n  background: var(--ptm-gold-border);\n  box-shadow: 0 0 4px var(--ptm-gold-border);\n  pointer-events: none;\n}\n\n/* Actions and backup (layout comes from .ptm-actions and .ptm-btn-group in core.css) */\n\n.ptm-bm-backup {\n  padding-top: 10px;\n  border-top: 1px solid var(--ptm-blue-line);\n}\n\n/* Modals */\n\n.ptm-bm-form {\n  display: grid;\n  gap: 14px;\n}\n\n.ptm-bm-preview {\n  margin: 0;\n  font-family: var(--ptm-font-title);\n  font-size: 15px;\n  color: var(--ptm-beige);\n}\n\n.ptm-bm-icons {\n  display: grid;\n  gap: 10px;\n}\n\n.ptm-bm-icons__grid {\n  display: grid;\n  gap: 6px;\n}\n\n.ptm-bm-icons__grid--currency {\n  grid-template-columns: repeat(auto-fill, 50px);\n}\n\n.ptm-bm-icons__grid--ascendancy {\n  grid-template-columns: repeat(auto-fill, 75px);\n}\n\n.ptm-bm-icons__cell {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  padding: 4px;\n  border: 1px solid transparent;\n  background: rgba(255, 255, 255, 0.04);\n  cursor: pointer;\n  transition: background-color 0.2s, border-color 0.2s;\n}\n\n.ptm-bm-icons__grid--currency .ptm-bm-icons__cell {\n  width: 50px;\n  height: 50px;\n}\n\n.ptm-bm-icons__grid--ascendancy .ptm-bm-icons__cell {\n  width: 75px;\n  height: 75px;\n}\n\n.ptm-bm-icons__cell img {\n  max-width: 100%;\n  max-height: 100%;\n  object-fit: contain;\n}\n\n.ptm-bm-icons__cell:hover {\n  background: rgba(138, 86, 9, 0.25);\n}\n\n.ptm-bm-icons__cell[aria-pressed='true'] {\n  border-color: var(--ptm-gold-border);\n  background: rgba(138, 86, 9, 0.5);\n}\n";
 
   // src/features/bookmarks/messages.ts
   var t3 = createTranslator({
@@ -2637,7 +2637,7 @@ function __ptmPageScript() {
   };
 
   // src/features/history/feature.css
-  var feature_default2 = ".ptm-history {\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 8px;\r\n}\r\n\r\n.ptm-history__list {\r\n  margin: 0;\r\n  padding: 0;\r\n  list-style: none;\r\n  background: var(--ptm-surface);\r\n  border: 1px solid var(--ptm-blue-border);\r\n}\r\n\r\n.ptm-history__item {\r\n  padding: 6px 7px;\r\n  border-top: 1px solid var(--ptm-blue-line);\r\n}\r\n\r\n.ptm-history__item:first-child {\r\n  border-top: 0;\r\n}\r\n\r\n.ptm-history__item:hover {\r\n  background: linear-gradient(to right, rgba(138, 86, 9, 0.4), transparent);\r\n}\r\n\r\n.ptm-history__title {\r\n  display: block;\r\n  overflow: hidden;\r\n  font-family: var(--ptm-font-title);\r\n  font-size: 14px;\r\n  color: var(--ptm-text);\r\n  text-decoration: none;\r\n  text-overflow: ellipsis;\r\n  white-space: nowrap;\r\n}\r\n\r\n.ptm-history__title:hover {\r\n  color: var(--ptm-beige);\r\n  text-decoration: underline;\r\n}\r\n\r\n.ptm-history__other {\r\n  font-size: 11px;\r\n  color: var(--ptm-beige);\r\n}\r\n";
+  var feature_default2 = ".ptm-history {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n\n.ptm-history__list {\n  margin: 0;\n  padding: 0;\n  list-style: none;\n  background: var(--ptm-surface);\n  border: 1px solid var(--ptm-blue-border);\n}\n\n.ptm-history__item {\n  padding: 6px 7px;\n  border-top: 1px solid var(--ptm-blue-line);\n}\n\n.ptm-history__item:first-child {\n  border-top: 0;\n}\n\n.ptm-history__item:hover {\n  background: linear-gradient(to right, rgba(138, 86, 9, 0.4), transparent);\n}\n\n.ptm-history__title {\n  display: block;\n  overflow: hidden;\n  font-family: var(--ptm-font-title);\n  font-size: 14px;\n  color: var(--ptm-text);\n  text-decoration: none;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n.ptm-history__title:hover {\n  color: var(--ptm-beige);\n  text-decoration: underline;\n}\n\n.ptm-history__other {\n  font-size: 11px;\n  color: var(--ptm-beige);\n}\n";
 
   // src/features/history/Panel.tsx
   var t6 = createTranslator({
@@ -2820,7 +2820,7 @@ function __ptmPageScript() {
   };
 
   // src/features/pins/feature.css
-  var feature_default3 = '.ptm-pinned {\r\n  box-shadow: inset 0 0 10px 2px var(--ptm-blue-border);\r\n}\r\n\r\n.ptm-pin-glow {\r\n  animation: ptm-pin-glow 1s ease;\r\n}\r\n\r\n@keyframes ptm-pin-glow {\r\n  0%, 50%, 100% { box-shadow: inset 0 0 10px 2px var(--ptm-blue-border); }\r\n  25%, 75% { box-shadow: inset 0 0 20px 10px var(--ptm-blue-border); }\r\n}\r\n\r\n/* Same width for "Pin" and "Unpin", so the button bar does not jump. */\r\n.ptm-pin-btn {\r\n  min-width: 60px;\r\n}\r\n\r\n.ptm-pins {\r\n  display: grid;\r\n  gap: 10px;\r\n}\r\n\r\n.ptm-pin {\r\n  min-width: 0;\r\n  border: 1px solid var(--ptm-blue-line);\r\n  background: #000;\r\n}\r\n\r\n/* The site sizes item cards for the result list; in the 380px sidebar they must shrink. */\r\n.ptm-pin__item {\r\n  display: flex;\r\n  justify-content: center;\r\n  overflow: hidden;\r\n}\r\n\r\n.ptm-pin__item .item-popup {\r\n  width: 100%;\r\n  min-width: 0;\r\n  max-width: 100%;\r\n  margin: 0;\r\n}\r\n\r\n.ptm-pin__price {\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  gap: 3px;\r\n  padding: 5px 10px 0;\r\n  color: var(--ptm-muted);\r\n}\r\n\r\n.ptm-pin__price img {\r\n  height: 25px;\r\n}\r\n\r\n/* Keep the currency name: without it a missing image leaves only the trade id ("exalted"). */\r\n.ptm-pin__price br,\r\n.ptm-pin__price .price-label {\r\n  display: none;\r\n}\r\n\r\n.ptm-pin__seller {\r\n  padding: 4px 10px 0;\r\n  text-align: center;\r\n}\r\n\r\n.ptm-pin__actions {\r\n  padding: 8px 10px 10px;\r\n}\r\n';
+  var feature_default3 = '.ptm-pinned {\n  box-shadow: inset 0 0 10px 2px var(--ptm-blue-border);\n}\n\n.ptm-pin-glow {\n  animation: ptm-pin-glow 1s ease;\n}\n\n@keyframes ptm-pin-glow {\n  0%, 50%, 100% { box-shadow: inset 0 0 10px 2px var(--ptm-blue-border); }\n  25%, 75% { box-shadow: inset 0 0 20px 10px var(--ptm-blue-border); }\n}\n\n/* Same width for "Pin" and "Unpin", so the button bar does not jump. */\n.ptm-pin-btn {\n  min-width: 60px;\n}\n\n.ptm-pins {\n  display: grid;\n  gap: 10px;\n}\n\n.ptm-pin {\n  min-width: 0;\n  border: 1px solid var(--ptm-blue-line);\n  background: #000;\n}\n\n/* The site sizes item cards for the result list; in the 380px sidebar they must shrink. */\n.ptm-pin__item {\n  display: flex;\n  justify-content: center;\n  overflow: hidden;\n}\n\n.ptm-pin__item .item-popup {\n  width: 100%;\n  min-width: 0;\n  max-width: 100%;\n  margin: 0;\n}\n\n.ptm-pin__price {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  gap: 3px;\n  padding: 5px 10px 0;\n  color: var(--ptm-muted);\n}\n\n.ptm-pin__price img {\n  height: 25px;\n}\n\n/* Keep the currency name: without it a missing image leaves only the trade id ("exalted"). */\n.ptm-pin__price br,\n.ptm-pin__price .price-label {\n  display: none;\n}\n\n.ptm-pin__seller {\n  padding: 4px 10px 0;\n  text-align: center;\n}\n\n.ptm-pin__actions {\n  padding: 8px 10px 10px;\n}\n';
 
   // src/features/pins/index.tsx
   var t8 = createTranslator({
@@ -3068,7 +3068,7 @@ function __ptmPageScript() {
   };
 
   // src/features/highlight-mods/feature.css
-  var feature_default4 = ".ptm-mod-highlight {\r\n  background: rgba(138, 86, 9, 0.25);\r\n}\r\n";
+  var feature_default4 = ".ptm-mod-highlight {\n  background: rgba(138, 86, 9, 0.25);\n}\n";
 
   // src/features/highlight-mods/index.ts
   var t10 = createTranslator({
@@ -3124,7 +3124,7 @@ function __ptmPageScript() {
   };
 
   // src/features/regroup-similar/feature.css
-  var feature_default5 = ".ptm-regroup-hidden {\r\n  display: none !important;\r\n}\r\n\r\n.ptm-regroup-shown {\r\n  background: rgba(16, 16, 16, 0.8) !important;\r\n}\r\n\r\n.ptm-regroup-btn {\r\n  margin-left: 5px;\r\n}\r\n";
+  var feature_default5 = ".ptm-regroup-hidden {\n  display: none !important;\n}\n\n.ptm-regroup-shown {\n  background: rgba(16, 16, 16, 0.8) !important;\n}\n\n.ptm-regroup-btn {\n  margin-left: 5px;\n}\n";
 
   // src/features/regroup-similar/index.ts
   var t11 = createTranslator({
@@ -3216,7 +3216,7 @@ function __ptmPageScript() {
   };
 
   // src/features/price-equivalent/feature.css
-  var feature_default6 = ".ptm-price-equivalent {\r\n  display: flex;\r\n  flex-wrap: wrap;\r\n  justify-content: center;\r\n  gap: 0 8px;\r\n  margin-top: 4px;\r\n  padding-top: 4px;\r\n  border-top: 1px solid rgba(163, 141, 109, 0.25);\r\n  font-family: var(--ptm-font-title);\r\n  font-size: 13px;\r\n  color: var(--ptm-muted);\r\n}\r\n\r\n.ptm-price-equivalent__part {\r\n  display: inline-flex;\r\n  align-items: center;\r\n  gap: 3px;\r\n}\r\n\r\n/* The site sizes every image in the price box; keep ours square. */\r\n.ptm-price-equivalent .ptm-price-equivalent__icon {\r\n  width: 18px !important;\r\n  height: 18px !important;\r\n  min-width: 18px;\r\n  max-width: none !important;\r\n  margin: 0 !important;\r\n  object-fit: contain;\r\n  vertical-align: middle;\r\n}\r\n";
+  var feature_default6 = ".ptm-price-equivalent {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: center;\n  gap: 0 8px;\n  margin-top: 4px;\n  padding-top: 4px;\n  border-top: 1px solid rgba(163, 141, 109, 0.25);\n  font-family: var(--ptm-font-title);\n  font-size: 13px;\n  color: var(--ptm-muted);\n}\n\n.ptm-price-equivalent__part {\n  display: inline-flex;\n  align-items: center;\n  gap: 3px;\n}\n\n/* The site sizes every image in the price box; keep ours square. */\n.ptm-price-equivalent .ptm-price-equivalent__icon {\n  width: 18px !important;\n  height: 18px !important;\n  min-width: 18px;\n  max-width: none !important;\n  margin: 0 !important;\n  object-fit: contain;\n  vertical-align: middle;\n}\n";
 
   // src/features/price-equivalent/format.ts
   var MIN_DIVINE = 0.1;
@@ -3394,7 +3394,7 @@ function __ptmPageScript() {
   }
 
   // src/features/mod-actions/feature.css
-  var feature_default7 = ".item-mod:has(> .ptm-mod-action) {\r\n  position: relative;\r\n}\r\n\r\n/* Sits just outside the left edge of the item card, so the site's tier labels stay readable. */\r\n.ptm-mod-action {\r\n  position: absolute;\r\n  top: 50%;\r\n  left: -41px;\r\n  z-index: 1;\r\n  width: 20px;\r\n  height: 20px;\r\n  margin-top: -10px;\r\n  padding: 0;\r\n  border: 1px solid var(--ptm-blue-border);\r\n  background: var(--ptm-blue);\r\n  color: var(--ptm-text);\r\n  font: 13px/18px var(--ptm-font-title);\r\n  text-align: center;\r\n  cursor: pointer;\r\n  opacity: 0;\r\n  transition: opacity 0.2s, background 0.2s;\r\n}\r\n\r\n.ptm-mod-action--exclude {\r\n  left: -22px;\r\n  border-color: var(--ptm-red-border);\r\n  background: var(--ptm-red);\r\n}\r\n\r\n.item-mod:hover > .ptm-mod-action,\r\n.ptm-mod-action:focus-visible {\r\n  opacity: 1;\r\n}\r\n\r\n.ptm-mod-action--add:hover {\r\n  background: var(--ptm-blue-hover);\r\n}\r\n\r\n.ptm-mod-action--exclude:hover {\r\n  background: var(--ptm-red-hover);\r\n}\r\n\r\n.ptm-mod-flash-ok {\r\n  animation: ptm-mod-flash-ok 0.9s ease;\r\n}\r\n\r\n.ptm-mod-flash-fail {\r\n  animation: ptm-mod-flash-fail 0.9s ease;\r\n}\r\n\r\n@keyframes ptm-mod-flash-ok {\r\n  0%, 60% { background: var(--ptm-green); }\r\n  100% { background: transparent; }\r\n}\r\n\r\n@keyframes ptm-mod-flash-fail {\r\n  0%, 60% { background: var(--ptm-red-border); }\r\n  100% { background: transparent; }\r\n}\r\n\r\n@media (hover: none) {\r\n  .ptm-mod-action {\r\n    opacity: 0.6;\r\n  }\r\n}\r\n";
+  var feature_default7 = ".item-mod:has(> .ptm-mod-action) {\n  position: relative;\n}\n\n/* Sits just outside the left edge of the item card, so the site's tier labels stay readable. */\n.ptm-mod-action {\n  position: absolute;\n  top: 50%;\n  left: -41px;\n  z-index: 1;\n  width: 20px;\n  height: 20px;\n  margin-top: -10px;\n  padding: 0;\n  border: 1px solid var(--ptm-blue-border);\n  background: var(--ptm-blue);\n  color: var(--ptm-text);\n  font: 13px/18px var(--ptm-font-title);\n  text-align: center;\n  cursor: pointer;\n  opacity: 0;\n  transition: opacity 0.2s, background 0.2s;\n}\n\n.ptm-mod-action--exclude {\n  left: -22px;\n  border-color: var(--ptm-red-border);\n  background: var(--ptm-red);\n}\n\n.item-mod:hover > .ptm-mod-action,\n.ptm-mod-action:focus-visible {\n  opacity: 1;\n}\n\n.ptm-mod-action--add:hover {\n  background: var(--ptm-blue-hover);\n}\n\n.ptm-mod-action--exclude:hover {\n  background: var(--ptm-red-hover);\n}\n\n.ptm-mod-flash-ok {\n  animation: ptm-mod-flash-ok 0.9s ease;\n}\n\n.ptm-mod-flash-fail {\n  animation: ptm-mod-flash-fail 0.9s ease;\n}\n\n@keyframes ptm-mod-flash-ok {\n  0%, 60% { background: var(--ptm-green); }\n  100% { background: transparent; }\n}\n\n@keyframes ptm-mod-flash-fail {\n  0%, 60% { background: var(--ptm-red-border); }\n  100% { background: transparent; }\n}\n\n@media (hover: none) {\n  .ptm-mod-action {\n    opacity: 0.6;\n  }\n}\n";
 
   // src/features/mod-actions/index.ts
   var t13 = createTranslator({
@@ -3611,236 +3611,236 @@ function __ptmPageScript() {
   };
 
   // src/features/layout/feature.css
-  var feature_default8 = `/*\r
- * Layout feature. Everything is scoped under html.ptm-layout (set while the feature runs).\r
- * html.ptm-layout-split is set by JS when there is room for two columns (see index.ts).\r
- * --ptm-layout-top is the document offset of the columns, measured by JS.\r
- */\r
-\r
-/* Always: full width, no background art, smaller header. */\r
-html.ptm-layout body {\r
-  background: #0e1115;\r
-}\r
-\r
-html.ptm-layout #trade {\r
-  max-width: 1920px;\r
-}\r
-\r
-/* Live tuning: header height comes from the logo, the status bar is absolute. */\r
-html.ptm-layout .logo a {\r
-  max-width: 110px;\r
-}\r
-\r
-/* Two columns: navigation on top, filters left, results right. */\r
-html.ptm-layout.ptm-layout-split #trade {\r
-  display: grid;\r
-  /* Results need 740px: icon 120 + item card (min-width 400 in the site CSS) + price 200 + scrollbar. */\r
-  grid-template-columns: minmax(440px, 1fr) minmax(740px, 1fr);\r
-  column-gap: 8px;\r
-  margin-bottom: 0;\r
-}\r
-\r
-html.ptm-layout.ptm-layout-split #trade > .navigation {\r
-  grid-column: 1 / -1;\r
-  grid-row: 1;\r
-}\r
-\r
-html.ptm-layout.ptm-layout-split #trade > .top,\r
-html.ptm-layout.ptm-layout-split #trade > #vue3-portal {\r
-  grid-row: 2;\r
-  /* Leaves room for the site footer (GGG copyright and legal links) below the columns. */\r
-  height: calc(100vh - var(--ptm-layout-top, 0px) - 48px);\r
-  min-height: 0;\r
-  overflow-y: auto;\r
-  overscroll-behavior: contain;\r
-}\r
-\r
-html.ptm-layout.ptm-layout-split #trade > .top {\r
-  grid-column: 1;\r
-}\r
-\r
-/* The filter column narrows with the window and the results' needs: size its content by the\r
- * column, not the viewport. */\r
-html.ptm-layout.ptm-layout-split #trade > .top {\r
-  container: ptm-filters / inline-size;\r
-}\r
-\r
-/* Narrow column: one filter per row, and the site's fixed 271px selects leave their labels room\r
- * (otherwise "Item Category" is cut to "Item Cat"). Stat filter rows are left alone. */\r
-@container ptm-filters (max-width: 640px) {\r
-  html.ptm-layout.ptm-layout-split #trade .filter-group-body > .filter:not(.full-span) {\r
-    width: 100%;\r
-  }\r
-\r
-  /* 100% in the table row: the label keeps its text width, the select takes the rest and still\r
-   * ends at the row edge, where the site positions its dropdown arrow. */\r
-  html.ptm-layout.ptm-layout-split #trade .filter-property .filter-select {\r
-    width: 100% !important;\r
-  }\r
-}\r
-\r
-/* Vue sets display: contents inline on the portal; it must be a real box to be the right column. */\r
-html.ptm-layout.ptm-layout-split #trade > #vue3-portal {\r
-  display: block !important;\r
-  grid-column: 2;\r
-}\r
-\r
-/*\r
- * The site splits a result row 25/50/25 %, which squeezes the item card below its 400px minimum in\r
- * a half-width column, so the price overlapped it. Fixed side columns leave the card the rest.\r
- */\r
-html.ptm-layout.ptm-layout-split #vue3-portal .resultset > .row > .left {\r
-  width: 120px;\r
-}\r
-\r
-html.ptm-layout.ptm-layout-split #vue3-portal .resultset > .row > .middle {\r
-  width: calc(100% - 320px);\r
-}\r
-\r
-html.ptm-layout.ptm-layout-split #vue3-portal .resultset > .row > .right {\r
-  width: 200px;\r
-}\r
-\r
-/* Clearfix divs would take grid cells. */\r
-html.ptm-layout.ptm-layout-split #trade > .clear {\r
-  display: none;\r
-}\r
-\r
-/* Left column: one filter pane per row, item search above league and status. */\r
-html.ptm-layout.ptm-layout-split #trade .top .search-bar .search-left,\r
-html.ptm-layout.ptm-layout-split #trade .top .search-bar .search-right,\r
-html.ptm-layout.ptm-layout-split #trade .top .search-bar .search-advanced-pane {\r
-  width: 100%;\r
-}\r
-\r
-/*\r
- * The control bar (quick filters + Search / Clear / Live) stays at the bottom of the screen while\r
- * the filters scroll: in the left column in two-column mode, in the window otherwise.\r
- */\r
-html.ptm-layout #trade .top .controls {\r
-  position: sticky;\r
-  bottom: 0;\r
-  z-index: 3;\r
-  background: #000;\r
-  border-top: 1px solid #5a3806;\r
-  box-shadow: 0 -6px 12px rgba(0, 0, 0, 0.6);\r
-}\r
-\r
-html.ptm-layout.ptm-layout-split #trade .top .controls {\r
-  display: flex;\r
-  flex-wrap: wrap;\r
-  align-items: center;\r
-  gap: 6px;\r
-  padding: 0 6px 8px;\r
-}\r
-\r
-html.ptm-layout.ptm-layout-split #trade .top .controls > .ptm-qf {\r
-  flex: 1 0 100%;\r
-}\r
-\r
-/* Live search and Clear keep their label width, Search takes the rest. */\r
-html.ptm-layout.ptm-layout-split #trade .top .controls > .controls-left,\r
-html.ptm-layout.ptm-layout-split #trade .top .controls > .controls-right {\r
-  width: auto;\r
-  flex: 0 0 auto;\r
-  padding: 0;\r
-}\r
-\r
-html.ptm-layout.ptm-layout-split #trade .top .controls > .controls-center {\r
-  width: auto;\r
-  flex: 1 1 0;\r
-  padding: 0;\r
-}\r
-\r
-html.ptm-layout.ptm-layout-split #trade .top .controls > .clear {\r
-  display: none;\r
-}\r
-\r
-html.ptm-layout.ptm-layout-split #trade .top .controls .livesearch-btn {\r
-  white-space: nowrap;\r
-}\r
-\r
-html.ptm-layout.ptm-layout-split #trade .top .controls .search-btn {\r
-  width: 100%;\r
-  min-width: 0;\r
-}\r
-\r
-html.ptm-layout.ptm-layout-split #trade .top .controls .controls-right {\r
-  display: flex;\r
-  justify-content: flex-end;\r
-  gap: 4px;\r
-}\r
-\r
-html.ptm-layout.ptm-layout-split #trade .top .controls .clear-btn,\r
-html.ptm-layout.ptm-layout-split #trade .top .controls .toggle-search-btn {\r
-  min-width: 0;\r
-}\r
-\r
-/* The window does not scroll in split mode, so JS shows "Back to top" for the results column. */\r
-html.ptm-layout.ptm-layout-split #trade > .top-btn {\r
-  display: none !important;\r
-}\r
-\r
-html.ptm-layout.ptm-layout-split.ptm-layout-scrolled #trade > .top-btn {\r
-  display: block !important;\r
-  opacity: 1 !important;\r
-}\r
-\r
-/* Keep "Back to top" clear of our sidebar. */\r
-html.ptm-layout.ptm-sidebar-open #trade > .top-btn {\r
-  right: calc(var(--ptm-sidebar-width, 400px) + 20px);\r
-}\r
-\r
-/*\r
- * In two columns the filters always stay open: the site collapses them after every search, which\r
- * makes no sense when they have their own column. Its show/hide toggle is hidden for that reason.\r
- */\r
-html.ptm-layout.ptm-layout-split #trade .search-advanced.search-advanced-hidden,\r
-html.ptm-layout.ptm-layout-split #trade .search-advanced.search-advanced-hidden .search-advanced-items {\r
-  height: auto !important;\r
-  overflow: visible !important;\r
-}\r
-\r
-html.ptm-layout.ptm-layout-split #trade .controls .toggle-search-btn {\r
-  display: none;\r
-}\r
-\r
-/*\r
- * Row actions (Travel to Hideout / Direct Whisper, Ignore Player, Pin, "N similar") as one vertical\r
- * button group: same width, shared borders, no loose buttons. Status and IGN stay above as text.\r
- */\r
-html.ptm-layout #vue3-portal .resultset > .row .details .btns {\r
-  display: flex;\r
-  flex-direction: column;\r
-  align-items: stretch;\r
-  gap: 0;\r
-}\r
-\r
-html.ptm-layout #vue3-portal .resultset > .row .details .btns > .btn-group,\r
-html.ptm-layout #vue3-portal .resultset > .row .details .btns > span:has(> .btn) {\r
-  display: block;\r
-  float: none;\r
-  margin: 0;\r
-}\r
-\r
-html.ptm-layout #vue3-portal .resultset > .row .details .btns .btn {\r
-  display: block;\r
-  float: none;\r
-  width: 100%;\r
-  min-height: 26px;\r
-  margin: 0 0 -1px !important;\r
-  padding: 4px 8px;\r
-  border-radius: 0;\r
-  font-size: 13px;\r
-  line-height: 16px;\r
-  text-align: center;\r
-}\r
-\r
-html.ptm-layout #vue3-portal .resultset > .row .details .btns > .status,\r
-html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name {\r
-  margin-bottom: 4px;\r
-  text-align: center;\r
-}\r
+  var feature_default8 = `/*
+ * Layout feature. Everything is scoped under html.ptm-layout (set while the feature runs).
+ * html.ptm-layout-split is set by JS when there is room for two columns (see index.ts).
+ * --ptm-layout-top is the document offset of the columns, measured by JS.
+ */
+
+/* Always: full width, no background art, smaller header. */
+html.ptm-layout body {
+  background: #0e1115;
+}
+
+html.ptm-layout #trade {
+  max-width: 1920px;
+}
+
+/* Live tuning: header height comes from the logo, the status bar is absolute. */
+html.ptm-layout .logo a {
+  max-width: 110px;
+}
+
+/* Two columns: navigation on top, filters left, results right. */
+html.ptm-layout.ptm-layout-split #trade {
+  display: grid;
+  /* Results need 740px: icon 120 + item card (min-width 400 in the site CSS) + price 200 + scrollbar. */
+  grid-template-columns: minmax(440px, 1fr) minmax(740px, 1fr);
+  column-gap: 8px;
+  margin-bottom: 0;
+}
+
+html.ptm-layout.ptm-layout-split #trade > .navigation {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
+html.ptm-layout.ptm-layout-split #trade > .top,
+html.ptm-layout.ptm-layout-split #trade > #vue3-portal {
+  grid-row: 2;
+  /* Leaves room for the site footer (GGG copyright and legal links) below the columns. */
+  height: calc(100vh - var(--ptm-layout-top, 0px) - 48px);
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+html.ptm-layout.ptm-layout-split #trade > .top {
+  grid-column: 1;
+}
+
+/* The filter column narrows with the window and the results' needs: size its content by the
+ * column, not the viewport. */
+html.ptm-layout.ptm-layout-split #trade > .top {
+  container: ptm-filters / inline-size;
+}
+
+/* Narrow column: one filter per row, and the site's fixed 271px selects leave their labels room
+ * (otherwise "Item Category" is cut to "Item Cat"). Stat filter rows are left alone. */
+@container ptm-filters (max-width: 640px) {
+  html.ptm-layout.ptm-layout-split #trade .filter-group-body > .filter:not(.full-span) {
+    width: 100%;
+  }
+
+  /* 100% in the table row: the label keeps its text width, the select takes the rest and still
+   * ends at the row edge, where the site positions its dropdown arrow. */
+  html.ptm-layout.ptm-layout-split #trade .filter-property .filter-select {
+    width: 100% !important;
+  }
+}
+
+/* Vue sets display: contents inline on the portal; it must be a real box to be the right column. */
+html.ptm-layout.ptm-layout-split #trade > #vue3-portal {
+  display: block !important;
+  grid-column: 2;
+}
+
+/*
+ * The site splits a result row 25/50/25 %, which squeezes the item card below its 400px minimum in
+ * a half-width column, so the price overlapped it. Fixed side columns leave the card the rest.
+ */
+html.ptm-layout.ptm-layout-split #vue3-portal .resultset > .row > .left {
+  width: 120px;
+}
+
+html.ptm-layout.ptm-layout-split #vue3-portal .resultset > .row > .middle {
+  width: calc(100% - 320px);
+}
+
+html.ptm-layout.ptm-layout-split #vue3-portal .resultset > .row > .right {
+  width: 200px;
+}
+
+/* Clearfix divs would take grid cells. */
+html.ptm-layout.ptm-layout-split #trade > .clear {
+  display: none;
+}
+
+/* Left column: one filter pane per row, item search above league and status. */
+html.ptm-layout.ptm-layout-split #trade .top .search-bar .search-left,
+html.ptm-layout.ptm-layout-split #trade .top .search-bar .search-right,
+html.ptm-layout.ptm-layout-split #trade .top .search-bar .search-advanced-pane {
+  width: 100%;
+}
+
+/*
+ * The control bar (quick filters + Search / Clear / Live) stays at the bottom of the screen while
+ * the filters scroll: in the left column in two-column mode, in the window otherwise.
+ */
+html.ptm-layout #trade .top .controls {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  background: #000;
+  border-top: 1px solid #5a3806;
+  box-shadow: 0 -6px 12px rgba(0, 0, 0, 0.6);
+}
+
+html.ptm-layout.ptm-layout-split #trade .top .controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 0 6px 8px;
+}
+
+html.ptm-layout.ptm-layout-split #trade .top .controls > .ptm-qf {
+  flex: 1 0 100%;
+}
+
+/* Live search and Clear keep their label width, Search takes the rest. */
+html.ptm-layout.ptm-layout-split #trade .top .controls > .controls-left,
+html.ptm-layout.ptm-layout-split #trade .top .controls > .controls-right {
+  width: auto;
+  flex: 0 0 auto;
+  padding: 0;
+}
+
+html.ptm-layout.ptm-layout-split #trade .top .controls > .controls-center {
+  width: auto;
+  flex: 1 1 0;
+  padding: 0;
+}
+
+html.ptm-layout.ptm-layout-split #trade .top .controls > .clear {
+  display: none;
+}
+
+html.ptm-layout.ptm-layout-split #trade .top .controls .livesearch-btn {
+  white-space: nowrap;
+}
+
+html.ptm-layout.ptm-layout-split #trade .top .controls .search-btn {
+  width: 100%;
+  min-width: 0;
+}
+
+html.ptm-layout.ptm-layout-split #trade .top .controls .controls-right {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+html.ptm-layout.ptm-layout-split #trade .top .controls .clear-btn,
+html.ptm-layout.ptm-layout-split #trade .top .controls .toggle-search-btn {
+  min-width: 0;
+}
+
+/* The window does not scroll in split mode, so JS shows "Back to top" for the results column. */
+html.ptm-layout.ptm-layout-split #trade > .top-btn {
+  display: none !important;
+}
+
+html.ptm-layout.ptm-layout-split.ptm-layout-scrolled #trade > .top-btn {
+  display: block !important;
+  opacity: 1 !important;
+}
+
+/* Keep "Back to top" clear of our sidebar. */
+html.ptm-layout.ptm-sidebar-open #trade > .top-btn {
+  right: calc(var(--ptm-sidebar-width, 400px) + 20px);
+}
+
+/*
+ * In two columns the filters always stay open: the site collapses them after every search, which
+ * makes no sense when they have their own column. Its show/hide toggle is hidden for that reason.
+ */
+html.ptm-layout.ptm-layout-split #trade .search-advanced.search-advanced-hidden,
+html.ptm-layout.ptm-layout-split #trade .search-advanced.search-advanced-hidden .search-advanced-items {
+  height: auto !important;
+  overflow: visible !important;
+}
+
+html.ptm-layout.ptm-layout-split #trade .controls .toggle-search-btn {
+  display: none;
+}
+
+/*
+ * Row actions (Travel to Hideout / Direct Whisper, Ignore Player, Pin, "N similar") as one vertical
+ * button group: same width, shared borders, no loose buttons. Status and IGN stay above as text.
+ */
+html.ptm-layout #vue3-portal .resultset > .row .details .btns {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+
+html.ptm-layout #vue3-portal .resultset > .row .details .btns > .btn-group,
+html.ptm-layout #vue3-portal .resultset > .row .details .btns > span:has(> .btn) {
+  display: block;
+  float: none;
+  margin: 0;
+}
+
+html.ptm-layout #vue3-portal .resultset > .row .details .btns .btn {
+  display: block;
+  float: none;
+  width: 100%;
+  min-height: 26px;
+  margin: 0 0 -1px !important;
+  padding: 4px 8px;
+  border-radius: 0;
+  font-size: 13px;
+  line-height: 16px;
+  text-align: center;
+}
+
+html.ptm-layout #vue3-portal .resultset > .row .details .btns > .status,
+html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name {
+  margin-bottom: 4px;
+  text-align: center;
+}
 `;
 
   // src/features/layout/index.ts
@@ -3907,147 +3907,147 @@ html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name 
   };
 
   // src/features/quick-filters/feature.css
-  var feature_default9 = `/* Two rows of button groups at the top of the site's control bar; buttons come from the UI kit. */\r
-.ptm-qf {\r
-  width: 100%;\r
-}\r
-\r
-.ptm-qf__strip {\r
-  display: grid;\r
-  gap: 5px;\r
-  padding: 6px 0;\r
-}\r
-\r
-.ptm-qf__row {\r
-  display: flex;\r
-  gap: 5px;\r
-}\r
-\r
-.ptm-qf__anchor {\r
-  position: relative;\r
-  display: flex;\r
-}\r
-\r
-.ptm-qf__anchor > .ptm-btn {\r
-  width: 100%;\r
-}\r
-\r
-.ptm-qf__btn {\r
-  position: relative;\r
-  overflow: hidden;\r
-}\r
-\r
-/* "No": red border and a red diagonal strike. */\r
-.ptm-qf__btn--no {\r
-  border-color: var(--ptm-red-border);\r
-  color: var(--ptm-beige);\r
-}\r
-\r
-.ptm-qf__btn--no::after {\r
-  content: '';\r
-  position: absolute;\r
-  inset: 0;\r
-  background: linear-gradient(to top right, transparent calc(50% - 1px), #d02020 calc(50% - 1px), #d02020 calc(50% + 1px), transparent calc(50% + 1px));\r
-  pointer-events: none;\r
-}\r
-\r
-.ptm-qf__clear {\r
-  flex: none;\r
-  width: 30px;\r
-  padding: 0;\r
-}\r
-\r
-.ptm-qf__badge {\r
-  padding: 1px 4px;\r
-  background: rgba(0, 0, 0, 0.45);\r
-  font-family: var(--ptm-font-body);\r
-  font-size: 11px;\r
-  color: var(--ptm-text);\r
-}\r
-\r
-.ptm-qf__btn[data-rarity='normal'],\r
-.ptm-qf__option[data-rarity='normal'] { color: #c8c8c8; }\r
-.ptm-qf__btn[data-rarity='magic'],\r
-.ptm-qf__option[data-rarity='magic'] { color: #8888ff; }\r
-.ptm-qf__btn[data-rarity='rare'],\r
-.ptm-qf__option[data-rarity='rare'] { color: #ffff77; }\r
-.ptm-qf__btn[data-rarity^='unique'],\r
-.ptm-qf__option[data-rarity^='unique'] { color: #af6025; }\r
-\r
-/* Opens upwards: the search bar below may be sticky at the bottom of the screen. */\r
-.ptm-qf__pop {\r
-  position: absolute;\r
-  bottom: calc(100% + 4px);\r
-  left: 0;\r
-  z-index: 50;\r
-  display: flex;\r
-  align-items: center;\r
-  gap: 4px;\r
-  padding: 5px;\r
-  background: var(--ptm-surface);\r
-  border: 1px solid var(--ptm-gold-border);\r
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);\r
-}\r
-\r
-.ptm-qf__pop--list {\r
-  flex-direction: column;\r
-  align-items: stretch;\r
-  gap: 0;\r
-  min-width: 160px;\r
-}\r
-\r
-.ptm-qf__input {\r
-  width: 64px;\r
-  height: 26px;\r
-  padding: 0 6px;\r
-  border: 0;\r
-  background: var(--ptm-input);\r
-  color: var(--ptm-text);\r
-  font-family: var(--ptm-font-body);\r
-  font-size: 13px;\r
-}\r
-\r
-.ptm-qf__quick,\r
-.ptm-qf__option {\r
-  display: inline-flex;\r
-  align-items: center;\r
-  justify-content: center;\r
-  height: 26px;\r
-  min-width: 28px;\r
-  padding: 0 6px;\r
-  border: 1px solid var(--ptm-blue-border);\r
-  background: var(--ptm-blue);\r
-  color: var(--ptm-text);\r
-  font-family: var(--ptm-font-body);\r
-  font-size: 12px;\r
-  cursor: pointer;\r
-}\r
-\r
-.ptm-qf__option {\r
-  justify-content: flex-start;\r
-  border: 0;\r
-  background: transparent;\r
-  font-family: var(--ptm-font-title);\r
-  font-size: 13px;\r
-  text-align: left;\r
-}\r
-\r
-.ptm-qf__quick:hover,\r
-.ptm-qf__option:hover,\r
-.ptm-qf__option[aria-checked='true'] {\r
-  background: rgba(138, 86, 9, 0.4);\r
-}\r
-\r
-/* Narrow filter column (container from the layout feature): chips wrap instead of being cut. */\r
-@container ptm-filters (max-width: 640px) {\r
-  .ptm-qf .ptm-btn-group {\r
-    flex-wrap: wrap;\r
-  }\r
-\r
-  .ptm-qf .ptm-btn-group > * {\r
-    flex: 1 0 auto;\r
-  }\r
-}\r
+  var feature_default9 = `/* Two rows of button groups at the top of the site's control bar; buttons come from the UI kit. */
+.ptm-qf {
+  width: 100%;
+}
+
+.ptm-qf__strip {
+  display: grid;
+  gap: 5px;
+  padding: 6px 0;
+}
+
+.ptm-qf__row {
+  display: flex;
+  gap: 5px;
+}
+
+.ptm-qf__anchor {
+  position: relative;
+  display: flex;
+}
+
+.ptm-qf__anchor > .ptm-btn {
+  width: 100%;
+}
+
+.ptm-qf__btn {
+  position: relative;
+  overflow: hidden;
+}
+
+/* "No": red border and a red diagonal strike. */
+.ptm-qf__btn--no {
+  border-color: var(--ptm-red-border);
+  color: var(--ptm-beige);
+}
+
+.ptm-qf__btn--no::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top right, transparent calc(50% - 1px), #d02020 calc(50% - 1px), #d02020 calc(50% + 1px), transparent calc(50% + 1px));
+  pointer-events: none;
+}
+
+.ptm-qf__clear {
+  flex: none;
+  width: 30px;
+  padding: 0;
+}
+
+.ptm-qf__badge {
+  padding: 1px 4px;
+  background: rgba(0, 0, 0, 0.45);
+  font-family: var(--ptm-font-body);
+  font-size: 11px;
+  color: var(--ptm-text);
+}
+
+.ptm-qf__btn[data-rarity='normal'],
+.ptm-qf__option[data-rarity='normal'] { color: #c8c8c8; }
+.ptm-qf__btn[data-rarity='magic'],
+.ptm-qf__option[data-rarity='magic'] { color: #8888ff; }
+.ptm-qf__btn[data-rarity='rare'],
+.ptm-qf__option[data-rarity='rare'] { color: #ffff77; }
+.ptm-qf__btn[data-rarity^='unique'],
+.ptm-qf__option[data-rarity^='unique'] { color: #af6025; }
+
+/* Opens upwards: the search bar below may be sticky at the bottom of the screen. */
+.ptm-qf__pop {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px;
+  background: var(--ptm-surface);
+  border: 1px solid var(--ptm-gold-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.ptm-qf__pop--list {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  min-width: 160px;
+}
+
+.ptm-qf__input {
+  width: 64px;
+  height: 26px;
+  padding: 0 6px;
+  border: 0;
+  background: var(--ptm-input);
+  color: var(--ptm-text);
+  font-family: var(--ptm-font-body);
+  font-size: 13px;
+}
+
+.ptm-qf__quick,
+.ptm-qf__option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  min-width: 28px;
+  padding: 0 6px;
+  border: 1px solid var(--ptm-blue-border);
+  background: var(--ptm-blue);
+  color: var(--ptm-text);
+  font-family: var(--ptm-font-body);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.ptm-qf__option {
+  justify-content: flex-start;
+  border: 0;
+  background: transparent;
+  font-family: var(--ptm-font-title);
+  font-size: 13px;
+  text-align: left;
+}
+
+.ptm-qf__quick:hover,
+.ptm-qf__option:hover,
+.ptm-qf__option[aria-checked='true'] {
+  background: rgba(138, 86, 9, 0.4);
+}
+
+/* Narrow filter column (container from the layout feature): chips wrap instead of being cut. */
+@container ptm-filters (max-width: 640px) {
+  .ptm-qf .ptm-btn-group {
+    flex-wrap: wrap;
+  }
+
+  .ptm-qf .ptm-btn-group > * {
+    flex: 1 0 auto;
+  }
+}
 `;
 
   // src/features/quick-filters/model.ts
@@ -4389,7 +4389,7 @@ html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name 
   };
 
   // src/features/stat-favorites/feature.css
-  var feature_default10 = "/* Favorites float to the top via `order`; vue-multiselect sets display: inline-block inline. */\r\n.ptm-stat-fav-list {\r\n  display: flex !important;\r\n  flex-direction: column;\r\n}\r\n\r\n.ptm-stat-fav-list > li.ptm-stat-fav {\r\n  order: -1;\r\n}\r\n\r\n.ptm-stat-fav-list.ptm-stat-has-fav::before {\r\n  content: attr(data-ptm-fav-label);\r\n  order: -2;\r\n  padding: 4px 12px;\r\n  font: 13px var(--ptm-font-title);\r\n  color: var(--ptm-muted);\r\n}\r\n\r\n/* Separator after the favorites block, before the first group header. */\r\n.ptm-stat-fav-list.ptm-stat-has-fav::after {\r\n  content: '';\r\n  order: -1;\r\n  border-bottom: 1px solid var(--ptm-gold-border);\r\n}\r\n\r\n.multiselect__option:has(> .ptm-stat-star) {\r\n  position: relative;\r\n  padding-right: 32px;\r\n}\r\n\r\n.ptm-stat-star {\r\n  position: absolute;\r\n  top: 50%;\r\n  right: 4px;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  width: 24px;\r\n  height: 24px;\r\n  margin-top: -12px;\r\n  padding: 0;\r\n  border: 0;\r\n  background: none;\r\n  color: var(--ptm-muted);\r\n  cursor: pointer;\r\n  opacity: 0.45;\r\n  transition: opacity 0.2s, color 0.2s;\r\n}\r\n\r\n.multiselect__option:hover > .ptm-stat-star,\r\n.ptm-stat-star[aria-pressed='true'] {\r\n  opacity: 1;\r\n}\r\n\r\n.ptm-stat-star:hover {\r\n  color: var(--ptm-beige);\r\n}\r\n\r\n.ptm-stat-star[aria-pressed='true'] {\r\n  color: var(--ptm-gold-border);\r\n  filter: brightness(1.6);\r\n}\r\n\r\n.ptm-stat-star[aria-pressed='true'] svg {\r\n  fill: currentColor;\r\n}\r\n\r\n@media (hover: none) {\r\n  .ptm-stat-star {\r\n    opacity: 0.6;\r\n  }\r\n}\r\n";
+  var feature_default10 = "/* Favorites float to the top via `order`; vue-multiselect sets display: inline-block inline. */\n.ptm-stat-fav-list {\n  display: flex !important;\n  flex-direction: column;\n}\n\n.ptm-stat-fav-list > li.ptm-stat-fav {\n  order: -1;\n}\n\n.ptm-stat-fav-list.ptm-stat-has-fav::before {\n  content: attr(data-ptm-fav-label);\n  order: -2;\n  padding: 4px 12px;\n  font: 13px var(--ptm-font-title);\n  color: var(--ptm-muted);\n}\n\n/* Separator after the favorites block, before the first group header. */\n.ptm-stat-fav-list.ptm-stat-has-fav::after {\n  content: '';\n  order: -1;\n  border-bottom: 1px solid var(--ptm-gold-border);\n}\n\n.multiselect__option:has(> .ptm-stat-star) {\n  position: relative;\n  padding-right: 32px;\n}\n\n.ptm-stat-star {\n  position: absolute;\n  top: 50%;\n  right: 4px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 24px;\n  height: 24px;\n  margin-top: -12px;\n  padding: 0;\n  border: 0;\n  background: none;\n  color: var(--ptm-muted);\n  cursor: pointer;\n  opacity: 0.45;\n  transition: opacity 0.2s, color 0.2s;\n}\n\n.multiselect__option:hover > .ptm-stat-star,\n.ptm-stat-star[aria-pressed='true'] {\n  opacity: 1;\n}\n\n.ptm-stat-star:hover {\n  color: var(--ptm-beige);\n}\n\n.ptm-stat-star[aria-pressed='true'] {\n  color: var(--ptm-gold-border);\n  filter: brightness(1.6);\n}\n\n.ptm-stat-star[aria-pressed='true'] svg {\n  fill: currentColor;\n}\n\n@media (hover: none) {\n  .ptm-stat-star {\n    opacity: 0.6;\n  }\n}\n";
 
   // src/features/stat-favorites/index.ts
   var t17 = createTranslator({
@@ -4714,7 +4714,7 @@ html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name 
   };
 
   // src/features/search-clear/feature.css
-  var feature_default12 = ".search-left:has(> .ptm-search-clear) {\r\n  position: relative;\r\n}\r\n\r\n.search-left:has(> .ptm-search-clear:not([hidden])) .multiselect__tags {\r\n  padding-right: 68px;\r\n}\r\n\r\n/* Left of the multiselect caret (40px wide). */\r\n.ptm-search-clear {\r\n  position: absolute;\r\n  top: 50%;\r\n  right: 40px;\r\n  z-index: 51;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  width: 24px;\r\n  height: 24px;\r\n  margin-top: -12px;\r\n  padding: 0;\r\n  border: 0;\r\n  background: none;\r\n  color: var(--ptm-muted);\r\n  cursor: pointer;\r\n  transition: color 0.2s;\r\n}\r\n\r\n.ptm-search-clear[hidden] {\r\n  display: none;\r\n}\r\n\r\n.ptm-search-clear:hover,\r\n.ptm-search-clear:focus-visible {\r\n  color: var(--ptm-beige);\r\n}\r\n";
+  var feature_default12 = ".search-left:has(> .ptm-search-clear) {\n  position: relative;\n}\n\n.search-left:has(> .ptm-search-clear:not([hidden])) .multiselect__tags {\n  padding-right: 68px;\n}\n\n/* Left of the multiselect caret (40px wide). */\n.ptm-search-clear {\n  position: absolute;\n  top: 50%;\n  right: 40px;\n  z-index: 51;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 24px;\n  height: 24px;\n  margin-top: -12px;\n  padding: 0;\n  border: 0;\n  background: none;\n  color: var(--ptm-muted);\n  cursor: pointer;\n  transition: color 0.2s;\n}\n\n.ptm-search-clear[hidden] {\n  display: none;\n}\n\n.ptm-search-clear:hover,\n.ptm-search-clear:focus-visible {\n  color: var(--ptm-beige);\n}\n";
 
   // src/features/search-clear/index.ts
   var t19 = createTranslator({
@@ -5358,7 +5358,7 @@ html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name 
   }
 
   // src/ui/core.css
-  var core_default = "/* Shared UI shell. Tokens and components follow DESIGN.md. Components are scoped to #ptm-root. */\r\n\r\n/* Tokens live on :root so feature styles inside the trade page can use them too. */\r\n:root {\r\n  --ptm-sidebar-width: 400px;\r\n  --ptm-focus: #c59a50;\r\n  --ptm-bg: rgba(10, 10, 10, 0.88);\r\n  --ptm-surface: #161616;\r\n  --ptm-input: #1e2124;\r\n  --ptm-blue: #0f304d;\r\n  --ptm-blue-hover: #133d62;\r\n  --ptm-blue-border: #4c4c7d;\r\n  --ptm-blue-line: rgba(76, 76, 125, 0.4);\r\n  --ptm-gold: #5a3806;\r\n  --ptm-gold-hover: #724708;\r\n  --ptm-gold-border: #8a5609;\r\n  --ptm-red: #5a0a09;\r\n  --ptm-red-hover: #710d0b;\r\n  --ptm-red-border: #6d2725;\r\n  --ptm-green: #4b7e42;\r\n  --ptm-green-border: #5e9954;\r\n  --ptm-yellow: #666521;\r\n  --ptm-yellow-border: #7a7921;\r\n  --ptm-text: #ffffff;\r\n  --ptm-beige: #fff8e1;\r\n  --ptm-muted: #a38d6d;\r\n  --ptm-menu: #373737;\r\n  --ptm-menu-border: #7a7a7a;\r\n  --ptm-font-title: FontinSmallCaps, FontinSmallcaps, Verdana, Arial, sans-serif;\r\n  --ptm-font-body: Verdana, Arial, Helvetica, sans-serif;\r\n}\r\n\r\n#ptm-root {\r\n  font-family: var(--ptm-font-body);\r\n  font-size: 13px;\r\n  color: var(--ptm-text);\r\n  line-height: 1.35;\r\n}\r\n\r\n#ptm-root *,\r\n#ptm-root *::before,\r\n#ptm-root *::after {\r\n  box-sizing: border-box;\r\n}\r\n\r\n#ptm-root button {\r\n  font: inherit;\r\n  color: inherit;\r\n}\r\n\r\n/* Page gets pushed left instead of being covered (Better Trading overlays it since PoE2 0.5). */\r\nhtml.ptm-sidebar-open body {\r\n  padding-right: var(--ptm-sidebar-width, 400px);\r\n}\r\n\r\n/* Animate only after boot, so the first paint does not slide. */\r\nhtml.ptm-ready body {\r\n  transition: padding-right 0.2s;\r\n}\r\n\r\n/* Small windows: the sidebar covers the page instead of squeezing it. */\r\n@media (max-width: 999px) {\r\n  html.ptm-sidebar-open body {\r\n    padding-right: 0;\r\n  }\r\n\r\n  /* Covering the page, so the page must not show through. */\r\n  html .ptm-sidebar {\r\n    background: #0a0a0a;\r\n  }\r\n}\r\n\r\n.ptm-icon {\r\n  flex: none;\r\n  vertical-align: middle;\r\n}\r\n\r\n/* Sidebar */\r\n\r\n.ptm-sidebar {\r\n  position: fixed;\r\n  top: 0;\r\n  right: 0;\r\n  bottom: 0;\r\n  width: min(var(--ptm-sidebar-width), 100vw);\r\n  z-index: 1000;\r\n  display: flex;\r\n  flex-direction: column;\r\n  padding: 5px 10px;\r\n  background: var(--ptm-bg);\r\n  border-left: 1px solid #000;\r\n  transition: right 0.2s;\r\n}\r\n\r\nhtml:not(.ptm-sidebar-open) .ptm-sidebar {\r\n  right: calc(-1 * var(--ptm-sidebar-width) - 2px);\r\n}\r\n\r\n.ptm-sidebar__header {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  padding: 4px 0 8px;\r\n}\r\n\r\n.ptm-sidebar__brand {\r\n  flex: 1;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  gap: 8px;\r\n  font-family: var(--ptm-font-title);\r\n  font-size: 20px;\r\n  color: var(--ptm-beige);\r\n  white-space: nowrap;\r\n}\r\n\r\n.ptm-sidebar__brand .ptm-logo {\r\n  transition: transform 0.2s;\r\n}\r\n\r\n.ptm-sidebar__brand:hover .ptm-logo {\r\n  transform: rotate(5deg);\r\n}\r\n\r\n.ptm-sidebar__panel {\r\n  flex: 1;\r\n  overflow-x: hidden;\r\n  overflow-y: auto;\r\n  padding: 8px 0;\r\n  scrollbar-width: thin;\r\n}\r\n\r\n.ptm-expand-tab {\r\n  position: fixed;\r\n  top: 50px;\r\n  right: 0;\r\n  z-index: 1000;\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 6px;\r\n  padding: 6px 8px 6px 10px;\r\n  border: 1px solid var(--ptm-blue-border);\r\n  border-right: 0;\r\n  background: var(--ptm-blue);\r\n  cursor: pointer;\r\n  transition: padding-left 0.2s, background-color 0.2s;\r\n}\r\n\r\n.ptm-expand-tab:hover {\r\n  padding-left: 15px;\r\n  background: var(--ptm-blue-hover);\r\n}\r\n\r\n/* Tabs */\r\n\r\n.ptm-tabs {\r\n  display: flex;\r\n}\r\n\r\n.ptm-tab {\r\n  flex: 1;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  gap: 5px;\r\n  padding: 6px 0;\r\n  border: 0;\r\n  border-bottom: 2px solid transparent;\r\n  background: none;\r\n  font-family: var(--ptm-font-title) !important;\r\n  font-size: 14px;\r\n  cursor: pointer;\r\n}\r\n\r\n.ptm-tab:hover {\r\n  background: rgba(90, 56, 6, 0.2);\r\n}\r\n\r\n.ptm-tab--active {\r\n  border-bottom-color: var(--ptm-gold-border);\r\n}\r\n\r\n/* Buttons: one height, one font, no wrapping. Variants only change colours. */\r\n\r\n.ptm-btn {\r\n  display: inline-flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  gap: 6px;\r\n  height: 30px;\r\n  min-width: 0;\r\n  padding: 0 12px;\r\n  border: 1px solid;\r\n  border-radius: 0;\r\n  font-family: var(--ptm-font-title) !important;\r\n  font-size: 13px;\r\n  line-height: 1;\r\n  letter-spacing: 0.3px;\r\n  white-space: nowrap;\r\n  color: var(--ptm-text);\r\n  cursor: pointer;\r\n  transition: background-color 0.15s, border-color 0.15s, color 0.15s;\r\n  user-select: none;\r\n}\r\n\r\na.ptm-btn,\r\na.ptm-btn:hover {\r\n  text-decoration: none;\r\n}\r\n\r\n.ptm-btn > span {\r\n  overflow: hidden;\r\n  text-overflow: ellipsis;\r\n}\r\n\r\n:is(#ptm-root, .ptm-qf) :is(a, button, input, select, textarea, [tabindex]):focus-visible,\r\n:is(.ptm-mod-action, .ptm-stat-star, .ptm-search-clear, .ptm-pin-btn, .ptm-regroup-btn, .ptm-stat-presets button):focus-visible {\r\n  outline: 2px solid var(--ptm-focus, #c59a50);\r\n  outline-offset: 1px;\r\n}\r\n\r\n/* Joined buttons overlap their borders: lift the focused one so its ring stays visible. */\r\n.ptm-btn:focus-visible {\r\n  position: relative;\r\n  z-index: 1;\r\n}\r\n\r\n.ptm-btn:disabled {\r\n  opacity: 0.45;\r\n  cursor: default;\r\n}\r\n\r\n.ptm-btn--sm {\r\n  height: 26px;\r\n  padding: 0 9px;\r\n  font-size: 12px;\r\n  gap: 4px;\r\n}\r\n\r\n.ptm-btn--block {\r\n  display: flex;\r\n  width: 100%;\r\n}\r\n\r\n.ptm-btn--blue { background: var(--ptm-blue); border-color: var(--ptm-blue-border); }\r\n.ptm-btn--blue:hover:not(:disabled) { background: var(--ptm-blue-hover); }\r\n.ptm-btn--gold { background: var(--ptm-gold); border-color: var(--ptm-gold-border); }\r\n.ptm-btn--gold:hover:not(:disabled) { background: var(--ptm-gold-hover); }\r\n.ptm-btn--red { background: var(--ptm-red); border-color: var(--ptm-red-border); }\r\n.ptm-btn--red:hover:not(:disabled) { background: var(--ptm-red-hover); }\r\n.ptm-btn--plain { background: rgba(255, 255, 255, 0.03); border-color: #3a3a3a; color: var(--ptm-beige); }\r\n.ptm-btn--plain:hover:not(:disabled) { background: rgba(255, 255, 255, 0.08); border-color: var(--ptm-menu-border); }\r\n\r\n/* Pressed toggles look the same in every variant. */\r\n.ptm-btn.ptm-btn--active {\r\n  background: var(--ptm-gold);\r\n  border-color: #c59a50;\r\n  color: #f3d278;\r\n}\r\n\r\n/* Groups: buttons share borders, no gaps, outer group decides the width. */\r\n.ptm-btn-group {\r\n  display: inline-flex;\r\n  max-width: 100%;\r\n}\r\n\r\n.ptm-btn-group > * + * {\r\n  margin-left: -1px;\r\n}\r\n\r\n.ptm-btn-group > .ptm-btn:hover:not(:disabled) {\r\n  position: relative;\r\n  z-index: 1;\r\n}\r\n\r\n.ptm-btn-group--block {\r\n  display: flex;\r\n  width: 100%;\r\n}\r\n\r\n.ptm-btn-group--block > * {\r\n  flex: 1 1 0;\r\n  min-width: 0;\r\n}\r\n\r\n/* Stack of groups, e.g. a panel footer. */\r\n.ptm-actions {\r\n  display: grid;\r\n  gap: 6px;\r\n  margin-top: 10px;\r\n}\r\n\r\n/* The site's CSS shows hidden file inputs; keep [hidden] meaning hidden inside our UI. */\r\n#ptm-root [hidden] {\r\n  display: none !important;\r\n}\r\n\r\n.ptm-icon-btn {\r\n  display: inline-flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  min-width: 24px;\r\n  height: 24px;\r\n  padding: 0 3px;\r\n  border: 0;\r\n  background: none;\r\n  color: rgba(255, 255, 255, 0.8);\r\n  cursor: pointer;\r\n}\r\n\r\n.ptm-icon-btn:hover {\r\n  color: #fff;\r\n}\r\n\r\n.ptm-toolbar {\r\n  display: flex;\r\n  flex-wrap: wrap;\r\n  justify-content: flex-end;\r\n  gap: 5px;\r\n  margin-bottom: 8px;\r\n}\r\n\r\n\r\n/* Menu */\r\n\r\n.ptm-menu {\r\n  position: relative;\r\n}\r\n\r\n.ptm-menu__list {\r\n  position: absolute;\r\n  top: 100%;\r\n  right: 0;\r\n  z-index: 10;\r\n  width: 200px;\r\n  margin: 2px 0 0;\r\n  padding: 0;\r\n  list-style: none;\r\n  background: var(--ptm-menu);\r\n  border: 1px solid var(--ptm-menu-border);\r\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);\r\n}\r\n\r\n.ptm-menu__item {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  width: 100%;\r\n  padding: 5px 8px;\r\n  border: 0;\r\n  background: none;\r\n  font-family: var(--ptm-font-body) !important;\r\n  font-size: 13px;\r\n  text-align: left;\r\n  cursor: pointer;\r\n}\r\n\r\n.ptm-menu__item:hover {\r\n  background: linear-gradient(90deg, var(--ptm-menu-border), transparent);\r\n}\r\n\r\n.ptm-menu__item--danger {\r\n  color: #ef7d7d !important;\r\n}\r\n\r\n/* Modal */\r\n\r\n.ptm-modal-overlay {\r\n  position: fixed;\r\n  inset: 0;\r\n  z-index: 1100;\r\n  display: flex;\r\n  align-items: flex-start;\r\n  justify-content: center;\r\n  padding-top: 8vh;\r\n  background: rgba(0, 0, 0, 0.6);\r\n  animation: ptm-fade-in 0.2s;\r\n}\r\n\r\n.ptm-modal {\r\n  max-height: 84vh;\r\n  display: flex;\r\n  flex-direction: column;\r\n  background: rgba(20, 20, 20, 0.95);\r\n  border: 1px solid var(--ptm-gold-border);\r\n  backdrop-filter: blur(2px);\r\n  animation: ptm-slide-in 0.2s;\r\n}\r\n\r\n.ptm-modal__header {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 10px;\r\n  padding: 10px 12px;\r\n  border-bottom: 1px solid var(--ptm-gold-border);\r\n}\r\n\r\n.ptm-modal__title {\r\n  flex: 1;\r\n  margin: 0;\r\n  font-family: var(--ptm-font-title);\r\n  font-size: 15px;\r\n  font-weight: normal;\r\n  text-transform: uppercase;\r\n  letter-spacing: 0.5px;\r\n  color: var(--ptm-beige);\r\n}\r\n\r\n.ptm-modal__body {\r\n  overflow-y: auto;\r\n  padding: 14px;\r\n  display: grid;\r\n  gap: 14px;\r\n}\r\n\r\n.ptm-modal__footer {\r\n  display: flex;\r\n  justify-content: flex-end;\r\n  gap: 5px;\r\n  padding: 10px 14px;\r\n  border-top: 1px solid rgba(138, 86, 9, 0.5);\r\n}\r\n\r\n/* Forms */\r\n\r\n.ptm-field {\r\n  display: grid;\r\n  gap: 6px;\r\n}\r\n\r\n.ptm-field__label {\r\n  font-family: var(--ptm-font-title);\r\n  font-size: 15px;\r\n  letter-spacing: 0.5px;\r\n  color: var(--ptm-beige);\r\n}\r\n\r\n.ptm-field__hint {\r\n  font-size: 11px;\r\n  color: rgba(255, 248, 225, 0.7);\r\n}\r\n\r\n.ptm-input {\r\n  width: 100%;\r\n  height: 30px;\r\n  padding: 0 8px;\r\n  border: 1px solid transparent;\r\n  background: var(--ptm-input);\r\n  color: var(--ptm-text);\r\n  font-family: var(--ptm-font-body);\r\n  font-size: 13px;\r\n}\r\n\r\n.ptm-input:focus {\r\n  outline: 2px solid var(--ptm-focus);\r\n  outline-offset: 0;\r\n  border-color: var(--ptm-gold-border);\r\n}\r\n\r\n.ptm-textarea {\r\n  height: 120px;\r\n  padding: 6px 8px;\r\n  resize: vertical;\r\n  font-family: Consolas, monospace;\r\n  font-size: 12px;\r\n}\r\n\r\n.ptm-checkbox {\r\n  display: flex;\r\n  align-items: flex-start;\r\n  gap: 8px;\r\n  cursor: pointer;\r\n}\r\n\r\n.ptm-checkbox input {\r\n  position: absolute;\r\n  opacity: 0;\r\n  pointer-events: none;\r\n}\r\n\r\n.ptm-checkbox__box {\r\n  flex: none;\r\n  position: relative;\r\n  width: 15px;\r\n  height: 15px;\r\n  margin-top: 1px;\r\n  border: 2px solid #8a6a3a;\r\n}\r\n\r\n.ptm-checkbox__box::after {\r\n  content: '';\r\n  position: absolute;\r\n  inset: 2px;\r\n  background: #fff;\r\n  transform: scale(0);\r\n  transition: transform 0.15s;\r\n}\r\n\r\n.ptm-checkbox input:checked + .ptm-checkbox__box::after {\r\n  transform: scale(1);\r\n}\r\n\r\n.ptm-checkbox input:focus-visible + .ptm-checkbox__box {\r\n  outline: 1px solid var(--ptm-gold-border);\r\n}\r\n\r\n.ptm-checkbox__text {\r\n  display: grid;\r\n  gap: 2px;\r\n}\r\n\r\n.ptm-checkbox__label {\r\n  font-family: var(--ptm-font-title);\r\n  font-size: 14px;\r\n  color: var(--ptm-beige);\r\n}\r\n\r\n.ptm-checkbox__description {\r\n  font-size: 11px;\r\n  color: var(--ptm-muted);\r\n}\r\n\r\n.ptm-settings-grid {\r\n  display: grid;\r\n  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));\r\n  gap: 12px 18px;\r\n}\r\n\r\n.ptm-section-title {\r\n  margin: 4px 0 0;\r\n  font-family: var(--ptm-font-title);\r\n  font-size: 15px;\r\n  font-weight: normal;\r\n  color: var(--ptm-beige);\r\n  border-bottom: 1px solid rgba(138, 86, 9, 0.5);\r\n  padding-bottom: 4px;\r\n}\r\n\r\n/* Text, alerts, toasts */\r\n\r\n.ptm-text {\r\n  margin: 0;\r\n}\r\n\r\n.ptm-meta {\r\n  margin: 0;\r\n  font-size: 11px;\r\n  color: var(--ptm-muted);\r\n}\r\n\r\n.ptm-meta a {\r\n  color: var(--ptm-beige);\r\n}\r\n\r\n.ptm-empty {\r\n  margin: 12px 0;\r\n  padding: 8px;\r\n  color: var(--ptm-muted);\r\n  text-align: center;\r\n}\r\n\r\n.ptm-alert {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 6px;\r\n  padding: 8px;\r\n  border: 1px solid;\r\n}\r\n\r\n.ptm-alert--warning { background: var(--ptm-yellow); border-color: var(--ptm-yellow-border); }\r\n.ptm-alert--error { background: var(--ptm-red); border-color: var(--ptm-red-border); }\r\n.ptm-alert--success { background: var(--ptm-green); border-color: var(--ptm-green-border); }\r\n\r\n.ptm-toasts {\r\n  position: fixed;\r\n  right: 30px;\r\n  bottom: 20px;\r\n  z-index: 1200;\r\n  display: grid;\r\n  gap: 6px;\r\n  justify-items: end;\r\n}\r\n\r\n.ptm-toasts > div {\r\n  display: grid;\r\n  gap: 6px;\r\n  justify-items: end;\r\n}\r\n\r\nhtml.ptm-sidebar-open .ptm-toasts {\r\n  right: calc(var(--ptm-sidebar-width) + 20px);\r\n}\r\n\r\n.ptm-toast {\r\n  max-width: 340px;\r\n  padding: 8px 12px;\r\n  border: 1px solid;\r\n  text-align: left;\r\n  cursor: pointer;\r\n  animation: ptm-slide-in 0.2s;\r\n}\r\n\r\n.ptm-toast--success { background: var(--ptm-green); border-color: var(--ptm-green-border); }\r\n.ptm-toast--warning { background: var(--ptm-yellow); border-color: var(--ptm-yellow-border); }\r\n.ptm-toast--error { background: var(--ptm-red); border-color: var(--ptm-red-border); }\r\n\r\n@keyframes ptm-fade-in {\r\n  from { opacity: 0; }\r\n}\r\n\r\n@keyframes ptm-slide-in {\r\n  from { opacity: 0; transform: translateY(10px); }\r\n}\r\n\r\n@media (prefers-reduced-motion: reduce) {\r\n  #ptm-root *,\r\n  .ptm-modal-overlay,\r\n  .ptm-modal,\r\n  .ptm-toast,\r\n  .ptm-pin-glow,\r\n  .ptm-mod-flash-ok,\r\n  .ptm-mod-flash-fail,\r\n  .ptm-mod-action,\r\n  .ptm-stat-star,\r\n  html.ptm-ready body {\r\n    animation: none !important;\r\n    transition: none !important;\r\n  }\r\n}\r\n";
+  var core_default = "/* Shared UI shell. Tokens and components follow DESIGN.md. Components are scoped to #ptm-root. */\n\n/* Tokens live on :root so feature styles inside the trade page can use them too. */\n:root {\n  --ptm-sidebar-width: 400px;\n  --ptm-focus: #c59a50;\n  --ptm-bg: rgba(10, 10, 10, 0.88);\n  --ptm-surface: #161616;\n  --ptm-input: #1e2124;\n  --ptm-blue: #0f304d;\n  --ptm-blue-hover: #133d62;\n  --ptm-blue-border: #4c4c7d;\n  --ptm-blue-line: rgba(76, 76, 125, 0.4);\n  --ptm-gold: #5a3806;\n  --ptm-gold-hover: #724708;\n  --ptm-gold-border: #8a5609;\n  --ptm-red: #5a0a09;\n  --ptm-red-hover: #710d0b;\n  --ptm-red-border: #6d2725;\n  --ptm-green: #4b7e42;\n  --ptm-green-border: #5e9954;\n  --ptm-yellow: #666521;\n  --ptm-yellow-border: #7a7921;\n  --ptm-text: #ffffff;\n  --ptm-beige: #fff8e1;\n  --ptm-muted: #a38d6d;\n  --ptm-menu: #373737;\n  --ptm-menu-border: #7a7a7a;\n  --ptm-font-title: FontinSmallCaps, FontinSmallcaps, Verdana, Arial, sans-serif;\n  --ptm-font-body: Verdana, Arial, Helvetica, sans-serif;\n}\n\n#ptm-root {\n  font-family: var(--ptm-font-body);\n  font-size: 13px;\n  color: var(--ptm-text);\n  line-height: 1.35;\n}\n\n#ptm-root *,\n#ptm-root *::before,\n#ptm-root *::after {\n  box-sizing: border-box;\n}\n\n#ptm-root button {\n  font: inherit;\n  color: inherit;\n}\n\n/* Page gets pushed left instead of being covered (Better Trading overlays it since PoE2 0.5). */\nhtml.ptm-sidebar-open body {\n  padding-right: var(--ptm-sidebar-width, 400px);\n}\n\n/* Animate only after boot, so the first paint does not slide. */\nhtml.ptm-ready body {\n  transition: padding-right 0.2s;\n}\n\n/* Small windows: the sidebar covers the page instead of squeezing it. */\n@media (max-width: 999px) {\n  html.ptm-sidebar-open body {\n    padding-right: 0;\n  }\n\n  /* Covering the page, so the page must not show through. */\n  html .ptm-sidebar {\n    background: #0a0a0a;\n  }\n}\n\n.ptm-icon {\n  flex: none;\n  vertical-align: middle;\n}\n\n/* Sidebar */\n\n.ptm-sidebar {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  width: min(var(--ptm-sidebar-width), 100vw);\n  z-index: 1000;\n  display: flex;\n  flex-direction: column;\n  padding: 5px 10px;\n  background: var(--ptm-bg);\n  border-left: 1px solid #000;\n  transition: right 0.2s;\n}\n\nhtml:not(.ptm-sidebar-open) .ptm-sidebar {\n  right: calc(-1 * var(--ptm-sidebar-width) - 2px);\n}\n\n.ptm-sidebar__header {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  padding: 4px 0 8px;\n}\n\n.ptm-sidebar__brand {\n  flex: 1;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  gap: 8px;\n  font-family: var(--ptm-font-title);\n  font-size: 20px;\n  color: var(--ptm-beige);\n  white-space: nowrap;\n}\n\n.ptm-sidebar__brand .ptm-logo {\n  transition: transform 0.2s;\n}\n\n.ptm-sidebar__brand:hover .ptm-logo {\n  transform: rotate(5deg);\n}\n\n.ptm-sidebar__panel {\n  flex: 1;\n  overflow-x: hidden;\n  overflow-y: auto;\n  padding: 8px 0;\n  scrollbar-width: thin;\n}\n\n.ptm-expand-tab {\n  position: fixed;\n  top: 50px;\n  right: 0;\n  z-index: 1000;\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  padding: 6px 8px 6px 10px;\n  border: 1px solid var(--ptm-blue-border);\n  border-right: 0;\n  background: var(--ptm-blue);\n  cursor: pointer;\n  transition: padding-left 0.2s, background-color 0.2s;\n}\n\n.ptm-expand-tab:hover {\n  padding-left: 15px;\n  background: var(--ptm-blue-hover);\n}\n\n/* Tabs */\n\n.ptm-tabs {\n  display: flex;\n}\n\n.ptm-tab {\n  flex: 1;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  gap: 5px;\n  padding: 6px 0;\n  border: 0;\n  border-bottom: 2px solid transparent;\n  background: none;\n  font-family: var(--ptm-font-title) !important;\n  font-size: 14px;\n  cursor: pointer;\n}\n\n.ptm-tab:hover {\n  background: rgba(90, 56, 6, 0.2);\n}\n\n.ptm-tab--active {\n  border-bottom-color: var(--ptm-gold-border);\n}\n\n/* Buttons: one height, one font, no wrapping. Variants only change colours. */\n\n.ptm-btn {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  gap: 6px;\n  height: 30px;\n  min-width: 0;\n  padding: 0 12px;\n  border: 1px solid;\n  border-radius: 0;\n  font-family: var(--ptm-font-title) !important;\n  font-size: 13px;\n  line-height: 1;\n  letter-spacing: 0.3px;\n  white-space: nowrap;\n  color: var(--ptm-text);\n  cursor: pointer;\n  transition: background-color 0.15s, border-color 0.15s, color 0.15s;\n  user-select: none;\n}\n\na.ptm-btn,\na.ptm-btn:hover {\n  text-decoration: none;\n}\n\n.ptm-btn > span {\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n\n:is(#ptm-root, .ptm-qf) :is(a, button, input, select, textarea, [tabindex]):focus-visible,\n:is(.ptm-mod-action, .ptm-stat-star, .ptm-search-clear, .ptm-pin-btn, .ptm-regroup-btn, .ptm-stat-presets button):focus-visible {\n  outline: 2px solid var(--ptm-focus, #c59a50);\n  outline-offset: 1px;\n}\n\n/* Joined buttons overlap their borders: lift the focused one so its ring stays visible. */\n.ptm-btn:focus-visible {\n  position: relative;\n  z-index: 1;\n}\n\n.ptm-btn:disabled {\n  opacity: 0.45;\n  cursor: default;\n}\n\n.ptm-btn--sm {\n  height: 26px;\n  padding: 0 9px;\n  font-size: 12px;\n  gap: 4px;\n}\n\n.ptm-btn--block {\n  display: flex;\n  width: 100%;\n}\n\n.ptm-btn--blue { background: var(--ptm-blue); border-color: var(--ptm-blue-border); }\n.ptm-btn--blue:hover:not(:disabled) { background: var(--ptm-blue-hover); }\n.ptm-btn--gold { background: var(--ptm-gold); border-color: var(--ptm-gold-border); }\n.ptm-btn--gold:hover:not(:disabled) { background: var(--ptm-gold-hover); }\n.ptm-btn--red { background: var(--ptm-red); border-color: var(--ptm-red-border); }\n.ptm-btn--red:hover:not(:disabled) { background: var(--ptm-red-hover); }\n.ptm-btn--plain { background: rgba(255, 255, 255, 0.03); border-color: #3a3a3a; color: var(--ptm-beige); }\n.ptm-btn--plain:hover:not(:disabled) { background: rgba(255, 255, 255, 0.08); border-color: var(--ptm-menu-border); }\n\n/* Pressed toggles look the same in every variant. */\n.ptm-btn.ptm-btn--active {\n  background: var(--ptm-gold);\n  border-color: #c59a50;\n  color: #f3d278;\n}\n\n/* Groups: buttons share borders, no gaps, outer group decides the width. */\n.ptm-btn-group {\n  display: inline-flex;\n  max-width: 100%;\n}\n\n.ptm-btn-group > * + * {\n  margin-left: -1px;\n}\n\n.ptm-btn-group > .ptm-btn:hover:not(:disabled) {\n  position: relative;\n  z-index: 1;\n}\n\n.ptm-btn-group--block {\n  display: flex;\n  width: 100%;\n}\n\n.ptm-btn-group--block > * {\n  flex: 1 1 0;\n  min-width: 0;\n}\n\n/* Stack of groups, e.g. a panel footer. */\n.ptm-actions {\n  display: grid;\n  gap: 6px;\n  margin-top: 10px;\n}\n\n/* The site's CSS shows hidden file inputs; keep [hidden] meaning hidden inside our UI. */\n#ptm-root [hidden] {\n  display: none !important;\n}\n\n.ptm-icon-btn {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  min-width: 24px;\n  height: 24px;\n  padding: 0 3px;\n  border: 0;\n  background: none;\n  color: rgba(255, 255, 255, 0.8);\n  cursor: pointer;\n}\n\n.ptm-icon-btn:hover {\n  color: #fff;\n}\n\n.ptm-toolbar {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: flex-end;\n  gap: 5px;\n  margin-bottom: 8px;\n}\n\n\n/* Menu */\n\n.ptm-menu {\n  position: relative;\n}\n\n.ptm-menu__list {\n  position: absolute;\n  top: 100%;\n  right: 0;\n  z-index: 10;\n  width: 200px;\n  margin: 2px 0 0;\n  padding: 0;\n  list-style: none;\n  background: var(--ptm-menu);\n  border: 1px solid var(--ptm-menu-border);\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);\n}\n\n.ptm-menu__item {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  width: 100%;\n  padding: 5px 8px;\n  border: 0;\n  background: none;\n  font-family: var(--ptm-font-body) !important;\n  font-size: 13px;\n  text-align: left;\n  cursor: pointer;\n}\n\n.ptm-menu__item:hover {\n  background: linear-gradient(90deg, var(--ptm-menu-border), transparent);\n}\n\n.ptm-menu__item--danger {\n  color: #ef7d7d !important;\n}\n\n/* Modal */\n\n.ptm-modal-overlay {\n  position: fixed;\n  inset: 0;\n  z-index: 1100;\n  display: flex;\n  align-items: flex-start;\n  justify-content: center;\n  padding-top: 8vh;\n  background: rgba(0, 0, 0, 0.6);\n  animation: ptm-fade-in 0.2s;\n}\n\n.ptm-modal {\n  max-height: 84vh;\n  display: flex;\n  flex-direction: column;\n  background: rgba(20, 20, 20, 0.95);\n  border: 1px solid var(--ptm-gold-border);\n  backdrop-filter: blur(2px);\n  animation: ptm-slide-in 0.2s;\n}\n\n.ptm-modal__header {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  padding: 10px 12px;\n  border-bottom: 1px solid var(--ptm-gold-border);\n}\n\n.ptm-modal__title {\n  flex: 1;\n  margin: 0;\n  font-family: var(--ptm-font-title);\n  font-size: 15px;\n  font-weight: normal;\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n  color: var(--ptm-beige);\n}\n\n.ptm-modal__body {\n  overflow-y: auto;\n  padding: 14px;\n  display: grid;\n  gap: 14px;\n}\n\n.ptm-modal__footer {\n  display: flex;\n  justify-content: flex-end;\n  gap: 5px;\n  padding: 10px 14px;\n  border-top: 1px solid rgba(138, 86, 9, 0.5);\n}\n\n/* Forms */\n\n.ptm-field {\n  display: grid;\n  gap: 6px;\n}\n\n.ptm-field__label {\n  font-family: var(--ptm-font-title);\n  font-size: 15px;\n  letter-spacing: 0.5px;\n  color: var(--ptm-beige);\n}\n\n.ptm-field__hint {\n  font-size: 11px;\n  color: rgba(255, 248, 225, 0.7);\n}\n\n.ptm-input {\n  width: 100%;\n  height: 30px;\n  padding: 0 8px;\n  border: 1px solid transparent;\n  background: var(--ptm-input);\n  color: var(--ptm-text);\n  font-family: var(--ptm-font-body);\n  font-size: 13px;\n}\n\n.ptm-input:focus {\n  outline: 2px solid var(--ptm-focus);\n  outline-offset: 0;\n  border-color: var(--ptm-gold-border);\n}\n\n.ptm-textarea {\n  height: 120px;\n  padding: 6px 8px;\n  resize: vertical;\n  font-family: Consolas, monospace;\n  font-size: 12px;\n}\n\n.ptm-checkbox {\n  display: flex;\n  align-items: flex-start;\n  gap: 8px;\n  cursor: pointer;\n}\n\n.ptm-checkbox input {\n  position: absolute;\n  opacity: 0;\n  pointer-events: none;\n}\n\n.ptm-checkbox__box {\n  flex: none;\n  position: relative;\n  width: 15px;\n  height: 15px;\n  margin-top: 1px;\n  border: 2px solid #8a6a3a;\n}\n\n.ptm-checkbox__box::after {\n  content: '';\n  position: absolute;\n  inset: 2px;\n  background: #fff;\n  transform: scale(0);\n  transition: transform 0.15s;\n}\n\n.ptm-checkbox input:checked + .ptm-checkbox__box::after {\n  transform: scale(1);\n}\n\n.ptm-checkbox input:focus-visible + .ptm-checkbox__box {\n  outline: 1px solid var(--ptm-gold-border);\n}\n\n.ptm-checkbox__text {\n  display: grid;\n  gap: 2px;\n}\n\n.ptm-checkbox__label {\n  font-family: var(--ptm-font-title);\n  font-size: 14px;\n  color: var(--ptm-beige);\n}\n\n.ptm-checkbox__description {\n  font-size: 11px;\n  color: var(--ptm-muted);\n}\n\n.ptm-settings-grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));\n  gap: 12px 18px;\n}\n\n.ptm-section-title {\n  margin: 4px 0 0;\n  font-family: var(--ptm-font-title);\n  font-size: 15px;\n  font-weight: normal;\n  color: var(--ptm-beige);\n  border-bottom: 1px solid rgba(138, 86, 9, 0.5);\n  padding-bottom: 4px;\n}\n\n/* Text, alerts, toasts */\n\n.ptm-text {\n  margin: 0;\n}\n\n.ptm-meta {\n  margin: 0;\n  font-size: 11px;\n  color: var(--ptm-muted);\n}\n\n.ptm-meta a {\n  color: var(--ptm-beige);\n}\n\n.ptm-empty {\n  margin: 12px 0;\n  padding: 8px;\n  color: var(--ptm-muted);\n  text-align: center;\n}\n\n.ptm-alert {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  padding: 8px;\n  border: 1px solid;\n}\n\n.ptm-alert--warning { background: var(--ptm-yellow); border-color: var(--ptm-yellow-border); }\n.ptm-alert--error { background: var(--ptm-red); border-color: var(--ptm-red-border); }\n.ptm-alert--success { background: var(--ptm-green); border-color: var(--ptm-green-border); }\n\n.ptm-toasts {\n  position: fixed;\n  right: 30px;\n  bottom: 20px;\n  z-index: 1200;\n  display: grid;\n  gap: 6px;\n  justify-items: end;\n}\n\n.ptm-toasts > div {\n  display: grid;\n  gap: 6px;\n  justify-items: end;\n}\n\nhtml.ptm-sidebar-open .ptm-toasts {\n  right: calc(var(--ptm-sidebar-width) + 20px);\n}\n\n.ptm-toast {\n  max-width: 340px;\n  padding: 8px 12px;\n  border: 1px solid;\n  text-align: left;\n  cursor: pointer;\n  animation: ptm-slide-in 0.2s;\n}\n\n.ptm-toast--success { background: var(--ptm-green); border-color: var(--ptm-green-border); }\n.ptm-toast--warning { background: var(--ptm-yellow); border-color: var(--ptm-yellow-border); }\n.ptm-toast--error { background: var(--ptm-red); border-color: var(--ptm-red-border); }\n\n@keyframes ptm-fade-in {\n  from { opacity: 0; }\n}\n\n@keyframes ptm-slide-in {\n  from { opacity: 0; transform: translateY(10px); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  #ptm-root *,\n  .ptm-modal-overlay,\n  .ptm-modal,\n  .ptm-toast,\n  .ptm-pin-glow,\n  .ptm-mod-flash-ok,\n  .ptm-mod-flash-fail,\n  .ptm-mod-action,\n  .ptm-stat-star,\n  html.ptm-ready body {\n    animation: none !important;\n    transition: none !important;\n  }\n}\n";
 
   // src/main.tsx
   var bridge = new PageBridge(window);
