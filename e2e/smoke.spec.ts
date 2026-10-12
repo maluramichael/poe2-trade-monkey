@@ -121,11 +121,20 @@ test('settings: switching Bookmarks off removes its tab', async ({ page }) => {
 test('fuzzy search: opening the item search adds ~ and selects the rest', async ({ page }) => {
   await open(page);
   const input = page.locator('#trade .search-bar .search-left .multiselect__input');
-  await input.fill('Gold');
-  // The fake site has no vue-multiselect, so toggle its open class like Vue would.
-  await input.evaluate((el) => el.closest('.multiselect')!.classList.add('multiselect--active'));
+  // The fake site has no vue-multiselect, so set its search text and open class like Vue would.
+  await input.evaluate((el: HTMLInputElement) => {
+    el.value = 'Gold';
+    el.closest('.multiselect')!.classList.add('multiselect--active');
+  });
   await expect(input).toHaveValue('~Gold');
   expect(await input.evaluate((el: HTMLInputElement) => [el.selectionStart, el.selectionEnd])).toEqual([1, 5]);
+
+  // Backspace on the tilde: it comes straight back.
+  await input.focus(); // focusing moves the caret in Firefox, so place it afterwards
+  await input.evaluate((el: HTMLInputElement) => el.setSelectionRange(1, 1));
+  await input.press('Backspace');
+  await expect(input).toHaveValue('~Gold');
+  expect(await input.evaluate((el: HTMLInputElement) => el.selectionStart)).toBe(1);
 });
 
 test('stat presets: rarity adds a weighted sum group over every source', async ({ page }) => {

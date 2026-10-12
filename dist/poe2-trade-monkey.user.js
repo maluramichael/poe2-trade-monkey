@@ -2,7 +2,7 @@
 // @name            PoE2 Trade Monkey
 // @name:de         PoE2 Trade Monkey
 // @namespace       https://github.com/maluramichael/poe2-trade-monkey
-// @version         0.4.0
+// @version         0.4.1
 // @description     Userscript that enhances the Path of Exile 2 trade site: bookmarks, history, pins, layout and result tools.
 // @description:de  Erweitert die Trade-Seite von Path of Exile 2: Lesezeichen für jede Liga, Verlauf, Pins, Schnellfilter, Zwei-Spalten-Layout und Werkzeuge für die Ergebnisse.
 // @author          Michael Malura
@@ -4809,28 +4809,36 @@ html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name 
     }
   });
   var ACTIVE = "multiselect--active";
+  function searchInput(el) {
+    return el instanceof HTMLInputElement && el.matches(".multiselect__input") && !!el.closest(sel.tradeRoot);
+  }
   function start6({ doc }) {
-    const handled = /* @__PURE__ */ new WeakSet();
     const observer = new MutationObserver((records) => {
       for (const { target } of records) {
         const select = target;
-        if (!select.classList.contains("multiselect") || !select.closest(sel.tradeRoot)) continue;
-        if (!select.classList.contains(ACTIVE)) {
-          handled.delete(select);
-          continue;
-        }
-        if (handled.has(select)) continue;
+        if (!select.classList.contains("multiselect") || !select.classList.contains(ACTIVE)) continue;
         const input = select.querySelector(".multiselect__input");
-        if (!input) continue;
-        handled.add(select);
-        if (input.value.startsWith("~")) continue;
+        if (!searchInput(input) || input.value.startsWith("~")) continue;
         input.value = `~${input.value}`;
         input.dispatchEvent(new Event("input", { bubbles: true }));
         input.setSelectionRange(1, input.value.length);
       }
     });
     observer.observe(doc.body, { attributes: true, attributeFilter: ["class"], subtree: true });
-    return { dispose: () => observer.disconnect() };
+    const onInput = (e3) => {
+      const input = e3.target;
+      if (!searchInput(input) || !input.value || input.value.startsWith("~") || e3.isComposing) return;
+      const caret = (input.selectionStart ?? 0) + 1;
+      input.value = `~${input.value}`;
+      input.setSelectionRange(caret, caret);
+    };
+    doc.addEventListener("input", onInput, true);
+    return {
+      dispose: () => {
+        observer.disconnect();
+        doc.removeEventListener("input", onInput, true);
+      }
+    };
   }
   var fuzzySearchFeature = {
     id: "fuzzy-search",
@@ -5243,7 +5251,7 @@ html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name 
         feature.id
       )) }),
       /* @__PURE__ */ u3("p", { class: "ptm-meta", children: [
-        t4("version", { version: "0.4.0" }),
+        t4("version", { version: "0.4.1" }),
         " ·",
         " ",
         /* @__PURE__ */ u3("a", { href: "https://github.com/maluramichael/poe2-trade-monkey", target: "_blank", rel: "noreferrer", children: t4("sourceCode") })
@@ -5416,7 +5424,7 @@ html.ptm-layout #vue3-portal .resultset > .row .details .btns > .character-name 
       void host.restart();
     });
     document.documentElement.classList.add("ptm-ready");
-    log.info(`v${"0.4.0"} ready with ${features.length} features`);
+    log.info(`v${"0.4.1"} ready with ${features.length} features`);
   }
   function waitForApp() {
     return Promise.race([bridge.whenReady().then(() => true), delay(3e4).then(() => false)]);

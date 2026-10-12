@@ -16,23 +16,18 @@ const t = createTranslator({
 
 const ACTIVE = 'multiselect--active';
 
-function start({ doc }: AppContext) {
-  // Multiselects already handled in their current activation, so a deleted tilde stays deleted.
-  const handled = new WeakSet<Element>();
+function searchInput(el: EventTarget | null): el is HTMLInputElement {
+  return el instanceof HTMLInputElement && el.matches('.multiselect__input') && !!el.closest(sel.tradeRoot);
+}
 
+function start({ doc }: AppContext) {
+  // On opening a multiselect: prefix the tilde and select the rest, so typing replaces it.
   const observer = new MutationObserver((records) => {
     for (const { target } of records) {
       const select = target as Element;
-      if (!select.classList.contains('multiselect') || !select.closest(sel.tradeRoot)) continue;
-      if (!select.classList.contains(ACTIVE)) {
-        handled.delete(select);
-        continue;
-      }
-      if (handled.has(select)) continue;
-      const input = select.querySelector<HTMLInputElement>('.multiselect__input');
-      if (!input) continue; // not searchable
-      handled.add(select);
-      if (input.value.startsWith('~')) continue;
+      if (!select.classList.contains('multiselect') || !select.classList.contains(ACTIVE)) continue;
+      const input = select.querySelector('.multiselect__input');
+      if (!searchInput(input) || input.value.startsWith('~')) continue; // not searchable or done
       input.value = `~${input.value}`;
       // vue-multiselect binds :value="search" and would reset the field on its next render
       // unless its search text learns about the tilde, so tell it like a keystroke would.
@@ -42,7 +37,23 @@ function start({ doc }: AppContext) {
   });
   observer.observe(doc.body, { attributes: true, attributeFilter: ['class'], subtree: true });
 
-  return { dispose: () => observer.disconnect() };
+  // While typing: a deleted tilde comes straight back. An empty field stays empty (clear button).
+  // Capture phase runs before vue-multiselect's own listener, so its search text sees the tilde.
+  const onInput = (e: Event) => {
+    const input = e.target;
+    if (!searchInput(input) || !input.value || input.value.startsWith('~') || (e as InputEvent).isComposing) return;
+    const caret = (input.selectionStart ?? 0) + 1;
+    input.value = `~${input.value}`;
+    input.setSelectionRange(caret, caret);
+  };
+  doc.addEventListener('input', onInput, true);
+
+  return {
+    dispose: () => {
+      observer.disconnect();
+      doc.removeEventListener('input', onInput, true);
+    },
+  };
 }
 
 export const fuzzySearchFeature: Feature = {

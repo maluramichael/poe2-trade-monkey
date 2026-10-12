@@ -48,14 +48,29 @@ describe('fuzzy search', () => {
     expect(typed).not.toHaveBeenCalled();
   });
 
-  it('keeps a deleted ~ deleted until the next activation', async () => {
+  it('puts a deleted ~ straight back, caret after the typed text', async () => {
+    const seen: string[] = [];
+    input().addEventListener('input', () => seen.push(input().value));
     await activate();
     expect(input().value).toBe('~');
     input().value = 'ring';
-    select().classList.add('multiselect--above'); // Vue touching the class while open
-    await flush();
-    expect(input().value).toBe('ring');
+    input().setSelectionRange(0, 0); // Backspace on the tilde leaves the caret at the start
+    input().dispatchEvent(new Event('input', { bubbles: true }));
+    expect(input().value).toBe('~ring');
+    expect(seen.at(-1)).toBe('~ring'); // Vue's listener already sees the tilde
+    expect([input().selectionStart, input().selectionEnd]).toEqual([1, 1]);
+  });
 
+  it('lets the field go empty', async () => {
+    await activate();
+    input().value = '';
+    input().dispatchEvent(new Event('input', { bubbles: true }));
+    expect(input().value).toBe('');
+  });
+
+  it('re-adds ~ on the next activation', async () => {
+    await activate();
+    input().value = 'ring';
     await deactivate();
     await activate();
     expect(input().value).toBe('~ring');
